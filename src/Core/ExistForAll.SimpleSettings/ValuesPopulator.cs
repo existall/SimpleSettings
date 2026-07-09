@@ -56,8 +56,8 @@ namespace ExistForAll.SimpleSettings
 			}
         }
 
-		private object ConvertPropertyValue(Type settingsType,
-			object value,
+		private object? ConvertPropertyValue(Type settingsType,
+			object? value,
 			PropertyInfo property,
 			SettingsOptions options)
 		{

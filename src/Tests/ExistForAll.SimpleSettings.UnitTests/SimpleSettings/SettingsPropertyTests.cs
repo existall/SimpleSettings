@@ -1,15 +1,13 @@
-﻿using Xunit;
-
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
 	public class SettingsPropertyTests
 	{
-		[Fact]
-		public void Build_WhenAllowEmptyIsFalse_ShouldThrowException()
+		[Test]
+		public async Task Build_WhenAllowEmptyIsFalse_ShouldThrowException()
 		{
 			var sut = SettingsBuilder.CreateBuilder();
 
-			Assert.Throws<SettingsPropertyValueException>(() => sut.GetSettings<IWithNonNullInterface>());
+			await Assert.That(() => sut.GetSettings<IWithNonNullInterface>()).Throws<SettingsPropertyValueException>();
 		}
 
 		public interface IWithNonNullInterface

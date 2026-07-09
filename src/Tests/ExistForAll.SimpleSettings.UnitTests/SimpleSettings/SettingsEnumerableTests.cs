@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
-using Xunit;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
@@ -11,19 +10,19 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
         private const int N4 = 4;
         private const int N103 = 103;
 
-        [Fact]
-        public void Build_WhereVariableHasValue_ShouldSetProperty()
+        [Test]
+        public async Task Build_WhereVariableHasValue_ShouldSetProperty()
         {
             var sut = SettingsBuilder.CreateBuilder();
 
             var result = sut.GetSettings<IEnumerableInterface>();
-            
-            Assert.Equal(4, result.Values.Count());
 
-            Assert.Contains(N12, result.Values);
-            Assert.Contains(N3, result.Values);
-            Assert.Contains(N4, result.Values);
-            Assert.Contains(N103, result.Values);
+            await Assert.That(result.Values.Count()).IsEqualTo(4);
+
+            await Assert.That(result.Values).Contains(N12);
+            await Assert.That(result.Values).Contains(N3);
+            await Assert.That(result.Values).Contains(N4);
+            await Assert.That(result.Values).Contains(N103);
         }
 
         [SettingsSection]

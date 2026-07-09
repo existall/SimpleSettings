@@ -37,7 +37,7 @@ namespace ExistForAll.SimpleSettings.Conversion
 
 			var configTypeConverter = _converters.First(x => x.CanConvert(elementType));
 
-			var instance = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+			var instance = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))!;
 			
 			foreach (var item in values)
 			{

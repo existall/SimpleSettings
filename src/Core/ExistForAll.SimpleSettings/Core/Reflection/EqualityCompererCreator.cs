@@ -15,10 +15,10 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			var method = typeBuilder.DefineMethod("Equals", MethodAttributes.Public | MethodAttributes.ReuseSlot | MethodAttributes.Virtual | MethodAttributes.HideBySig, typeof(bool), new[] { typeof(object) });
 
 			var methodGenerator = method.GetILGenerator();
-			var other = methodGenerator.DeclareLocal(typeBuilder.DeclaringType);
+			var other = methodGenerator.DeclareLocal(typeBuilder.DeclaringType!);
 			var next = methodGenerator.DefineLabel();
 			methodGenerator.Emit(OpCodes.Ldarg_1);
-			methodGenerator.Emit(OpCodes.Isinst, typeBuilder.DeclaringType);
+			methodGenerator.Emit(OpCodes.Isinst, typeBuilder.DeclaringType!);
 			methodGenerator.Emit(OpCodes.Stloc, other);
 			methodGenerator.Emit(OpCodes.Ldloc, other);
 			methodGenerator.Emit(OpCodes.Brtrue_S, next);
@@ -29,11 +29,11 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			{
 				var comparerType = typeof(EqualityComparer<>).MakeGenericType(field.FieldType).GetTypeInfo();
 				next = methodGenerator.DefineLabel();
-				methodGenerator.EmitCall(OpCodes.Call, comparerType.GetMethod("get_Default"), null);
+				methodGenerator.EmitCall(OpCodes.Call, comparerType.GetMethod("get_Default")!, null);
 				methodGenerator.Emit(OpCodes.Ldarg_0);
 				methodGenerator.Emit(OpCodes.Ldfld, field);
 				methodGenerator.Emit(OpCodes.Ldloc, other);
-				methodGenerator.EmitCall(OpCodes.Callvirt, comparerType.GetMethod("Equals", new[] { field.FieldType, field.FieldType }), null);
+				methodGenerator.EmitCall(OpCodes.Callvirt, comparerType.GetMethod("Equals", new[] { field.FieldType, field.FieldType })!, null);
 				methodGenerator.Emit(OpCodes.Brtrue_S, next);
 				methodGenerator.Emit(OpCodes.Ldc_I4);
 				methodGenerator.Emit(OpCodes.Ret);
@@ -56,10 +56,10 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			foreach (var field in fields)
 			{
 				var comparerType = typeof(EqualityComparer<>).MakeGenericType(field.FieldType).GetTypeInfo();
-				methodGenerator.EmitCall(OpCodes.Call, comparerType.GetMethod("get_Default"), null);
+				methodGenerator.EmitCall(OpCodes.Call, comparerType.GetMethod("get_Default")!, null);
 				methodGenerator.Emit(OpCodes.Ldarg_0);
 				methodGenerator.Emit(OpCodes.Ldfld, field);
-				methodGenerator.EmitCall(OpCodes.Callvirt, comparerType.GetMethod("GetHashCode", new[] { field.FieldType }), null);
+				methodGenerator.EmitCall(OpCodes.Callvirt, comparerType.GetMethod("GetHashCode", new[] { field.FieldType })!, null);
 				methodGenerator.Emit(OpCodes.Xor);
 			}
 

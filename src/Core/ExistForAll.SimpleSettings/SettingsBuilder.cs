@@ -100,7 +100,7 @@ namespace ExistForAll.SimpleSettings
         {
             var generateType = _settingsClassGenerator.GenerateType(@interface);
 
-            var instance = Activator.CreateInstance(generateType);
+            var instance = Activator.CreateInstance(generateType)!;
 
             _valuesPopulator.PopulateInstanceWithValues(instance, @interface, Options, SectionBinders);
 

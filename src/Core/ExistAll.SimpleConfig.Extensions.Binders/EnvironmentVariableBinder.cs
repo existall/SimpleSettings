@@ -7,9 +7,9 @@ namespace ExistForAll.SimpleSettings.Binders
     public class EnvironmentVariableBinder : ISectionBinder
     {
         private readonly IDictionary _environmentVariables;
-        public string Prefix { get; }
+        public string? Prefix { get; }
 
-        public Func<string, string, string> VariableNameFormatter { get; set; }
+        public Func<string, string, string>? VariableNameFormatter { get; set; }
 
         public EnvironmentVariableBinder(string prefix)
             : this()

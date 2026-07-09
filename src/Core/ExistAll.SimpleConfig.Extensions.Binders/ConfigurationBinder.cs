@@ -4,11 +4,11 @@ namespace ExistForAll.SimpleSettings.Binders
 {
 	public class ConfigurationBinder : ISectionBinder
 	{
-		public string RootSection { get; }
+		public string? RootSection { get; }
 
 		private readonly IConfiguration _configuration;
 
-		public ConfigurationBinder(IConfiguration configuration, string rootSection = null)
+		public ConfigurationBinder(IConfiguration configuration, string? rootSection = null)
 		{
 			RootSection = rootSection;
 			_configuration = configuration;

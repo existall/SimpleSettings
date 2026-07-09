@@ -42,7 +42,7 @@ namespace ExistsForAll.SimpleSettings.Binders
 
          foreach (var arg in args)
          {
-            var (key, value) = SplitByDelimiter(arg, _options);
+            var (key, value) = SplitByDelimiter(arg, _options)!;
 
             var name = key.TrimStart(_options.ArgumentPrefixes.ToArray());
 
@@ -53,12 +53,13 @@ namespace ExistsForAll.SimpleSettings.Binders
          }
       }
 
-      private static Tuple<string, string> SplitByDelimiter(string str, CommandLineSettingsBinderOptions options)
+      private static Tuple<string, string?>? SplitByDelimiter(string str, CommandLineSettingsBinderOptions options)
       {
          if (str == null)
             return null;
 
-         string key, value;
+         string key;
+         string? value;
 
          if (!options.Delimiters.Any())
          {
@@ -85,7 +86,7 @@ namespace ExistsForAll.SimpleSettings.Binders
             }
          }
 
-         return new Tuple<string, string>(key, value);
+         return new Tuple<string, string?>(key, value);
       }
    }
 }

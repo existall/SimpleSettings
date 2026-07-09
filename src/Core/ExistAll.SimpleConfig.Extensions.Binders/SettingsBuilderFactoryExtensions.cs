@@ -40,7 +40,7 @@ namespace ExistForAll.SimpleSettings.Binders
         }
 
         public static T AddCommandLine<T>(this T target,
-            Action<CommandLineSettingsBinderOptions> action = null) where T : ISettingsBuilderFactory
+            Action<CommandLineSettingsBinderOptions>? action = null) where T : ISettingsBuilderFactory
         {
             var args = Environment.CommandLine.Trim().Split(' ');
 
@@ -51,7 +51,7 @@ namespace ExistForAll.SimpleSettings.Binders
 
         public static T AddArguments<T>(this T target,
             string[] args
-            , Action<CommandLineSettingsBinderOptions> action = null) where T : ISettingsBuilderFactory
+            , Action<CommandLineSettingsBinderOptions>? action = null) where T : ISettingsBuilderFactory
         {
             var options = new CommandLineSettingsBinderOptions();
             action?.Invoke(options);

@@ -33,11 +33,11 @@ namespace ExistForAll.SimpleSettings.Conversion
 
             var values = value.GetType().IsArray ? (IEnumerable) value : new[] {value};
 
-            var elementType = settingsType.GetElementType();
+            var elementType = settingsType.GetElementType()!;
 
             var settingsTypeConverter = _converters.First(x => x.CanConvert(elementType));
 
-            var list = (IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType));
+            var list = (IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(elementType))!;
 
             foreach (var item in values)
             {
@@ -46,12 +46,12 @@ namespace ExistForAll.SimpleSettings.Conversion
             }
 
             var toArray = typeof(Enumerable).GetTypeInfo()
-                .GetMethod("ToArray")
+                .GetMethod("ToArray")!
                 .MakeGenericMethod(elementType);
 
             var array = toArray.Invoke(null, new object[] {list});
 
-            return array;
+            return array!;
         }
     }
 }

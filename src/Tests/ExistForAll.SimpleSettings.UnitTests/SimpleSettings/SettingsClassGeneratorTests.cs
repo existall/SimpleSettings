@@ -1,14 +1,13 @@
-﻿using System;
+using System;
 using System.Reflection;
 using ExistForAll.SimpleSettings.Core.Reflection;
-using Xunit;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
 	public class SettingsClassGeneratorTests
 	{
-		[Fact]
-		public void GenerateType_WhereTypeCreated_ShouldDerivedFromInterface()
+		[Test]
+		public async Task GenerateType_WhereTypeCreated_ShouldDerivedFromInterface()
 		{
 			var interfaceType = typeof(ITestInterface);
 
@@ -18,12 +17,12 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 			var typeInfo = result.GetTypeInfo();
 
-			Assert.True(typeInfo.IsClass);
-			Assert.True(interfaceType.GetTypeInfo().IsAssignableFrom(typeInfo));
+			await Assert.That(typeInfo.IsClass).IsTrue();
+			await Assert.That(interfaceType.GetTypeInfo().IsAssignableFrom(typeInfo)).IsTrue();
 		}
 
-		[Fact]
-		public void GenerateType_WhenGivenAnInterface_ShouldCreateType()
+		[Test]
+		public async Task GenerateType_WhenGivenAnInterface_ShouldCreateType()
 		{
 			var generator = new SettingsClassGenerator();
 
@@ -31,15 +30,15 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 			var result = generator.GenerateType(type);
 
-			var instance = (IRoot)Activator.CreateInstance(result);
+			var instance = (IRoot)Activator.CreateInstance(result)!;
 
 			var isAssignableFrom = type.IsInstanceOfType(instance);
 
-			Assert.True(isAssignableFrom);
+			await Assert.That(isAssignableFrom).IsTrue();
 		}
 
-		[Fact]
-		public void GenerateType_WhenGivenAnInterfaceInheritance_ShouldCreateTypeFromDerived()
+		[Test]
+		public async Task GenerateType_WhenGivenAnInterfaceInheritance_ShouldCreateTypeFromDerived()
 		{
 			var generator = new SettingsClassGenerator();
 
@@ -47,13 +46,13 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 			var result = generator.GenerateType(type);
 
-			var instance = (IRootChild)Activator.CreateInstance(result);
+			var instance = (IRootChild)Activator.CreateInstance(result)!;
 
 			var isAssignableFrom = type.IsInstanceOfType(instance);
 
-			Assert.NotNull(result.GetProperty(nameof(IRootChild.Age)));
-			Assert.NotNull(result.GetProperty(nameof(IRootChild.Value)));
-			Assert.True(isAssignableFrom);
+			await Assert.That(result.GetProperty(nameof(IRootChild.Age))).IsNotNull();
+			await Assert.That(result.GetProperty(nameof(IRootChild.Value))).IsNotNull();
+			await Assert.That(isAssignableFrom).IsTrue();
 		}
 	}
 }

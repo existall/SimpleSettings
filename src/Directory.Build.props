@@ -1,0 +1,23 @@
+<Project>
+
+  <!-- Common build settings for every project in the solution -->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!-- Shared NuGet package metadata (formerly version.props) -->
+  <PropertyGroup>
+    <Version>1.0.0</Version>
+    <Authors>Guy Ludvig</Authors>
+    <Company>ExistsForAll</Company>
+    <Description>SimpleSettings allow applications to use configurations values from any data store in the type of interfaces, thus decouples the frameworks from your appliaction and allowing application to inject interfaces and nothing else. This framework should be used instead of .Net Core IOptions&lt;T&gt;.</Description>
+    <PackageProjectUrl>https://github.com/existall/SimpleConfig</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/existall/SimpleConfig</RepositoryUrl>
+    <RepositoryType>GIT</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>Configuration, Settings, Ioc, DI, ExistsForAll, Dependency injection, Options, SimpleConfig</PackageTags>
+  </PropertyGroup>
+
+</Project>

@@ -1,15 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using ExistForAll.SimpleSettings.Core;
-using Xunit;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
-    public class NonDefaultSettingsTypesExtractorTests
+	public class NonDefaultSettingsTypesExtractorTests
 	{
-		[Fact]
-		public void ExtractSettingsTypes_WhenTypeHasNonDefaultAttributeIndication_ShouldExtractType()
+		[Test]
+		public async Task ExtractSettingsTypes_WhenTypeHasNonDefaultAttributeIndication_ShouldExtractType()
 		{
 			var sut = new SettingsTypesExtractor();
 
@@ -20,11 +19,11 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 				AttributeType = typeof(SomeOtherAttribute)
 			});
 
-			Assert.Contains(typeof(INonDefaultAttributeInterface), results);
+			await Assert.That(results).Contains(typeof(INonDefaultAttributeInterface));
 		}
 
-		[Fact]
-		public void ExtractSettingsTypes_WhenTypeHasNonDefaultInterfaceIndidation_ShouldExtractType()
+		[Test]
+		public async Task ExtractSettingsTypes_WhenTypeHasNonDefaultInterfaceIndidation_ShouldExtractType()
 		{
 			var sut = new SettingsTypesExtractor();
 
@@ -35,11 +34,11 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 				InterfaceBase = typeof(INonDefaultInterfaceIndication)
 			});
 
-			Assert.Contains(typeof(INonDefaultInterfaceInterface), results);
+			await Assert.That(results).Contains(typeof(INonDefaultInterfaceInterface));
 		}
 
-		[Fact]
-		public void ExtractSettingsTypes_WhenTypeHasNonDefaultSuffixIndidation_ShouldExtractType()
+		[Test]
+		public async Task ExtractSettingsTypes_WhenTypeHasNonDefaultSuffixIndidation_ShouldExtractType()
 		{
 			var sut = new SettingsTypesExtractor();
 
@@ -50,7 +49,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 				SettingsSuffix = "SomeSuffix"
 			});
 
-			Assert.Contains(typeof(INonDefaultSuffixIndicationInterfaceSomeSuffix), results);
+			await Assert.That(results).Contains(typeof(INonDefaultSuffixIndicationInterfaceSomeSuffix));
 		}
 
 		private IEnumerable<Assembly> MockAssemblies(Type returnType)

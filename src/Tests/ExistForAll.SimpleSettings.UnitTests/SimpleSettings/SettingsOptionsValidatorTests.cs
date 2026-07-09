@@ -1,100 +1,99 @@
-﻿using System;
+using System;
 using ExistForAll.SimpleSettings.Core;
-using Xunit;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
 
 	public class SettingsOptionsValidatorTests
 	{
-		[Theory]
-		[InlineData(null,null,null)]
-		[InlineData(null, null, "")]
-		[InlineData(null, null, "  ")]
-		public void ValidateOptions_WhenAttributeAndInterfaceAndSuffixAreMissing_ShouldThrowException(Type attributeType,
-			Type interfaceType,
-			string suffix)
+		[Test]
+		[Arguments(null, null, null)]
+		[Arguments(null, null, "")]
+		[Arguments(null, null, "  ")]
+		public async Task ValidateOptions_WhenAttributeAndInterfaceAndSuffixAreMissing_ShouldThrowException(Type? attributeType,
+			Type? interfaceType,
+			string? suffix)
 		{
 			var options = new SettingsOptions()
 			{
-				AttributeType = attributeType,
-				InterfaceBase = interfaceType,
-				SettingsSuffix = suffix
+				AttributeType = attributeType!,
+				InterfaceBase = interfaceType!,
+				SettingsSuffix = suffix!
 			};
 
 			var sut = GetSut();
 
-			Assert.Throws<SettingsOptionsArgumentNullException>(() => sut.ValidateOptions(options));
+			await Assert.That(() => sut.ValidateOptions(options)).Throws<SettingsOptionsArgumentNullException>();
 		}
 
-        [Fact]
-        public void ValidateOptions_WhenAttributeTypeIsNotAnAttribute_ShouldThrowException()
-        {
-            var options = new SettingsOptions()
-            {
-                AttributeType = typeof(NotAttribute)
-            };
-
-            var sut = GetSut();
-
-            Assert.Throws<SettingsOptionNonAttributeException>(() => sut.ValidateOptions(options));
-        }
-
-        [Fact]
-        public void ValidateOptions_WhenAttributeTypeIAnAttribute_ShouldPassValidation()
-        {
-            var options = new SettingsOptions()
-            {
-                AttributeType = typeof(SomeAttribute)
-            };
-
-            var sut = GetSut();
-
-            sut.ValidateOptions(options);
-        }
-
-        [Theory]
-		[InlineData(null)]
-		[InlineData(" ")]
-		[InlineData("")]
-		public void ValidateOptions_WhenHasNoArrayDelimiter_ShouldThrowException(string delimiter)
+		[Test]
+		public async Task ValidateOptions_WhenAttributeTypeIsNotAnAttribute_ShouldThrowException()
 		{
 			var options = new SettingsOptions()
 			{
-				ArraySplitDelimiter = delimiter
+				AttributeType = typeof(NotAttribute)
 			};
 
 			var sut = GetSut();
 
-			Assert.Throws<SettingsOptionsArgumentMissingException>(() => sut.ValidateOptions(options));
+			await Assert.That(() => sut.ValidateOptions(options)).Throws<SettingsOptionNonAttributeException>();
 		}
 
-		[Theory]
-		[InlineData(null)]
-		[InlineData(" ")]
-		[InlineData("")]
-		public void ValidateOptions_WhenHasNoDateTimeFormat_ShouldThrowException(string format)
+		[Test]
+		public async Task ValidateOptions_WhenAttributeTypeIAnAttribute_ShouldPassValidation()
 		{
 			var options = new SettingsOptions()
 			{
-				DateTimeFormat = format
+				AttributeType = typeof(SomeAttribute)
 			};
 
 			var sut = GetSut();
 
-			Assert.Throws<SettingsOptionsArgumentMissingException>(() => sut.ValidateOptions(options));
+			await Assert.That(() => sut.ValidateOptions(options)).ThrowsNothing();
 		}
 
-		[Fact]
-		public void ValidateOptions_WhenHasNoSectionNameFormater_ShouldThrowException()
+		[Test]
+		[Arguments((string?)null)]
+		[Arguments(" ")]
+		[Arguments("")]
+		public async Task ValidateOptions_WhenHasNoArrayDelimiter_ShouldThrowException(string? delimiter)
+		{
+			var options = new SettingsOptions()
+			{
+				ArraySplitDelimiter = delimiter!
+			};
+
+			var sut = GetSut();
+
+			await Assert.That(() => sut.ValidateOptions(options)).Throws<SettingsOptionsArgumentMissingException>();
+		}
+
+		[Test]
+		[Arguments((string?)null)]
+		[Arguments(" ")]
+		[Arguments("")]
+		public async Task ValidateOptions_WhenHasNoDateTimeFormat_ShouldThrowException(string? format)
+		{
+			var options = new SettingsOptions()
+			{
+				DateTimeFormat = format!
+			};
+
+			var sut = GetSut();
+
+			await Assert.That(() => sut.ValidateOptions(options)).Throws<SettingsOptionsArgumentMissingException>();
+		}
+
+		[Test]
+		public async Task ValidateOptions_WhenHasNoSectionNameFormater_ShouldThrowException()
 		{
 			var options = new SettingsOptions
 			{
-				SectionNameFormatter = null
+				SectionNameFormatter = null!
 			};
 			var sut = GetSut();
 
-			Assert.Throws<SettingsOptionsArgumentMissingException>(() => sut.ValidateOptions(options));
+			await Assert.That(() => sut.ValidateOptions(options)).Throws<SettingsOptionsArgumentMissingException>();
 		}
 
 		private SettingsOptionsValidator GetSut()
@@ -102,14 +101,14 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 			return new SettingsOptionsValidator();
 		}
 
-        private class SomeAttribute : Attribute
-        {
+		private class SomeAttribute : Attribute
+		{
 
-        }
+		}
 
-        private class NotAttribute
-        {
+		private class NotAttribute
+		{
 
-        }
+		}
 	}
 }
