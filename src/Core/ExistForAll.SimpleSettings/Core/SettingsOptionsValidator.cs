@@ -15,7 +15,7 @@ namespace ExistForAll.SimpleSettings.Core
 			}
 
             if (!typeof(Attribute).GetTypeInfo().IsAssignableFrom(settingsOptions.AttributeType)) 
-                throw new SettingsOptionNonAttributeException(settingsOptions.AttributeType);
+                throw new SettingsOptionNonAttributeException(settingsOptions.AttributeType!);
 
 
             if (string.IsNullOrWhiteSpace(settingsOptions.ArraySplitDelimiter))

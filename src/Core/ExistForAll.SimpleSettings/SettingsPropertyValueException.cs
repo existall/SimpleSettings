@@ -7,7 +7,7 @@ namespace ExistForAll.SimpleSettings
 	{
 		public SettingsPropertyValueException(
 			Type interfaceType,
-			object value,
+			object? value,
 			PropertyInfo property,
 			Exception exception)
 			: base(Resources.PropertySetterExceptionMessage(interfaceType, value, property), exception)

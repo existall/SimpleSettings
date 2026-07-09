@@ -7,7 +7,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 {
 	internal class TypeConverter : ITypeConverter
 	{
-		public object ConvertValue(object value, PropertyInfo propertyInfo, SettingsOptions options)
+		public object? ConvertValue(object? value, PropertyInfo propertyInfo, SettingsOptions options)
 		{
 			var propertyType = propertyInfo.PropertyType;
 
@@ -19,7 +19,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 					return propertyType.GetTypeInfo().IsValueType ? Activator.CreateInstance(propertyType) : null;
 
 				var genericType = propertyType.GetTypeInfo().GetGenericArguments().First();
-				var method = typeof(Enumerable).GetTypeInfo().GetMethod("Empty").MakeGenericMethod(genericType);
+				var method = typeof(Enumerable).GetTypeInfo().GetMethod("Empty")!.MakeGenericMethod(genericType);
 				var emptyEnumerable = method.Invoke(null, null);
 				return emptyEnumerable;
 			}
@@ -39,7 +39,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			if (attribute?.ConverterType == null)
 				return options.Converters.First(x => x.CanConvert(strippedType));
 
-			var converter = (ISettingsTypeConverter)Activator.CreateInstance(attribute.ConverterType);
+			var converter = (ISettingsTypeConverter)Activator.CreateInstance(attribute.ConverterType)!;
 
 			return converter;
 		}

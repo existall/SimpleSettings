@@ -25,7 +25,7 @@ namespace ExistForAll.SimpleSettings
 			return _settingsHolders.TryGetValue(type, out var holder) ? holder.SettingsImplementation : throw new SettingsTypeNotFoundException(type);
 		}
 
-        public bool TryGetSettings(Type type, out object settings)
+        public bool TryGetSettings(Type type, out object? settings)
         {
             if (!type.GetTypeInfo().IsInterface)
             {

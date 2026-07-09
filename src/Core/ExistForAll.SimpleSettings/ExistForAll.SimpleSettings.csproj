@@ -1,18 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputType>Library</OutputType>
-  </PropertyGroup>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.5;netstandard2.0</TargetFrameworks>
-    <ApplicationIcon />
-    <OutputTypeEx>library</OutputTypeEx>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <OutputType>Library</OutputType>
     <RootNamespace>ExistForAll.SimpleSettings</RootNamespace>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Reflection.Emit" Version="4.7.0" />
-    <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-  </ItemGroup>
-  <Import Project="../../version.props">
-  </Import>
 </Project>

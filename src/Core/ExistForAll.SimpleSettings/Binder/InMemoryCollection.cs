@@ -15,7 +15,7 @@ namespace ExistForAll.SimpleSettings.Binder
 			_inner.Add(CreateKey(section, key), value);
 		}
 
-		internal bool TryGetValue(string section, string key, out string value)
+		internal bool TryGetValue(string section, string key, out string? value)
 		{
 			value = null;
 			var hasValue = _inner.TryGetValue(CreateKey(section, key), out value);

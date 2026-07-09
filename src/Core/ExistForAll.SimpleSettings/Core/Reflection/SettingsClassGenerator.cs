@@ -9,7 +9,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 	{
 		private readonly ITypePropertiesExtractor _typePropertiesExtractor;
 		private readonly IPropertyCreator _propertyCreator;
-		private readonly ModuleBuilder _moduleBuilder;
+		private readonly ModuleBuilder _moduleBuilder = null!;
 
 		internal SettingsClassGenerator(ITypePropertiesExtractor typePropertiesExtractor,
 			IPropertyCreator propertyCreator)
@@ -23,27 +23,9 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 				new PropertyCreator())
 		{
 			var assemblyName = new AssemblyName(Guid.NewGuid().ToString());
-#if NET451
-			var assemblyBuilder =
-AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
-#else
 			var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
-#endif
 
-
-#if ENABLE_LINQ_PARTIAL_TRUST
-        new ReflectionPermission(PermissionState.Unrestricted).Assert();
-#endif
-			try
-			{
-				_moduleBuilder = assemblyBuilder.DefineDynamicModule("ConfingModule");
-			}
-			finally
-			{
-#if ENABLE_LINQ_PARTIAL_TRUST
-            PermissionSet.RevertAssert();
-#endif
-			}
+			_moduleBuilder = assemblyBuilder.DefineDynamicModule("ConfingModule");
 		}
 
 		public Type GenerateType(Type interfaceType)

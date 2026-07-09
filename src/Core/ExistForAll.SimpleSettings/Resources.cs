@@ -31,7 +31,7 @@ namespace ExistForAll.SimpleSettings
 			$@"While trying to generate a class from interface [{type.FullName}] something went wrong.
 				please see inner exception for more details";
 
-		public static string PropertySetterExceptionMessage(Type interfaceType, object value, PropertyInfo property) =>
+		public static string PropertySetterExceptionMessage(Type interfaceType, object? value, PropertyInfo property) =>
 			$@"failed to to set the value [{value}] within the property [{property.Name}] for interface [{interfaceType.Name}].
 see inner exception for more details";
 

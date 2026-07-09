@@ -20,9 +20,9 @@ namespace ExistForAll.SimpleSettings.Extensions.GenericHost
         }
 
         private static void IntegrateSimpleSettings(this IServiceCollection services,
-            Action<ISettingsBuilderOptions> action = null)
+            Action<ISettingsBuilderOptions>? action = null)
         {
-            SettingsBuilderOptions options = null;
+            SettingsBuilderOptions? options = null;
 
             var settingsBuilder = SettingsBuilder.CreateBuilder(factory =>
             {
@@ -30,7 +30,7 @@ namespace ExistForAll.SimpleSettings.Extensions.GenericHost
                 action?.Invoke(options);
             });
 
-            var settingsProvider = settingsBuilder.ScanAssemblies(options.Assemblies);
+            var settingsProvider = settingsBuilder.ScanAssemblies(options!.Assemblies);
 
             // replace this with a replaceable settings provider to support time based Settingsuration
 

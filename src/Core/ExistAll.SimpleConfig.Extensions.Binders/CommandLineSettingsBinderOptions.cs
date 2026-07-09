@@ -9,7 +9,7 @@ namespace ExistForAll.SimpleSettings.Binders
         private readonly List<char> _argumentPrefixes = new List<char>(new[] {'-', '/'});
         private readonly List<string> _delimiters = new List<string>(new[] {":", "="});
 
-        public NameFormatter NameFormatter { get; set; }
+        public NameFormatter? NameFormatter { get; set; }
 
         public IEnumerable<char> ArgumentPrefixes => _argumentPrefixes;
 
