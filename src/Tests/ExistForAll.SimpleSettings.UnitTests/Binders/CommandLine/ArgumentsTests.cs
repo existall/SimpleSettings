@@ -1,6 +1,5 @@
 using ExistForAll.SimpleSettings.Binder;
 using ExistForAll.SimpleSettings.Binders;
-using Xunit;
 
 namespace ExistForAll.SimpleSettings.UnitTests.Binders.CommandLine
 {
@@ -8,20 +7,20 @@ namespace ExistForAll.SimpleSettings.UnitTests.Binders.CommandLine
     {
         private const string Args = " name=value age:3";
 
-        [Fact]
-        public void Build_WhenNameMatchKey_ShouldPlaceValue()
+        [Test]
+        public async Task Build_WhenNameMatchKey_ShouldPlaceValue()
         {
             var sut = SettingsBuilder.CreateBuilder(x =>
                 x.AddArguments(Args.Split(' ')));
 
             var result = sut.GetSettings<ICommandLineInterface>();
 
-            Assert.Equal("value", result.Name);
-            Assert.NotEqual(3, result.Age);
+            await Assert.That(result.Name).IsEqualTo("value");
+            await Assert.That(result.Age).IsNotEqualTo(3);
         }
 
-        [Fact]
-        public void Build_WhenNameMatchKeyInSensitive_ShouldPlaceValue()
+        [Test]
+        public async Task Build_WhenNameMatchKeyInSensitive_ShouldPlaceValue()
         {
             var sut = SettingsBuilder.CreateBuilder(x =>
                 x.AddArguments(Args.Split(' '),
@@ -29,12 +28,12 @@ namespace ExistForAll.SimpleSettings.UnitTests.Binders.CommandLine
 
             var result = sut.GetSettings<ICommandLineInterface>();
 
-            Assert.Equal("value", result.Name);
-            Assert.Equal(3, result.Age);
+            await Assert.That(result.Name).IsEqualTo("value");
+            await Assert.That(result.Age).IsEqualTo(3);
         }
 
-        [Fact]
-        public void Build_WhenArgumentAreAfterInMemory_ShouldUseArgumentBinder()
+        [Test]
+        public async Task Build_WhenArgumentAreAfterInMemory_ShouldUseArgumentBinder()
         {
             var section = nameof(ICommandLineInterface).TrimStart('I');
             var collection = new InMemoryCollection();
@@ -46,8 +45,8 @@ namespace ExistForAll.SimpleSettings.UnitTests.Binders.CommandLine
 
             var result = sut.GetSettings<ICommandLineInterface>();
 
-            Assert.Equal("name", result.Name);
-            Assert.Equal(15, result.Age);
+            await Assert.That(result.Name).IsEqualTo("name");
+            await Assert.That(result.Age).IsEqualTo(15);
 
             sut = SettingsBuilder.CreateBuilder(x =>
                 x.AddInMemoryCollection(collection)
@@ -56,13 +55,13 @@ namespace ExistForAll.SimpleSettings.UnitTests.Binders.CommandLine
 
             result = sut.GetSettings<ICommandLineInterface>();
 
-            Assert.Equal("value", result.Name);
-            Assert.Equal(3, result.Age);
+            await Assert.That(result.Name).IsEqualTo("value");
+            await Assert.That(result.Age).IsEqualTo(3);
         }
 
         public interface ICommandLineInterface
         {
-            [SettingsProperty("name")] 
+            [SettingsProperty("name")]
             string Name { get; set; }
             int Age { get; set; }
         }

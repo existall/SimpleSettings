@@ -1,27 +1,26 @@
-﻿using System;
+using System;
 using ExistForAll.SimpleSettings.Conversion;
-using Xunit;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
 	public class SettingsBuilderConversionsTests
 	{
-		[Fact]
-		public void Build_WhenAddGlobalConverter_ShouldReturnConverterValue()
-        {
-            var sut = SettingsBuilder.CreateBuilder(x => x.AddTypeConverter(new GuidSettingsConvertor()));
-            var result = sut.GetSettings<IGuidInterface>();
-            
-			Assert.NotEqual(Guid.Empty, result.Guid);
+		[Test]
+		public async Task Build_WhenAddGlobalConverter_ShouldReturnConverterValue()
+		{
+			var sut = SettingsBuilder.CreateBuilder(x => x.AddTypeConverter(new GuidSettingsConvertor()));
+			var result = sut.GetSettings<IGuidInterface>();
+
+			await Assert.That(result.Guid).IsNotEqualTo(Guid.Empty);
 		}
 
-		[Fact]
-		public void Build_WhenAddLocalConverter_ShouldReturnConverterValue()
-        {
-            var sut = SettingsBuilder.CreateBuilder();
-            var result = sut.GetSettings<IGuidInterfaceWithConversionAttribute>();
+		[Test]
+		public async Task Build_WhenAddLocalConverter_ShouldReturnConverterValue()
+		{
+			var sut = SettingsBuilder.CreateBuilder();
+			var result = sut.GetSettings<IGuidInterfaceWithConversionAttribute>();
 
-			Assert.NotEqual(Guid.Empty, result.Guid);
+			await Assert.That(result.Guid).IsNotEqualTo(Guid.Empty);
 		}
 
 		public interface IGuidInterface
@@ -59,4 +58,3 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 		}
 	}
 }
-

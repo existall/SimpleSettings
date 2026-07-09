@@ -1,15 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using ExistForAll.SimpleSettings.Core;
-using Xunit;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
-    public class SettingsTypesExtractorTests
+	public class SettingsTypesExtractorTests
 	{
-        [Fact]
-		public void ExtractSettingsTypes_WhenTypeHasNoIndications_ShouldNotExtractType()
+		[Test]
+		public async Task ExtractSettingsTypes_WhenTypeHasNoIndications_ShouldNotExtractType()
 		{
 			var sut = new SettingsTypesExtractor();
 
@@ -17,11 +16,11 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 			var results = sut.ExtractSettingsTypes(assemblyCollection, new SettingsOptions());
 
-			Assert.DoesNotContain(typeof(INonIndicationInterface), results);
+			await Assert.That(results).DoesNotContain(typeof(INonIndicationInterface));
 		}
 
-		[Fact]
-		public void ExtractSettingsTypes_WhenTypeHasAttributeIndications_ShouldExtractType()
+		[Test]
+		public async Task ExtractSettingsTypes_WhenTypeHasAttributeIndications_ShouldExtractType()
 		{
 			var sut = new SettingsTypesExtractor();
 
@@ -29,11 +28,11 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 			var results = sut.ExtractSettingsTypes(assemblyCollection, new SettingsOptions());
 
-			Assert.Contains(typeof(IAttributeIndicationInterface), results);
+			await Assert.That(results).Contains(typeof(IAttributeIndicationInterface));
 		}
 
-		[Fact]
-		public void ExtractSettingsTypes_WhenTypeHasInterfaceIndications_ShouldExtractType()
+		[Test]
+		public async Task ExtractSettingsTypes_WhenTypeHasInterfaceIndications_ShouldExtractType()
 		{
 			var sut = new SettingsTypesExtractor();
 
@@ -41,11 +40,11 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 			var results = sut.ExtractSettingsTypes(assemblyCollection, new SettingsOptions());
 
-			Assert.Contains(typeof(IIndicationInterface), results);
+			await Assert.That(results).Contains(typeof(IIndicationInterface));
 		}
 
-		[Fact]
-		public void ExtractSettingsTypes_WhenTypeHasSettingsSuffixIndications_ShouldExtractType()
+		[Test]
+		public async Task ExtractSettingsTypes_WhenTypeHasSettingsSuffixIndications_ShouldExtractType()
 		{
 			var sut = new SettingsTypesExtractor();
 
@@ -53,7 +52,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 			var results = sut.ExtractSettingsTypes(assemblyCollection, new SettingsOptions());
 
-			Assert.Contains(typeof(IIndicationInterfaceSettings), results);
+			await Assert.That(results).Contains(typeof(IIndicationInterfaceSettings));
 		}
 
 		private IEnumerable<Assembly> MockAssemblies(Type returnType)

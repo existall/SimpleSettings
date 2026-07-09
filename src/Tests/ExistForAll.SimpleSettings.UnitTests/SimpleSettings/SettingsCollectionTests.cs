@@ -1,28 +1,27 @@
 using System;
-using Xunit;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
     public class SettingsCollectionTests
     {
         private const string SomeName = "SomeName";
-		
-        [Fact]
-        public void GetSettings_WhenTypeIsNotInterface_ShouldThrowException()
+
+        [Test]
+        public async Task GetSettings_WhenTypeIsNotInterface_ShouldThrowException()
         {
             var sut = SettingsBuilder.CreateBuilder();
 
-            Assert.Throws<InvalidOperationException>(() => sut.GetSettings<SettingsBuilder>());
+            await Assert.That(() => sut.GetSettings<SettingsBuilder>()).Throws<InvalidOperationException>();
         }
 
-        [Fact]
-        public void GetSettings_BuildingInterfaceNotFromAssembly_ShouldReturnInstanceWithValues()
+        [Test]
+        public async Task GetSettings_BuildingInterfaceNotFromAssembly_ShouldReturnInstanceWithValues()
         {
             var sut = SettingsBuilder.CreateBuilder();
 
             var result = sut.GetSettings<ISomeInterface>();
-			
-            Assert.Equal(result.Name,SomeName);
+
+            await Assert.That(result.Name).IsEqualTo(SomeName);
         }
 
         public interface ISomeInterface
@@ -30,6 +29,5 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
             [SettingsProperty(DefaultValue = SomeName)]
             string Name { get; set; }
         }
-		
     }
 }
