@@ -1,0 +1,239 @@
+name: Release
+
+on:
+  push:
+    branches: [ master ]          # every merge -> fresh alpha prerelease
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Release channel
+        type: choice
+        options: [ beta, rc, stable ]
+        default: beta
+      bump:
+        description: SemVer part to bump (relative to the latest stable tag; ignored on the first release)
+        type: choice
+        options: [ patch, minor, major ]
+        default: minor
+      dry_run:
+        description: Build/pack/upload only - do NOT tag, push to NuGet, or create a Release
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+# Serialize releases; never cancel an in-flight publish.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  ARTIFACTS: ${{ github.workspace }}/artifacts
+  NUGET_SOURCE: https://api.nuget.org/v3/index.json
+  TAG_PREFIX: v                   # deliberately NOT "version-": those tags are the dead ExistAll.SimpleConfig line
+  BASELINE_VERSION: 2.0.0         # first release on the v* line (modernized, breaking vs published 1.0.0)
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # A) Automatic ALPHA prerelease on every push to master.
+  #    MinVer stamps a height-based prerelease, e.g. 2.0.0-alpha.0.7.
+  # ---------------------------------------------------------------------------
+  prerelease:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read              # no tag/release here
+    defaults:
+      run:
+        working-directory: src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore ExistAll.SimpleConfig.slnx
+
+      - name: Build
+        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      - name: Test
+        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
+
+      - name: Pack (MinVer -> height-based alpha)
+        run: dotnet pack ExistAll.SimpleConfig.slnx -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
+
+      - name: List packages
+        run: ls -1 "$ARTIFACTS"
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-prerelease
+          path: |
+            ${{ env.ARTIFACTS }}/*.nupkg
+            ${{ env.ARTIFACTS }}/*.snupkg
+
+      - name: Push to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        # dotnet nuget push globs natively; each .nupkg also pushes its adjacent .snupkg.
+        run: dotnet nuget push "$ARTIFACTS/*.nupkg" --api-key "$NUGET_API_KEY" --source "$NUGET_SOURCE" --skip-duplicate
+
+  # ---------------------------------------------------------------------------
+  # B) Manual, curated RELEASE (beta.N / rc.N / stable) via workflow_dispatch.
+  #    Tag is created LOCALLY (MinVer reads it), pushed only AFTER a successful
+  #    NuGet push, then a GitHub Release is created.
+  # ---------------------------------------------------------------------------
+  release:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write             # push tag + create GitHub Release
+    environment:
+      name: nuget.org             # add a Required reviewer here to gate stable publishes
+    defaults:
+      run:
+        working-directory: src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # all tags -> correct next-version computation
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Compute next version tag
+        id: ver
+        env:
+          BUMP: ${{ inputs.bump }}
+          CHANNEL: ${{ inputs.channel }}
+        run: |
+          set -euo pipefail
+          PREFIX="$TAG_PREFIX"
+          git fetch --tags --force --quiet
+
+          # Highest STABLE tag under the "v" prefix: vMAJOR.MINOR.PATCH (no pre-release).
+          # The "v[0-9]" glob excludes the legacy "version-*" tags by construction.
+          latest_stable="$(
+            git tag --list "${PREFIX}[0-9]*" \
+              | grep -E "^${PREFIX}[0-9]+\.[0-9]+\.[0-9]+$" \
+              | sed "s/^${PREFIX}//" \
+              | sort -V | tail -n1 || true
+          )"
+
+          if [ -z "$latest_stable" ]; then
+            # First release on the v* line -> the baseline itself (bump ignored).
+            TARGET="$BASELINE_VERSION"
+            echo "No v* stable tag yet -> first release targets baseline $TARGET (bump '$BUMP' ignored)."
+          else
+            IFS='.' read -r MA MI PA <<< "$latest_stable"
+            case "$BUMP" in
+              major) MA=$((MA+1)); MI=0; PA=0 ;;
+              minor) MI=$((MI+1)); PA=0 ;;
+              patch) PA=$((PA+1)) ;;
+              *) echo "::error::invalid bump '$BUMP'"; exit 1 ;;
+            esac
+            TARGET="${MA}.${MI}.${PA}"
+            echo "Latest stable $latest_stable + $BUMP -> $TARGET"
+          fi
+
+          if [ "$CHANNEL" = "stable" ]; then
+            NEW_TAG="${PREFIX}${TARGET}"
+            if git rev-parse -q --verify "refs/tags/${NEW_TAG}" >/dev/null; then
+              echo "::error::tag ${NEW_TAG} already exists"; exit 1
+            fi
+            PRERELEASE=false
+          else
+            # Continue the -beta.N / -rc.N series for this target base.
+            last_n="$(
+              git tag --list "${PREFIX}${TARGET}-${CHANNEL}.*" \
+                | sed -E "s/^${PREFIX}${TARGET}-${CHANNEL}\.([0-9]+)$/\1/" \
+                | grep -E '^[0-9]+$' | sort -n | tail -n1 || true
+            )"
+            next_n=$(( ${last_n:-0} + 1 ))
+            NEW_TAG="${PREFIX}${TARGET}-${CHANNEL}.${next_n}"
+            PRERELEASE=true
+          fi
+
+          echo "Computed tag: $NEW_TAG (prerelease=$PRERELEASE)"
+          {
+            echo "tag=$NEW_TAG"
+            echo "prerelease=$PRERELEASE"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create local tag (MinVer reads it at pack time)
+        run: |
+          set -euo pipefail
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.ver.outputs.tag }}" -m "Release ${{ steps.ver.outputs.tag }}"
+
+      - name: Restore
+        run: dotnet restore ExistAll.SimpleConfig.slnx
+
+      - name: Build
+        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      - name: Test
+        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
+
+      - name: Pack (MinVer -> exact tagged version)
+        run: dotnet pack ExistAll.SimpleConfig.slnx -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-${{ steps.ver.outputs.tag }}
+          path: |
+            ${{ env.ARTIFACTS }}/*.nupkg
+            ${{ env.ARTIFACTS }}/*.snupkg
+
+      - name: Push to NuGet.org
+        if: ${{ !inputs.dry_run }}
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        # dotnet nuget push globs natively; each .nupkg also pushes its adjacent .snupkg.
+        run: dotnet nuget push "$ARTIFACTS/*.nupkg" --api-key "$NUGET_API_KEY" --source "$NUGET_SOURCE" --skip-duplicate
+
+      - name: Push git tag (only after a successful publish)
+        if: ${{ !inputs.dry_run }}
+        run: git push origin "${{ steps.ver.outputs.tag }}"
+
+      - name: Create GitHub Release
+        if: ${{ !inputs.dry_run }}
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: ${{ steps.ver.outputs.tag }}
+          prerelease: ${{ steps.ver.outputs.prerelease }}
+          generate_release_notes: true
+          files: |
+            ${{ env.ARTIFACTS }}/*.nupkg
+            ${{ env.ARTIFACTS }}/*.snupkg
