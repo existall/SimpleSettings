@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [ master ]
+
+# PR validation only reads the repo.
+permissions:
+  contents: read
+
+# Cancel superseded runs for the same PR.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src   # global.json (Microsoft.Testing.Platform opt-in) lives here
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # MinVer needs full history + tags to compute the version
+
+      - name: Setup .NET (8 + 10)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+          # Build uses the SDK pinned by src/global.json (10.0.100); the 8.0 runtime
+          # installed here is what actually runs the net8.0 test target.
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore ExistAll.SimpleConfig.slnx
+
+      - name: Build (Release, deterministic)
+        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+
+      - name: Test (net8.0 + net10.0)
+        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
