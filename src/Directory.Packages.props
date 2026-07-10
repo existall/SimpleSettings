@@ -21,4 +21,9 @@
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Build / versioning -->
+    <PackageVersion Include="MinVer" Version="7.0.0" />
+  </ItemGroup>
+
 </Project>
