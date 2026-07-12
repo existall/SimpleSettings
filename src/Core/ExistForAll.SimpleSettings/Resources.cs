@@ -43,10 +43,10 @@ see inner exception for more details";
 			$@"[{propertyName}] is marked as Null not allowed, yet the value is null. please provide value via binder or attribute";
 
 		public static string TypeIsNotInterface(string typeName) =>
-			@"[{typeName}] is not an interface, SimpleSettings supports only interfaces";
+			$@"[{typeName}] is not an interface, SimpleSettings supports only interfaces";
 
         public static string SettingsOptionAttributeTypeMessage(Type type) =>
-            $"SimpleSettings support Attribute indication of interfaces, the type provided [${type.FullName}] is not an attribute.";
+            $"SimpleSettings support Attribute indication of interfaces, the type provided [{type.FullName}] is not an attribute.";
 
     }
 }
