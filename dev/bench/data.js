@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783883216863,
+  "lastUpdate": 1783883987637,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -43,6 +43,50 @@ window.BENCHMARK_DATA = {
           {
             "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
             "value": 17528616,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6bd5b0e22f67bf0a148a33cbf564e1605ce09426",
+          "message": "Session wrap: refresh handoff + fix-plan; gitignore benchmark output (#23)\n\n* Session wrap: refresh handoff + fix-plan; gitignore BenchmarkDotNet output\n\n- Handoff/fix-plan now reflect #21 merged (Q1–Q4 + M1 collision fix +\n  micro-benchmarks, proven 2.7x–32x on repeated paths) and #22 open\n  (per-push benchmark tracking, gate on allocation regressions).\n- Records the durable facts: gate on allocations not time, gh-pages holds the\n  baseline, and the M1 rule (generated impl name is separate from the section name).\n- Next priority remains P3.\n- gitignore BenchmarkDotNet.Artifacts/ so local benchmark runs don't leave\n  untracked output.\n\n* gitignore .claude/settings.local.json (personal SessionStart hook)",
+          "timestamp": "2026-07-12T22:18:29+03:00",
+          "tree_id": "0b8865c30f9f19ad623373ee0761b8b023901187",
+          "url": "https://github.com/existall/SimpleSettings/commit/6bd5b0e22f67bf0a148a33cbf564e1605ce09426"
+        },
+        "date": 1783883987442,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17560104,
             "unit": "bytes"
           }
         ]
