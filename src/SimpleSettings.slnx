@@ -9,7 +9,7 @@
     <Project Path="Core/ExistForAll.SimpleSettings/ExistForAll.SimpleSettings.csproj" />
   </Folder>
   <Folder Name="/Extensions/">
-    <Project Path="Core/ExistAll.SimpleConfig.Extensions.Binders/ExistForAll.SimpleSettings.Binders.csproj" />
+    <Project Path="Core/ExistForAll.SimpleSettings.Extensions.Binders/ExistForAll.SimpleSettings.Binders.csproj" />
     <Project Path="Core/ExistForAll.SimpleSettings.Core.AspNet/ExistForAll.SimpleSettings.Core.AspNet.csproj" />
     <Project Path="Core/ExistForAll.SimpleSettings.Extensions.GenericHost/ExistForAll.SimpleSettings.Extensions.GenericHost.csproj" />
   </Folder>
@@ -17,6 +17,6 @@
     <Project Path="Tests/ExistForAll.SimpleSettings.UnitTests/ExistForAll.SimpleSettings.UnitTests.csproj" />
   </Folder>
   <Folder Name="/Performance/">
-    <Project Path="performance/ExistsForAll.SimpleSettings.Benchmark/ExistsForAll.SimpleSettings.Benchmark.csproj" />
+    <Project Path="performance/ExistForAll.SimpleSettings.Benchmark/ExistForAll.SimpleSettings.Benchmark.csproj" />
   </Folder>
 </Solution>

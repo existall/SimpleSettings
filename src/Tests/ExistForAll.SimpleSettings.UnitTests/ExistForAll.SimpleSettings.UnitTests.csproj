@@ -15,7 +15,7 @@
     <PackageReference Include="TUnit" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\ExistAll.SimpleConfig.Extensions.Binders\ExistForAll.SimpleSettings.Binders.csproj" />
+    <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings.Extensions.Binders\ExistForAll.SimpleSettings.Binders.csproj" />
     <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings.Core.AspNet\ExistForAll.SimpleSettings.Core.AspNet.csproj" />
     <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings\ExistForAll.SimpleSettings.csproj" />
     <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings.Extensions.GenericHost\ExistForAll.SimpleSettings.Extensions.GenericHost.csproj" />

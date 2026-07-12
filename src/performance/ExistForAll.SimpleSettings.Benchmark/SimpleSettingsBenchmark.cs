@@ -2,7 +2,7 @@ using System.Linq;
 using BenchmarkDotNet.Attributes;
 using ExistForAll.SimpleSettings;
 
-namespace ExistsForAll.SimpleSettings.Benchmark
+namespace ExistForAll.SimpleSettings.Benchmark
 {
 	public class SimpleSettingsBenchmark
 	{
