@@ -18,6 +18,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  SOLUTION: SimpleSettings.slnx   # single source of truth for the solution file name
 
 jobs:
   build-test:
@@ -48,10 +49,10 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restore
-        run: dotnet restore ExistAll.SimpleConfig.slnx
+        run: dotnet restore "$SOLUTION"
 
       - name: Build (Release, deterministic)
-        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+        run: dotnet build "$SOLUTION" -c Release --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Test (net8.0 + net10.0)
-        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
+        run: dotnet test "$SOLUTION" -c Release --no-build

@@ -33,6 +33,7 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  SOLUTION: SimpleSettings.slnx   # single source of truth for the solution file name
   ARTIFACTS: ${{ github.workspace }}/artifacts
   NUGET_SOURCE: https://api.nuget.org/v3/index.json
   TAG_PREFIX: v                   # deliberately NOT "version-": those tags are the dead ExistAll.SimpleConfig line
@@ -70,16 +71,16 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restore
-        run: dotnet restore ExistAll.SimpleConfig.slnx
+        run: dotnet restore "$SOLUTION"
 
       - name: Build
-        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+        run: dotnet build "$SOLUTION" -c Release --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Test
-        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
+        run: dotnet test "$SOLUTION" -c Release --no-build
 
       - name: Pack (MinVer -> height-based alpha)
-        run: dotnet pack ExistAll.SimpleConfig.slnx -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
+        run: dotnet pack "$SOLUTION" -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
 
       - name: List packages
         run: ls -1 "$ARTIFACTS"
@@ -202,16 +203,16 @@ jobs:
           git tag -a "${{ steps.ver.outputs.tag }}" -m "Release ${{ steps.ver.outputs.tag }}"
 
       - name: Restore
-        run: dotnet restore ExistAll.SimpleConfig.slnx
+        run: dotnet restore "$SOLUTION"
 
       - name: Build
-        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+        run: dotnet build "$SOLUTION" -c Release --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Test
-        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
+        run: dotnet test "$SOLUTION" -c Release --no-build
 
       - name: Pack (MinVer -> exact tagged version)
-        run: dotnet pack ExistAll.SimpleConfig.slnx -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
+        run: dotnet pack "$SOLUTION" -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
