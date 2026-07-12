@@ -3,15 +3,18 @@
 _Last updated: 2026-07-12 · owner: Guy Ludvig (guy@frontegg.com)_
 
 ## TL;DR
-We're working the three-specialist review fix plan (**`FIX-PLAN.md`**, repo root — read it for per-item file:line detail). This session cleared the top of the plan and opened the performance track. **`master` is clean at `ef25761`, no open PRs.** Suite is **green — 51 tests on net10.0** locally (CI runs net8.0 + net10.0).
+We're working the three-specialist review fix plan (**`FIX-PLAN.md`**, repo root — read it for per-item file:line detail). The performance track is now through **P2 + quick wins Q1–Q4**, the `docs/` tutorials are refreshed, and every merged workstream branch is pruned. **`master` is clean with no open PRs** once the Q1–Q4 perf PR merges. Suite is **green — 55 tests on net10.0** locally (CI runs net8.0 + net10.0).
 
 Still **pre-stable** (no `v*` tag; only auto-alphas published), so breaking changes remain free — keep doing breaking cleanup now.
 
 ## Current state
-- On **`master`** @ `ef25761` (PR #17). Clean tree, no open PRs. Next work branches off `master`.
-- Orphaned merged remote branches (from #8–#17) can be pruned anytime; deleting remote branches needs the `guy-lud` push identity.
+- On **`master`** (the Q1–Q4 perf PR merge — **verify with `git log` first**; this file can lag reality). Clean tree, no open PRs. Next work branches off `master`.
+- Remote now holds only **legacy / held** branches (`validate-settings`, `version-7.x`, and older pre-#8 feature branches); the whole #8–#20 workstream was pruned. Deleting remote branches needs the `guy-lud` push identity.
 
 ## What shipped (recent → older)
+- **Perf quick wins Q1–Q4** (current PR). Q1 `SettingsCollection.GetEnumerator` now yields over its backing dictionary (was rebuilding a whole `Dictionary` per enumeration); Q2 `SettingsTypesExtractor` suffix match → `EndsWith(…, OrdinalIgnoreCase)` with the trimmed suffix hoisted out of the per-type predicate (also kills a `ToLower` CurrentCulture smell); Q3 `EnvironmentVariableBinder` fast-paths `context.Key` when there's no prefix/formatter (no `StringBuilder`) and does a single `IDictionary` lookup; Q4 `SettingsClassGenerator` caches the generated impl by interface `Type` (`ConcurrentDictionary`) instead of a per-call mangled-name `Assembly.GetType`. **Q5 was already resolved by B4** (the dead null-checks are gone). +3 regression tests → 55/TFM.
+- **#20 — docs tutorials refresh.** All six `docs/*.md` rewritten against the current public API + the `SimpleConfig`→`SimpleSettings` rename (settles the A2 docs debt).
+- **#18 — P2.** Memoized `TypePropertiesExtractor.ExtractTypeProperties` and replaced its O(n²) inherited-dedup with a single `HashSet<string>` pass. The cache is a **private instance field** on the extractor — not static, not injected (per review).
 - **#17 — P1 + C3.** `ISettingsProvider.GetSettings` used to re-bind a fresh instance on every call while DI registered startup-built singletons (the C3 divergence). The provider now serves the startup-built `ISettingsCollection` — the *same* instance as the DI singleton — falling back to a build only for never-scanned types. **C3 contract = cache in the provider only** (Core's public `SettingsBuilder.GetSettings` unchanged; no reload — settings are immutable snapshots). + regression test (both paths `ReferenceEquals`).
 - **#16 — P0 benchmark harness.** Rebuilt the benchmark into a `[MemoryDiagnoser]` BenchmarkDotNet harness: `ScanBenchmark.ColdScan`; `ResolveBenchmark` (`[Params]` 1/10/50 · `ColdBuild` / `WarmResolve_Provider` / `WarmResolve_DiSingleton`); `ShapeBenchmark` (typed / array / deep-hierarchy). Run: `dotnet run -c Release --project src/performance/ExistForAll.SimpleSettings.Benchmark` (fast smoke: append `-- --job dry`). Baseline numbers intentionally NOT committed (machine-specific).
 - **#15 — A2 naming consolidation.** All code/projects now spell the org **`ExistForAll`** (was a mix of `ExistAll` / `ExistsForAll`). Renamed the Binders folder (csproj + package id unchanged), the benchmark project, `Company` / `PackageTags`, and the README brand line.
@@ -25,12 +28,11 @@ Still **pre-stable** (no `v*` tag; only auto-alphas published), so breaking chan
 - **Pre-stable window:** no `v*` stable tag (the `version-*` tags are the dead legacy `ExistAll.SimpleConfig` package). Breaking changes free until the first `v2.0.0-beta`.
 
 ## Next priorities (ranked — detail in FIX-PLAN.md)
-1. **P2** — memoize `TypePropertiesExtractor.ExtractTypeProperties` (shared `ConcurrentDictionary<Type, PropertyInfo[]>`) and replace its O(n²) dedup with a `HashSet<string>`. Sev High, Eff S, no decision; visible on the P0 harness. *(in progress this session)*
-2. **Rest of perf:** quick wins **Q1–Q5** (GetEnumerator `yield`, `OrdinalIgnoreCase` suffix match, env-binder fast path, generated-type cache, dead null-checks) → **P3** (cached compiled "settings plan" — biggest ceiling) → P4 (de-reflect array/enumerable converters) → P5 (resolve config section once per type).
-3. **Engine tests:** T4 `ValuesPopulator`, T5 `TypeConverter`, T6 converters, T7 generator caching + concurrency stress.
-4. **Architecture:** A1 (AOT/trim `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` — HIGH, it's a `Reflection.Emit` lib), C1 (`List<T>`/`IList<T>` support), C2 (public `SimpleSettingsException` base), A3 (`Core.AspNet` public type or drop the package), A4 (float `Microsoft.Extensions.*` floor per-TFM), A5 (make `SettingsHolder` internal), A6 (command-line quoted-arg parsing).
-5. **Docs debt (deferred from A2):** the `SimpleConfig` → `SimpleSettings` refresh — the `docs/*.md` tutorials and the README links still pointing at `existall/SimpleConfig`.
-6. **D1 validations feature** — owner-driven; reconcile the `validate-settings` branch.
+1. **Perf:** **P3** — cached compiled "settings plan" (emit setters into the generated class, hoist section/key names once per type, cache the chosen converter per property). Biggest remaining ceiling, Eff L. Then **P4** (de-reflect array/enumerable converters) → **P5** (resolve the config section once per type, not per property).
+2. **Engine tests:** T4 `ValuesPopulator`, T5 `TypeConverter`, T6 converters, T7 generator concurrency stress — note the unsynchronized check-then-`DefineType` in `SettingsClassGenerator.GenerateType`: the Q4 `ConcurrentDictionary` made the cache thread-safe but did **not** close that generation race (still a T7 item).
+3. **Architecture:** A1 (AOT/trim `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` — HIGH, it's a `Reflection.Emit` lib), C1 (`List<T>`/`IList<T>` support), C2 (public `SimpleSettingsException` base), A3 (`Core.AspNet` public type or drop the package), A4 (float `Microsoft.Extensions.*` floor per-TFM), A5 (make `SettingsHolder` internal), A6 (command-line quoted-arg parsing).
+4. **README** links — give the repo/brand links a pass (the `docs/` tutorials were done in #20; the README may still have stale `existall/SimpleConfig` links).
+5. **D1 validations feature** — owner-driven; reconcile the `validate-settings` branch.
 
 ## How releasing works (unchanged — durable)
 - **`ci.yml`** — on PRs to `master`: build + test (net8.0 + net10.0). **`release.yml`**: push to `master` → auto-publishes a MinVer height-based `-alpha` to nuget.org; manual **Release** (`workflow_dispatch`, `channel` beta/rc/stable + `bump` patch/minor/major) computes the next version, tags `v*`, publishes, creates a GitHub Release (`dry_run: true` previews).
