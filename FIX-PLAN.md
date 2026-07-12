@@ -3,8 +3,9 @@
 _Derived from the 2026-07-10 three-part review (architecture · tests · performance). Every finding below was verified against source with file:line. Work items are self-contained and ordered so they can be implemented one at a time._
 
 ## Progress (2026-07-12)
-- **Done & merged:** B1, B2, B4, B5, B9 + T1, T2 (PR #8) · BindingContext test (PR #10) · D3 namespace typo (PR #11) · T3 DI integration tests (PR #12). Suite: 78 → **100 green**.
-- **Open:** solution rename `ExistAll.SimpleConfig.slnx` → `SimpleSettings.slnx` (PR #13 — part of A2).
+- **Done & merged:** B1, B2, B4, B5, B9 + T1, T2 (PR #8) · BindingContext test (#10) · D3 namespace typo (#11) · T3 DI integration tests (#12) · solution rename (#13) · **A2 naming → ExistForAll (#15)** · **P0 benchmark harness (#16)** · **P1 provider cache + C3 decided/implemented (#17)**. Suite: 78 → **102 green** (51 per TFM · net8.0 + net10.0).
+- **Next:** P2 (memoize `ExtractTypeProperties` + replace the O(n²) dedup) — in progress.
+- **C3 — DECIDED (option 2):** cache in the provider only; Core `SettingsBuilder.GetSettings` unchanged; no reload. See #17.
 - **Held — do NOT delete (feature work coming):** D1 Validations (reconcile with the `validate-settings` branch) · D2 EqualityCompererCreator.
 - Running status lives in `SESSION-HANDOFF.md`.
 
