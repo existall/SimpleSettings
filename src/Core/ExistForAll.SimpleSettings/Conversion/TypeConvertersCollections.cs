@@ -10,6 +10,7 @@ namespace ExistForAll.SimpleSettings.Conversion
 			AddLast(new UriTypeConvertor());
 			AddLast(new ArrayTypeConverter(settingsOptions, this));
 			AddLast(new EnumerableTypeConverter(settingsOptions, this));
+			AddLast(new EnumTypeConverter());
 			AddLast(new DefaultTypeConverter());
 		}
 	}

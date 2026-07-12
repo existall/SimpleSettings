@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace ExistForAll.SimpleSettings.Conversion
 {
@@ -11,7 +12,7 @@ namespace ExistForAll.SimpleSettings.Conversion
 
 		public object Convert(object value, Type settingsType)
 		{
-			return System.Convert.ChangeType(value, settingsType);
+			return System.Convert.ChangeType(value, settingsType, CultureInfo.InvariantCulture);
 		}
 	}
 }
