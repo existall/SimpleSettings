@@ -1,49 +1,97 @@
 Getting Started
 ===============
 
-SimpleConfig uses a `ConfigBuilder` in order to create a `ConfigCollection`. `ConfigCollection`holds a key value pair of `Type` and the generated implementation of the Config interface. Thus it can be easily registered to any IOC container of your liking.
+SimpleSettings (previously SimpleConfig) uses a `SettingsBuilder` in order to create your settings objects. `SettingsBuilder.ScanAssemblies` returns an `ISettingsCollection` that holds a key value pair of `Type` and the generated implementation of the settings interface. Thus it can be easily registered to any IOC container of your liking.
 
-`IConfigBuilder.Build` is the entry point to get all config files, the `Build` method accept a collection of Assemblies and ConfigOptions.
+## Installation
+SimpleSettings ships as a set of NuGet packages. The core package is all you need to get started:
 
 ````C#
-var assemblies = new[]{this.GetType().GetTypeInfo().Assembly};
-
-var configCollection = new ConfigBuilder().Build(assemblies, new ConfigOptions());
+dotnet add package ExistForAll.SimpleSettings
 ````
 
-the result is a new class `ConfigCollection` where you can iterate all of the implemintations of your config interfaces.
-
-## First Config Interface
-
-As written in the introduction SimpleConfig uses interfaces to pass values into services, thus we need to create our first interface.
+`SettingsBuilder.CreateBuilder` is the entry point. Once you have a builder, `ScanAssemblies` accepts one or more Assemblies and returns the collection of generated settings.
 
 ````C#
-[ConfigSection]
-public interface IEmailSenderConfig
+var assemblies = new[] { typeof(Program).Assembly };
 
-	[DefaultValue("SomeUrl")]
-	string EmailServiceUrl { get; set; }
-
-	[DefaultValue(3)]
-	int Retries { get; set; }
-}
+var settingsCollection = SettingsBuilder
+    .CreateBuilder()
+    .ScanAssemblies(assemblies);
 ````
 
-When `ConfigBuilder.Build` invoked, it will search all indication of a config interfaces and use `Emit` to create a concreate class at run time. (Unforunatly Roslyn was not fast enough). The `DefaultValue` Attribute will set the value into the property.
+the result is an `ISettingsCollection` where you can iterate all of the implementations of your settings interfaces.
 
-Now as the builder returns the `ConfigCollection` we can explicitly request the interface like so
+## First Settings Interface
 
-````C#
-IEmailSenderConfig config = configCollection.GetConfig<IEmailSenderConfig>();
-````
-and get the values we used as deafults or simply iterate over the items like so
+As written in the introduction SimpleSettings uses interfaces to pass values into services, thus we need to create our first interface.
 
 ````C#
-foreach (var configItem in configCollection)
+[SettingsSection]
+public interface IEmailSenderSettings
 {
-	Type interfaceType = configItem.Key;
-	object configImplemintation = configItem.Value;
+    [SettingsProperty(DefaultValue = "SomeUrl")]
+    string EmailServiceUrl { get; set; }
+
+    [SettingsProperty(DefaultValue = 3)]
+    int Retries { get; set; }
 }
 ````
 
-SimpleConfig is highly extendable and we will explain how to work with it on the next [page](https://github.com/existall/SimpleConfig/blob/master/docs/building_the_collection.md)
+When `ScanAssemblies` is invoked, it will search for every indication of a settings interface and use `Emit` to create a concrete class at run time. (Unfortunately Roslyn was not fast enough). The `SettingsProperty` attribute's `DefaultValue` will set the value into the property.
+
+Now as the builder returns the `ISettingsCollection` we can explicitly request the interface like so
+
+````C#
+IEmailSenderSettings settings = settingsCollection.GetSettings<IEmailSenderSettings>();
+````
+and get the values we used as defaults or simply iterate over the items like so
+
+````C#
+foreach (var settingsItem in settingsCollection)
+{
+    Type interfaceType = settingsItem.Key;
+    object settingsImplementation = settingsItem.Value;
+}
+````
+
+If you only need a single interface, you can skip the collection and ask the builder directly:
+
+````C#
+var settings = SettingsBuilder
+    .CreateBuilder()
+    .GetSettings<IEmailSenderSettings>();
+````
+
+## Using Dependency Injection
+
+Most applications will wire SimpleSettings into the .NET generic host. Add the `ExistForAll.SimpleSettings.Extensions.GenericHost` package and call `AddSimpleSettings`:
+
+````C#
+dotnet add package ExistForAll.SimpleSettings.Extensions.GenericHost
+````
+
+````C#
+services.AddSimpleSettings(o =>
+{
+    o.AddAssemblies(new[] { typeof(IEmailSenderSettings).Assembly });
+});
+````
+
+Every scanned interface is registered as a singleton, so you can inject it directly:
+
+````C#
+public class EmailSender
+{
+    public EmailSender(IEmailSenderSettings settings) { }
+}
+````
+
+You can also resolve settings through the registered `ISettingsProvider`:
+
+````C#
+var provider = serviceProvider.GetRequiredService<ISettingsProvider>();
+var settings = provider.GetSettings<IEmailSenderSettings>();
+````
+
+SimpleSettings is highly extendable and we will explain how to work with it on the next [page](https://github.com/existall/SimpleSettings/blob/master/docs/building_the_collection.md)

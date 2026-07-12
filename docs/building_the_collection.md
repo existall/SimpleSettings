@@ -1,45 +1,47 @@
 # Building The Collection
-To build the `ConfigCollection` you must provide assemblies to which SimpleConfig scans them and get all the config interfaces.
+To build the settings collection you must provide the assemblies SimpleSettings scans in order to get all the settings interfaces.
 
-Thus SimpleConfig provides an AssemblyCollection for you to set all assemblies you want it to scan.
-We know that many applications uses different architectures so `AssemblyCollection` has one method
-
-
-## !!This feature will be removed in the next version, and will support only public interfaces!!
-`public void Add(IAssemblyHolder assemblyHolder)`
-
-`SimpleConfig` don't expect you to implement the `IAssemblyHolder` interface, it provide two extension methods.
-
-1. `AddExportedTypesAssembly` - Get the public config interfaces in the assemblies.
-2. `AddFullTypesAssembly` - Get all of the config interfaces in the assemblies, even the internal.
-
+You pass those assemblies to `ScanAssemblies`, which has an overload that accepts an `IEnumerable<Assembly>` and another that accepts one required assembly followed by any number of additional ones.
 
 ````C#
-var assemblyCollection = new AssemblyCollection()
-				.AddFullTypesAssembly(this.GetType().GetTypeInfo().Assembly)
-				.AddExportedTypesAssembly(typeof(SomeType).GetTypeInfo().Assembly);
+var settingsCollection = SettingsBuilder
+    .CreateBuilder()
+    .ScanAssemblies(typeof(Program).Assembly);
 ````
+
+SimpleSettings scans only the public (exported) interfaces in the assemblies you provide, so make sure the interfaces you want discovered are public.
 
 ## Options
 
-To the build method we need to pass `ConfigOptions`, this Options class allows you to replace some of SimpleConfig defaults. To better understand the ConfigOptions see the [Extend]() section.
+To configure SimpleSettings, use the `CreateBuilder` overload that gives you a builder factory. The factory exposes `SetupOptions` along with a set of `Set*` helpers that mutate `SettingsOptions`. To better understand the options see the [Extend](https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md) section.
 
-## Binders
-SimpleConfig can populate properties with values not only from `DefaultValue` attribute but from any `Binder` you can create.
-
-To add a Binder use the `Add` method on the `ConfigBuilder` like so.
 ````C#
-ConfigBuilder.Add(ISectionBinder sectionBinder);
+var settingsCollection = SettingsBuilder
+    .CreateBuilder(factory =>
+    {
+        factory.SetDateTimeFormat("yyyy-MM-dd");
+        factory.SetArraySplitDelimiter(";");
+    })
+    .ScanAssemblies(typeof(Program).Assembly);
 ````
 
-#### The order in which binders are added is important, the last binder will set the value into the property. If no value was set the deafult value will be set.
+## Binders
+SimpleSettings can populate properties with values not only from the `SettingsProperty` default value but from any `Binder` you can create.
 
-SimpleConfig provides two Binders out of the box, `ConfigurationBinder` which can extract values from Microsoft .Net Core `IConfiguraton` and `InMemoryCollection`. We are currently working on `SqlBinder`.
+To add a Binder use the `AddSectionBinder` method on the builder factory like so.
+````C#
+SettingsBuilder.CreateBuilder(factory =>
+{
+    factory.AddSectionBinder(sectionBinder);
+});
+````
 
-For more information about the Binders click on them.
-1. [ConfigurationBinder]()
-2. [InMemoryBinder]()
+#### The order in which binders are added is important, the last binder will set the value into the property. If no value was set the default value will be set.
 
-To create new Binders see [Extend section]()
+SimpleSettings provides several binders out of the box. `InMemoryCollection` lives in the core package and is added via `AddInMemoryCollection`. The `ExistForAll.SimpleSettings.Binders` package adds a `ConfigurationBinder` which can extract values from Microsoft .NET `IConfiguration` (via `AddConfiguration`), an `EnvironmentVariableBinder` (via `AddEnvironmentVariable`) and a command line binder (via `AddCommandLine` / `AddArguments`).
 
-To continue on to Config Interfaces click [here]()
+For more information about the Binders see the [Build a SectionBinder](https://github.com/existall/SimpleSettings/blob/master/docs/Build%20a%20SectionBinder.md) page.
+
+To create new Binders see the [Extend section](https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md).
+
+To continue on to Settings Interfaces click [here](https://github.com/existall/SimpleSettings/blob/master/docs/Build%20Config%20Interface.md).
