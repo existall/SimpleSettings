@@ -27,6 +27,25 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 		}
 
 		[Test]
+		public async Task Build_WithPrefix_ShouldLookUpPrefixedVariable()
+		{
+			const string prefix = "PREFIX_";
+			var guid = Guid.NewGuid().ToString();
+
+			using (new DisposableEnvironmentVariable(prefix + EnvironmentVariable, guid))
+			{
+				var sut = SettingsBuilder.CreateBuilder(x =>
+					x.AddEnvironmentVariable(o => o.Prefix = prefix));
+
+				var result = sut.ScanAssemblies(GetType().Assembly);
+
+				var settings = result.GetSettings<IWithEnvironmentVariable>();
+
+				await Assert.That(settings.EnvironmentVariable).IsEqualTo(guid);
+			}
+		}
+
+		[Test]
 		public async Task TryGetValue_WhenEnvVariableIsLast_ShouldSetValueFromEnv()
 		{
 			var guid = Guid.NewGuid().ToString();

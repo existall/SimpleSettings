@@ -56,6 +56,17 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 		}
 
 		[Test]
+		public async Task GenerateType_WhenCalledTwiceForSameInterface_ReturnsCachedType()
+		{
+			var generator = new SettingsClassGenerator();
+
+			var first = generator.GenerateType(typeof(ITestInterface));
+			var second = generator.GenerateType(typeof(ITestInterface));
+
+			await Assert.That(ReferenceEquals(first, second)).IsTrue();
+		}
+
+		[Test]
 		public async Task GenerateType_WhenDerivedHidesABasePropertyName_DeduplicatesByName()
 		{
 			var generator = new SettingsClassGenerator();
