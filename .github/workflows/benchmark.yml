@@ -1,0 +1,102 @@
+name: Benchmarks
+
+# Track BenchmarkDotNet results on every push to master and compare them on PRs, so a
+# performance/allocation regression is visible in the diff before it lands.
+#
+# We gate on ALLOCATED BYTES rather than time: allocation counts are deterministic and
+# therefore stable on shared GitHub-hosted runners, whereas wall-clock time is far too noisy
+# to fail a build on. Time is still recorded by BenchmarkDotNet in the run logs for eyeballing.
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+# Push (master) records the new baseline on the gh-pages data branch -> needs contents: write.
+# PRs get a comment when a benchmark regresses -> needs pull-requests: write.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: bench-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # MinVer (used by the referenced library) wants full history + tags
+
+      - name: Setup .NET (8 + 10)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+          # The build uses the SDK pinned by src/global.json; the 8.0 runtime is here for the
+          # multi-targeted core library the benchmark references.
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('src/Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Run benchmarks
+        working-directory: src   # global.json lives here
+        # ShortRun keeps CI time reasonable; allocation counts are deterministic regardless of
+        # iteration count. The micro-benchmark filters match nothing until PR #21 lands them on
+        # master, at which point they are tracked automatically alongside ScanBenchmark.
+        run: >
+          dotnet run -c Release
+          --project performance/ExistForAll.SimpleSettings.Benchmark
+          --
+          --filter "*ScanBenchmark*" "*EnumerateBenchmark*" "*EnvBinderBenchmark*" "*GenerateTypeBenchmark*"
+          --job short
+          --exporters json
+          --artifacts ${{ github.workspace }}/bdn
+
+      - name: Extract per-benchmark allocations (bytes/op)
+        # Reshape BenchmarkDotNet's JSON into the github-action-benchmark 'customSmallerIsBetter'
+        # format: [{ name, unit, value }]. jq -s slurps the per-class report files into one array.
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(bdn/results/*-report-full-compressed.json)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::No BenchmarkDotNet JSON produced under bdn/results/"; exit 1
+          fi
+          jq -s '[.[].Benchmarks[] | {name: .FullName, unit: "bytes", value: (.Memory.BytesAllocatedPerOperation // 0)}]' \
+            "${files[@]}" > allocations.json
+          echo "Tracked allocations:"; cat allocations.json
+
+      - name: Track & gate on allocations
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: Allocations (bytes/op)
+          tool: customSmallerIsBetter
+          output-file-path: allocations.json
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # master push: store the new point on gh-pages (dev/bench). PR: compare vs baseline only.
+          auto-push: ${{ github.event_name == 'push' }}
+          save-data-file: ${{ github.event_name == 'push' }}
+          # A settings type's allocation profile is deterministic, so a >10% jump is a real regression.
+          alert-threshold: '110%'
+          fail-threshold: '110%'
+          comment-on-alert: true
+          # Block the PR check on a regression; don't fail post-merge master runs (baseline is already recorded).
+          fail-on-alert: ${{ github.event_name == 'pull_request' }}
+          alert-comment-cc-users: '@guy-lud'
+          summary-always: true
