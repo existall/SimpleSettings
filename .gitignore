@@ -311,3 +311,6 @@ tools/
 /src/params.json
 /src/params.txt
 /.vscode/
+
+# BenchmarkDotNet output — local benchmark runs leave this under src/ (CI uses --artifacts)
+BenchmarkDotNet.Artifacts/

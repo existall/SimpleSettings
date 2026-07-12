@@ -3,8 +3,9 @@
 _Derived from the 2026-07-10 three-part review (architecture · tests · performance). Every finding below was verified against source with file:line. Work items are self-contained and ordered so they can be implemented one at a time._
 
 ## Progress (2026-07-12)
-- **Done & merged:** B1, B2, B4, B5, B9 + T1, T2 (PR #8) · BindingContext test (#10) · D3 namespace typo (#11) · T3 DI integration tests (#12) · solution rename (#13) · **A2 naming → ExistForAll (#15)** · **P0 benchmark harness (#16)** · **P1 provider cache + C3 decided/implemented (#17)** · **P2 memoize `ExtractTypeProperties` + `HashSet` dedup (#18)** · **docs tutorials refresh (#20)**.
-- **In flight:** **Q1–Q4 perf quick wins** (current PR) — GetEnumerator `yield`, `OrdinalIgnoreCase` suffix match, env-binder fast path, generated-type cache. **Q5 was already resolved by B4** (the dead null-checks are gone). Suite → **55 per TFM** (net8.0 + net10.0).
+- **Done & merged:** B1, B2, B4, B5, B9 + T1, T2 (PR #8) · BindingContext test (#10) · D3 namespace typo (#11) · T3 DI integration tests (#12) · solution rename (#13) · **A2 naming → ExistForAll (#15)** · **P0 benchmark harness (#16)** · **P1 provider cache + C3 decided/implemented (#17)** · **P2 memoize `ExtractTypeProperties` + `HashSet` dedup (#18)** · **docs tutorials refresh (#20)** · **Q1–Q4 perf quick wins + M1 collision fix + micro-benchmarks (#21)**.
+- **Q1–Q4 proven** via isolated micro-benchmarks (macro `ScanBenchmark` can't resolve them): Q1 2.7× / 64 KB→88 B · Q3 2.65× / 152 B→0 · Q4 32× / 224 B→0. **Q5 was already resolved by B4.** **M1** (code-review finding): namespace-qualify the generated impl name in the generator only — `GetNormalizeInterfaceName` also backs the section name. Suite → **56 per TFM**.
+- **In flight:** **#22 benchmark-tracking CI** — runs BDN on push/PR, gates PRs on **allocation** regressions (>10%) via github-action-benchmark on `gh-pages`; time is informational. Green, ready to merge.
 - **Next:** P3 (cached compiled "settings plan") — the biggest remaining ceiling.
 - **C3 — DECIDED (option 2):** cache in the provider only; Core `SettingsBuilder.GetSettings` unchanged; no reload. See #17.
 - **Held — do NOT delete (feature work coming):** D1 Validations (reconcile with the `validate-settings` branch) · D2 EqualityCompererCreator.
