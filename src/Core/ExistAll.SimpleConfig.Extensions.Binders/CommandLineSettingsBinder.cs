@@ -4,7 +4,7 @@ using System.Linq;
 using ExistForAll.SimpleSettings;
 using ExistForAll.SimpleSettings.Binders;
 
-namespace ExistsForAll.SimpleSettings.Binders
+namespace ExistForAll.SimpleSettings.Binders
 {
    public class CommandLineSettingsBinder : ISectionBinder
    {
