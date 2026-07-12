@@ -8,16 +8,20 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 {
 	internal class TypePropertiesExtractor : ITypePropertiesExtractor
 	{
-		// A settings interface's property set is immutable for the process lifetime, and both the class
-		// generator and the values populator ask for it (each news up its own extractor), so memoize
-		// process-wide with a shared cache. Extraction also collapses the previous O(n^2) inherited
-		// dedup (Where(p => properties.All(...))) to a single HashSet pass.
-		private static readonly ConcurrentDictionary<Type, PropertyInfo[]> Cache =
-			new ConcurrentDictionary<Type, PropertyInfo[]>();
+		// ExtractTypeProperties is called repeatedly for a settings type (once per type-generation and
+		// once per populate), so results are memoized. The cache is an injected dependency rather than a
+		// static field, so its lifetime and scope are the caller's choice. Extraction also collapses the
+		// previous O(n^2) inherited dedup (Where(p => properties.All(...))) to a single HashSet pass.
+		private readonly ConcurrentDictionary<Type, PropertyInfo[]> _cache;
+
+		public TypePropertiesExtractor(ConcurrentDictionary<Type, PropertyInfo[]> cache)
+		{
+			_cache = cache ?? throw new ArgumentNullException(nameof(cache));
+		}
 
 		public IEnumerable<PropertyInfo> ExtractTypeProperties(Type type)
 		{
-			return Cache.GetOrAdd(type, Extract);
+			return _cache.GetOrAdd(type, Extract);
 		}
 
 		private static PropertyInfo[] Extract(Type type)

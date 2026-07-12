@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,7 +13,7 @@ namespace ExistForAll.SimpleSettings
 		private readonly ITypeConverter _typeConverter;
 
 		public ValuesPopulator() :
-			this(new TypePropertiesExtractor(), new TypeConverter())
+			this(new TypePropertiesExtractor(new ConcurrentDictionary<Type, PropertyInfo[]>()), new TypeConverter())
 		{
 		}
 
