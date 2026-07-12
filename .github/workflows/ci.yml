@@ -48,10 +48,10 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restore
-        run: dotnet restore ExistAll.SimpleConfig.slnx
+        run: dotnet restore SimpleSettings.slnx
 
       - name: Build (Release, deterministic)
-        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+        run: dotnet build SimpleSettings.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Test (net8.0 + net10.0)
-        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
+        run: dotnet test SimpleSettings.slnx -c Release --no-build

@@ -70,16 +70,16 @@ jobs:
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restore
-        run: dotnet restore ExistAll.SimpleConfig.slnx
+        run: dotnet restore SimpleSettings.slnx
 
       - name: Build
-        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+        run: dotnet build SimpleSettings.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Test
-        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
+        run: dotnet test SimpleSettings.slnx -c Release --no-build
 
       - name: Pack (MinVer -> height-based alpha)
-        run: dotnet pack ExistAll.SimpleConfig.slnx -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
+        run: dotnet pack SimpleSettings.slnx -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
 
       - name: List packages
         run: ls -1 "$ARTIFACTS"
@@ -202,16 +202,16 @@ jobs:
           git tag -a "${{ steps.ver.outputs.tag }}" -m "Release ${{ steps.ver.outputs.tag }}"
 
       - name: Restore
-        run: dotnet restore ExistAll.SimpleConfig.slnx
+        run: dotnet restore SimpleSettings.slnx
 
       - name: Build
-        run: dotnet build ExistAll.SimpleConfig.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
+        run: dotnet build SimpleSettings.slnx -c Release --no-restore -p:ContinuousIntegrationBuild=true
 
       - name: Test
-        run: dotnet test ExistAll.SimpleConfig.slnx -c Release --no-build
+        run: dotnet test SimpleSettings.slnx -c Release --no-build
 
       - name: Pack (MinVer -> exact tagged version)
-        run: dotnet pack ExistAll.SimpleConfig.slnx -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
+        run: dotnet pack SimpleSettings.slnx -c Release --no-build -p:ContinuousIntegrationBuild=true -o "$ARTIFACTS"
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
