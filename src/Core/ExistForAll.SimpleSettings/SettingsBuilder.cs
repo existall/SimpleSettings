@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using ExistForAll.SimpleSettings.Core;
 using ExistForAll.SimpleSettings.Core.Reflection;
@@ -34,7 +35,9 @@ namespace ExistForAll.SimpleSettings
             IValuesPopulator valuesPopulator)
         {
             Options = options;
-            SectionBinders = sectionBinders;
+            // Materialize once so the populator's `binders as ISectionBinder[]` fast-path hits instead of
+            // re-allocating via ToArray on every populate (the factory hands us a SortedList.Values view).
+            SectionBinders = sectionBinders as ISectionBinder[] ?? sectionBinders.ToArray();
             _settingsTypesExtractor = settingsTypesExtractor;
             _settingsOptionsValidator = settingsOptionsValidator;
             _settingsClassGenerator = settingsClassGenerator;

@@ -5,6 +5,6 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 {
 	internal interface ITypeConverter
 	{
-		PropertyConversion CreateConversion(PropertyInfo propertyInfo, SettingsOptions options);
+		PropertyConversion CreateConversion(PropertyInfo propertyInfo, SettingsPropertyAttribute? attribute, SettingsOptions options);
 	}
 }

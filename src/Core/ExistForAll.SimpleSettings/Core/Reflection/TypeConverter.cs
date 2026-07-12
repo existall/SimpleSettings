@@ -11,10 +11,9 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 		// type once nullability is stripped, and what a null bound value should yield. Previously all of this
 		// (including up to three SettingsPropertyAttribute reads and a linear converter scan) ran on every
 		// single populate; now it runs once per type and the result is cached in the settings plan.
-		public PropertyConversion CreateConversion(PropertyInfo propertyInfo, SettingsOptions options)
+		public PropertyConversion CreateConversion(PropertyInfo propertyInfo, SettingsPropertyAttribute? attribute, SettingsOptions options)
 		{
 			var propertyType = propertyInfo.PropertyType;
-			var attribute = propertyInfo.GetCustomAttribute<SettingsPropertyAttribute>();
 
 			var throwOnNull = attribute != null && !attribute.AllowEmpty;
 			var nullResult = CreateNullResult(propertyType);

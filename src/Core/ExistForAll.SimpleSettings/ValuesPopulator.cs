@@ -79,20 +79,41 @@ namespace ExistForAll.SimpleSettings
 			for (var i = 0; i < properties.Length; i++)
 			{
 				var property = properties[i];
-				propertyPlans[i] = new PropertyPlan(property,
-					property.GetPropertyName(),
-					property.GetDefaultValue(),
-					_typeConverter.CreateConversion(property, options));
+
+				// Read [SettingsProperty] once and thread it into key/default/conversion — GetCustomAttribute
+				// re-materializes the attribute + its backing array on every call, and this runs per property
+				// for every type at cold-scan scale. inherit:true matches the prior key-resolution behavior
+				// (a no-op for interface members, which is all settings types are).
+				var attribute = property.GetCustomAttribute<SettingsPropertyAttribute>(inherit: true);
+
+				try
+				{
+					var key = !string.IsNullOrWhiteSpace(attribute?.Name) ? attribute.Name : property.Name;
+
+					propertyPlans[i] = new PropertyPlan(property,
+						key,
+						attribute?.DefaultValue,
+						_typeConverter.CreateConversion(property, attribute, options));
+				}
+				catch (Exception e)
+				{
+					// Restore the original exception contract: converter-setup failures used to surface inside
+					// the per-populate convert try as SettingsPropertyValueException. The bound value isn't
+					// known at plan build, hence null.
+					throw new SettingsPropertyValueException(settings, null, property, e);
+				}
 			}
 
 			var plan = new SettingsPlan(settings, options, propertyPlans);
 
-			// Concurrent builds would produce equivalent plans, so last-writer-wins is harmless.
+			// Concurrent builds would produce equivalent plans, so last-writer-wins is harmless. A build that
+			// throws is never cached (we don't reach here), so the next call retries — matching the old
+			// re-throw-every-time behavior.
 			_plans[settings] = plan;
 			return plan;
 		}
 
-		private static object? ConvertPropertyValue(Type settingsType, object? value, PropertyPlan propertyPlan)
+		private static object? ConvertPropertyValue(Type settingsType, object? value, in PropertyPlan propertyPlan)
 		{
 			try
 			{

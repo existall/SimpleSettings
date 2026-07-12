@@ -8,7 +8,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 	{
 		public static string GetNormalizeInterfaceName(this Type target)
 		{
-			return target.Name[0] == 'I' ? $"{target.Name.Substring(1)}" : target.Name;
+			return target.Name[0] == 'I' ? target.Name.Substring(1) : target.Name;
 		}
 
 		public static string GetSectionName(this Type settingsClass, SettingsOptions options)
@@ -18,15 +18,6 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			return !string.IsNullOrWhiteSpace(attribute?.Name)
 				? attribute.Name
 				: options.SectionNameFormatter(settingsClass);
-		}
-
-		public static string GetPropertyName(this PropertyInfo propertyInfo)
-		{
-			var attribute = propertyInfo.GetCustomAttribute<SettingsPropertyAttribute>(true);
-
-			return !string.IsNullOrWhiteSpace(attribute?.Name)
-				? attribute.Name
-				: propertyInfo.Name;
 		}
 
 		public static bool IsEnumerable(this Type type)

@@ -7,8 +7,8 @@ namespace ExistForAll.SimpleSettings.Benchmark
 	/// <summary>
 	/// P3 — warm re-populate of a settings type through a primed builder, scaled by property count. The impl
 	/// type is emitted and the per-type <c>SettingsPlan</c> (section name resolved once, per-property keys +
-	/// defaults + converters cached, and the generated <c>__Set</c> bound as a delegate) are built once in
-	/// setup, so each measured call pays only: allocate the instance + run the populate off the cached plan.
+	/// defaults + converters cached) are built once in setup, so each measured call pays only: allocate the
+	/// instance + run the populate off the cached plan.
 	/// This is the hot path P3 targets — repeated resolves that previously re-read attributes, rescanned the
 	/// converter list, rebuilt the section name, and set each property reflectively. It mirrors
 	/// <c>ResolveBenchmark.WarmResolve_Provider</c> but is a dedicated, cold-noise-free entry so CI can gate
