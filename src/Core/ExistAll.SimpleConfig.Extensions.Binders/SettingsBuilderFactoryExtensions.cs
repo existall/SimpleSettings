@@ -1,5 +1,4 @@
 using System;
-using ExistsForAll.SimpleSettings.Binders;
 using Microsoft.Extensions.Configuration;
 
 namespace ExistForAll.SimpleSettings.Binders
