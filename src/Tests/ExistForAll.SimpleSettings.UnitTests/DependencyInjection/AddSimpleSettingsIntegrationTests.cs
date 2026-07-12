@@ -65,6 +65,25 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 		}
 
 		[Test]
+		public async Task AddSimpleSettings_Provider_ReturnsTheSameInstanceAsTheContainer()
+		{
+			var services = new ServiceCollection();
+			services.AddSimpleSettings(o => o.AddAssemblies(new[] { typeof(IDiExampleSettings).Assembly }));
+
+			var provider = services.BuildServiceProvider();
+			var fromContainer = provider.GetRequiredService<IDiExampleSettings>();
+			var settingsProvider = provider.GetRequiredService<ISettingsProvider>();
+
+			var first = settingsProvider.GetSettings<IDiExampleSettings>();
+			var second = settingsProvider.GetSettings<IDiExampleSettings>();
+
+			// C3: the provider serves the startup-built singleton, so both resolution paths agree and
+			// repeat resolves return the same cached instance instead of re-binding a fresh one.
+			await Assert.That(ReferenceEquals(fromContainer, first)).IsTrue();
+			await Assert.That(ReferenceEquals(first, second)).IsTrue();
+		}
+
+		[Test]
 		public async Task AddSimpleSettings_NullAction_Throws()
 		{
 			var services = new ServiceCollection();

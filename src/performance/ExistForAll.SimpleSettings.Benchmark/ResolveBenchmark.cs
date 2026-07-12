@@ -10,8 +10,9 @@ namespace ExistForAll.SimpleSettings.Benchmark
 	/// <list type="bullet">
 	/// <item><c>ColdBuild</c> — a fresh <see cref="SettingsBuilder"/> per call: IL-emit the implementation
 	/// type into a new dynamic assembly + reflectively populate it (the per-type startup cost).</item>
-	/// <item><c>WarmResolve_Provider</c> — a primed builder re-binding a fresh instance every call. This is
-	/// exactly what <c>ISettingsProvider.GetSettings</c> does today, and the path P1 will cache.</item>
+	/// <item><c>WarmResolve_Provider</c> — a primed builder re-binding a fresh instance every call: the raw
+	/// <c>SettingsBuilder.GetSettings</c> re-bind cost. P1 makes <c>ISettingsProvider</c> serve the cached
+	/// collection for scanned settings instead, so its resolves drop toward <c>WarmResolve_DiSingleton</c>.</item>
 	/// <item><c>WarmResolve_DiSingleton</c> — resolving the startup-built singleton from a DI container
 	/// (what <c>AddSimpleSettings</c> registers via <c>AddSingleton(interface, instance)</c>).</item>
 	/// </list>
