@@ -314,3 +314,6 @@ tools/
 
 # BenchmarkDotNet output — local benchmark runs leave this under src/ (CI uses --artifacts)
 BenchmarkDotNet.Artifacts/
+
+# Personal per-clone Claude Code settings (e.g. the SessionStart handoff hook)
+.claude/settings.local.json
