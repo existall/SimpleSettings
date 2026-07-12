@@ -39,7 +39,12 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 
 			try
 			{
-				var name = $"{interfaceType.GetNormalizeInterfaceName()}Impl";
+				// Namespace-qualified so two settings interfaces that share a simple name
+				// (e.g. Foo.ISettings + Bar.ISettings) don't collide on the generated type name and
+				// abort the scan. Deliberately NOT GetNormalizeInterfaceName() — that helper also backs
+				// the default config section name (SettingsOptions.SectionNameFormatter), which must stay
+				// simple-name-based; the generated impl name is an internal detail and can differ.
+				var name = $"{(interfaceType.FullName ?? interfaceType.Name).Replace('.', '_').Replace('+', '_')}Impl";
 
 				var properties = _typePropertiesExtractor.ExtractTypeProperties(interfaceType);
 
