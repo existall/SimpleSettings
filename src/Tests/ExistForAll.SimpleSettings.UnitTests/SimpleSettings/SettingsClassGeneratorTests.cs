@@ -56,6 +56,33 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 		}
 
 		[Test]
+		public async Task GenerateType_WhenCalledTwiceForSameInterface_ReturnsCachedType()
+		{
+			var generator = new SettingsClassGenerator();
+
+			var first = generator.GenerateType(typeof(ITestInterface));
+			var second = generator.GenerateType(typeof(ITestInterface));
+
+			await Assert.That(ReferenceEquals(first, second)).IsTrue();
+		}
+
+		[Test]
+		public async Task GenerateType_ForTwoInterfacesSharingASimpleName_GeneratesDistinctTypes()
+		{
+			// DupA.IDuplicateName and DupB.IDuplicateName share the simple name "IDuplicateName".
+			// The generated impl name must be namespace-qualified, otherwise both map to the same
+			// module type name and the second DefineType throws (aborting the whole scan).
+			var generator = new SettingsClassGenerator();
+
+			var a = generator.GenerateType(typeof(DupA.IDuplicateName));
+			var b = generator.GenerateType(typeof(DupB.IDuplicateName));
+
+			await Assert.That(ReferenceEquals(a, b)).IsFalse();
+			await Assert.That(typeof(DupA.IDuplicateName).GetTypeInfo().IsAssignableFrom(a.GetTypeInfo())).IsTrue();
+			await Assert.That(typeof(DupB.IDuplicateName).GetTypeInfo().IsAssignableFrom(b.GetTypeInfo())).IsTrue();
+		}
+
+		[Test]
 		public async Task GenerateType_WhenDerivedHidesABasePropertyName_DeduplicatesByName()
 		{
 			var generator = new SettingsClassGenerator();
@@ -74,5 +101,23 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 	{
 		new string Value { get; set; }
 		int Extra { get; set; }
+	}
+}
+
+namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings.DupA
+{
+	// Same simple name as DupB.IDuplicateName; no suffix/attribute/base so neither is auto-discovered
+	// by assembly scans — they only exercise the generator directly via GenerateType.
+	public interface IDuplicateName
+	{
+		string Value { get; set; }
+	}
+}
+
+namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings.DupB
+{
+	public interface IDuplicateName
+	{
+		string Value { get; set; }
 	}
 }

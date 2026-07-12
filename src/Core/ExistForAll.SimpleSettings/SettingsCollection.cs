@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace ExistForAll.SimpleSettings
@@ -49,9 +48,8 @@ namespace ExistForAll.SimpleSettings
 
 		public IEnumerator<KeyValuePair<Type, object>> GetEnumerator()
 		{
-			var dictionary = _settingsHolders.ToDictionary(x => x.Key, y => y.Value.SettingsImplementation);
-
-			return dictionary.GetEnumerator();
+			foreach (var holder in _settingsHolders)
+				yield return new KeyValuePair<Type, object>(holder.Key, holder.Value.SettingsImplementation);
 		}
 	}
 }

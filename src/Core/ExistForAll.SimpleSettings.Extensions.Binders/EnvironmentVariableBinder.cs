@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Text;
 
 namespace ExistForAll.SimpleSettings.Binders
 {
@@ -24,19 +23,26 @@ namespace ExistForAll.SimpleSettings.Binders
 
         public void BindPropertySettings(BindingContext context)
         {
-            var sb = new StringBuilder();
+            // Fast path (the common case): with no prefix and no formatter the variable name is just the
+            // key, so skip the StringBuilder allocation entirely.
+            string variableName;
+            if (Prefix == null && VariableNameFormatter == null)
+            {
+                variableName = context.Key;
+            }
+            else
+            {
+                var name = VariableNameFormatter != null
+                    ? VariableNameFormatter(context.Section, context.Key)
+                    : context.Key;
+                variableName = Prefix != null ? Prefix + name : name;
+            }
 
-            if (Prefix != null)
-                sb.Append(Prefix);
-
-            sb.Append(VariableNameFormatter != null
-                ? VariableNameFormatter(context.Section, context.Key)
-                : context.Key);
-
-            var variableName = sb.ToString();
-            
-            if(_environmentVariables.Contains(variableName))
-                context.SetNewValue(_environmentVariables[variableName]);
+            // Single lookup: the non-generic IDictionary indexer returns null for an absent key, and an
+            // environment variable is never null when present.
+            var value = _environmentVariables[variableName];
+            if (value != null)
+                context.SetNewValue(value);
         }
     }
 }

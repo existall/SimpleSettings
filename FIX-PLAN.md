@@ -3,8 +3,9 @@
 _Derived from the 2026-07-10 three-part review (architecture · tests · performance). Every finding below was verified against source with file:line. Work items are self-contained and ordered so they can be implemented one at a time._
 
 ## Progress (2026-07-12)
-- **Done & merged:** B1, B2, B4, B5, B9 + T1, T2 (PR #8) · BindingContext test (#10) · D3 namespace typo (#11) · T3 DI integration tests (#12) · solution rename (#13) · **A2 naming → ExistForAll (#15)** · **P0 benchmark harness (#16)** · **P1 provider cache + C3 decided/implemented (#17)**. Suite: 78 → **102 green** (51 per TFM · net8.0 + net10.0).
-- **Next:** P2 (memoize `ExtractTypeProperties` + replace the O(n²) dedup) — in progress.
+- **Done & merged:** B1, B2, B4, B5, B9 + T1, T2 (PR #8) · BindingContext test (#10) · D3 namespace typo (#11) · T3 DI integration tests (#12) · solution rename (#13) · **A2 naming → ExistForAll (#15)** · **P0 benchmark harness (#16)** · **P1 provider cache + C3 decided/implemented (#17)** · **P2 memoize `ExtractTypeProperties` + `HashSet` dedup (#18)** · **docs tutorials refresh (#20)**.
+- **In flight:** **Q1–Q4 perf quick wins** (current PR) — GetEnumerator `yield`, `OrdinalIgnoreCase` suffix match, env-binder fast path, generated-type cache. **Q5 was already resolved by B4** (the dead null-checks are gone). Suite → **55 per TFM** (net8.0 + net10.0).
+- **Next:** P3 (cached compiled "settings plan") — the biggest remaining ceiling.
 - **C3 — DECIDED (option 2):** cache in the provider only; Core `SettingsBuilder.GetSettings` unchanged; no reload. See #17.
 - **Held — do NOT delete (feature work coming):** D1 Validations (reconcile with the `validate-settings` branch) · D2 EqualityCompererCreator.
 - Running status lives in `SESSION-HANDOFF.md`.
@@ -24,43 +25,43 @@ _Derived from the 2026-07-10 three-part review (architecture · tests · perform
 ## Summary checklist
 
 **Phase 1 — Correctness bugfixes (one-liners, non-breaking, highest ROI)**
-- [ ] B1 · Register `EnumTypeConverter` — enum binding is broken · Sev High · Eff S
-- [ ] B2 · Invariant culture in `DefaultTypeConverter` — locale data corruption · Sev High · Eff S
-- [ ] B4 · Fix `BindingContext.PropertyType` (returns the interface, not the property type) · Sev Med · Eff S
-- [ ] B5 · Fix validator contradiction (can’t null `AttributeType`) · Sev Med · Eff S
-- [ ] B9 · Fix broken error-message interpolation in `Resources` · Sev Low · Eff S
+- [x] B1 · Register `EnumTypeConverter` — enum binding is broken · Sev High · Eff S
+- [x] B2 · Invariant culture in `DefaultTypeConverter` — locale data corruption · Sev High · Eff S
+- [x] B4 · Fix `BindingContext.PropertyType` (returns the interface, not the property type) · Sev Med · Eff S
+- [x] B5 · Fix validator contradiction (can’t null `AttributeType`) · Sev Med · Eff S
+- [x] B9 · Fix broken error-message interpolation in `Resources` · Sev Low · Eff S
 
 **Phase 2 — Dead code & naming (do while pre-stable; breaking)**
-- [ ] D1 · Delete (or wire) the dead `Validations` API + `ValidatorType` · Sev Med · Eff M · **Break**
-- [ ] D2 · Delete (or fix+wire) `EqualityCompererCreator` (dead + invalid IL) · Sev Med · Eff S
-- [ ] D3 · Fix the `ExistsForAll` namespace typo in the Binders package · Sev Med · Eff S · **Break**
+- [ ] D1 · Delete (or wire) the dead `Validations` API + `ValidatorType` · Sev Med · Eff M · **Break** · **HELD — feature work coming**
+- [ ] D2 · Delete (or fix+wire) `EqualityCompererCreator` (dead + invalid IL) · Sev Med · Eff S · **HELD**
+- [x] D3 · Fix the `ExistsForAll` namespace typo in the Binders package · Sev Med · Eff S · **Break**
 
 **Phase 3 — Correctness/feature (needs design)**
 - [ ] C1 · Decide: support `List<T>`/`IList<T>`/`ICollection<T>` or document the `IEnumerable<T>`-only limit · Sev Med · Eff M
 - [ ] C2 · Introduce a public `SimpleSettingsException` base; make boundary-crossing exceptions public + structured · Sev Med · Eff M · **Break**
-- [ ] C3 · Decide reload / provider-vs-singleton semantics (see also P1) · Sev High · Eff M–L
+- [x] C3 · Decide reload / provider-vs-singleton semantics (see also P1) · Sev High · Eff M–L · **DECIDED: option 2, provider-level cache (#17)**
 
 **Phase 4 — Tests (write-first shortlist, then broaden)**
-- [ ] T1 · Culture parse test (fails first · pairs with B2)
-- [ ] T2 · Enum-from-string test (fails first · pairs with B1)
-- [ ] T3 · DI / Generic-Host integration tests (headline feature, 0 coverage today)
+- [x] T1 · Culture parse test (fails first · pairs with B2)
+- [x] T2 · Enum-from-string test (fails first · pairs with B1)
+- [x] T3 · DI / Generic-Host integration tests (headline feature, 0 coverage today)
 - [ ] T4 · `ValuesPopulator` unit tests (precedence + exception wrappers)
 - [ ] T5 · `TypeConverter` unit tests (null / nullable / empty-enumerable / attribute)
 - [ ] T6 · Converter unit tests (array / enumerable / Uri / DateTime + `List<T>` doc test)
-- [ ] T7 · `SettingsClassGenerator` caching + concurrency stress; collection not-found; binder edge cases
+- [ ] T7 · `SettingsClassGenerator` caching + concurrency stress; collection not-found; binder edge cases · *(caching now covered; concurrency race still open — see P/Q4 note)*
 
 **Phase 5 — Performance**
-- [ ] P0 · Upgrade the benchmark harness (MemoryDiagnoser + phase-split + fixtures) — do first, to measure P1–P3
-- [ ] P1 · Cache built instance on the `ISettingsProvider` resolve path · Sev High · Eff S
-- [ ] P2 · Memoize `ExtractTypeProperties` + fix O(n²) dedup · Sev High · Eff S
+- [x] P0 · Upgrade the benchmark harness (MemoryDiagnoser + phase-split + fixtures) — do first, to measure P1–P3
+- [x] P1 · Cache built instance on the `ISettingsProvider` resolve path · Sev High · Eff S
+- [x] P2 · Memoize `ExtractTypeProperties` + fix O(n²) dedup · Sev High · Eff S
 - [ ] P3 · Cached compiled “settings plan” (emit setters, hoist names, cache converters) · Sev High · Eff L
-- [ ] Q1–Q5 · Quick wins (GetEnumerator, OrdinalIgnoreCase, env-binder, type-cache, dead ctor checks)
+- [x] Q1–Q5 · Quick wins (GetEnumerator, OrdinalIgnoreCase, env-binder, type-cache; Q5 dead ctor checks already done by B4)
 - [ ] P4 · De-reflect array/enumerable converters · Sev Med · Eff M
 - [ ] P5 · Resolve config section once per type, not per property · Sev Med · Eff M
 
 **Phase 6 — Architecture strategy**
 - [ ] A1 · Decide AOT/trim story; annotate `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` and/or plan a source generator · Sev High · Eff M–L
-- [ ] A2 · Consolidate naming: `ExistAll` / `ExistsForAll` → `ExistForAll` (folder, `.slnx`, `Company`, benchmark) · Sev Low · Eff M
+- [x] A2 · Consolidate naming: `ExistAll` / `ExistsForAll` → `ExistForAll` (folder, `.slnx`, `Company`, benchmark) · Sev Low · Eff M
 - [ ] A3 · `Core.AspNet` ships no public type — make `Environments` public or drop the package · Sev Med · Eff S
 - [ ] A4 · Float `Microsoft.Extensions.*` floor per-TFM (don’t force net8 consumers to 10.x) · Sev Med · Eff S
 - [ ] A5 · Make `SettingsHolder`/`ISettingsHolder` internal (leaked detail) · Sev Low · Eff S · **Break**

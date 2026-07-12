@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -10,6 +11,10 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 		private readonly ITypePropertiesExtractor _typePropertiesExtractor;
 		private readonly IPropertyCreator _propertyCreator;
 		private readonly ModuleBuilder _moduleBuilder = null!;
+
+		// A settings interface generates exactly one impl type for the module's lifetime, so cache by the
+		// interface Type instead of re-querying the module by mangled type name on every call.
+		private readonly ConcurrentDictionary<Type, Type> _generatedTypes = new();
 
 		internal SettingsClassGenerator(ITypePropertiesExtractor typePropertiesExtractor,
 			IPropertyCreator propertyCreator)
@@ -29,14 +34,17 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 
 		public Type GenerateType(Type interfaceType)
 		{
+			if (_generatedTypes.TryGetValue(interfaceType, out var existingType))
+				return existingType;
+
 			try
 			{
-				var name = $"{interfaceType.GetNormalizeInterfaceName()}Impl";
-
-				var existingType = _moduleBuilder.Assembly.GetType(name.Replace("+", "\\+"));
-
-				if (existingType != null)
-					return existingType;
+				// Namespace-qualified so two settings interfaces that share a simple name
+				// (e.g. Foo.ISettings + Bar.ISettings) don't collide on the generated type name and
+				// abort the scan. Deliberately NOT GetNormalizeInterfaceName() — that helper also backs
+				// the default config section name (SettingsOptions.SectionNameFormatter), which must stay
+				// simple-name-based; the generated impl name is an internal detail and can differ.
+				var name = $"{(interfaceType.FullName ?? interfaceType.Name).Replace('.', '_').Replace('+', '_')}Impl";
 
 				var properties = _typePropertiesExtractor.ExtractTypeProperties(interfaceType);
 
@@ -45,10 +53,12 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 				typeBuilder.AddInterfaceImplementation(interfaceType);
 
 				_propertyCreator.CreateAnonymousProperties(typeBuilder, properties.ToArray(), out _);
-				
-				var result = typeBuilder.CreateTypeInfo();
 
-				return result.AsType();
+				var result = typeBuilder.CreateTypeInfo().AsType();
+
+				_generatedTypes[interfaceType] = result;
+
+				return result;
 			}
 			catch (Exception e)
 			{

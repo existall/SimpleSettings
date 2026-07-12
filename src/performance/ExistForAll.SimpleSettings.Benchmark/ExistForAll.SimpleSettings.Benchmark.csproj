@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings\ExistForAll.SimpleSettings.csproj" />
+    <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings.Extensions.Binders\ExistForAll.SimpleSettings.Binders.csproj" />
   </ItemGroup>
 
 </Project>
