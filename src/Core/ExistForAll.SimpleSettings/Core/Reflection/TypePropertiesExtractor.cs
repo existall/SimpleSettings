@@ -9,15 +9,11 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 	internal class TypePropertiesExtractor : ITypePropertiesExtractor
 	{
 		// ExtractTypeProperties is called repeatedly for a settings type (once per type-generation and
-		// once per populate), so results are memoized. The cache is an injected dependency rather than a
-		// static field, so its lifetime and scope are the caller's choice. Extraction also collapses the
-		// previous O(n^2) inherited dedup (Where(p => properties.All(...))) to a single HashSet pass.
-		private readonly ConcurrentDictionary<Type, PropertyInfo[]> _cache;
-
-		public TypePropertiesExtractor(ConcurrentDictionary<Type, PropertyInfo[]> cache)
-		{
-			_cache = cache ?? throw new ArgumentNullException(nameof(cache));
-		}
+		// once per populate), so results are memoized. The cache is a private instance field: not static
+		// (no process-global state) and not an injected dependency (nothing outside supplies or shares
+		// it). Extraction also collapses the previous O(n^2) inherited dedup
+		// (Where(p => properties.All(...))) to a single HashSet pass.
+		private readonly ConcurrentDictionary<Type, PropertyInfo[]> _cache = new();
 
 		public IEnumerable<PropertyInfo> ExtractTypeProperties(Type type)
 		{

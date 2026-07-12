@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -20,8 +19,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 		}
 
 		public SettingsClassGenerator()
-			: this(new TypePropertiesExtractor(new ConcurrentDictionary<Type, PropertyInfo[]>()),
-				new PropertyCreator())
+			: this(new TypePropertiesExtractor(), new PropertyCreator())
 		{
 			var assemblyName = new AssemblyName(Guid.NewGuid().ToString());
 			var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
