@@ -57,13 +57,13 @@ jobs:
       - name: Run benchmarks
         working-directory: src   # global.json lives here
         # ShortRun keeps CI time reasonable; allocation counts are deterministic regardless of
-        # iteration count. The micro-benchmark filters match nothing until PR #21 lands them on
-        # master, at which point they are tracked automatically alongside ScanBenchmark.
+        # iteration count. PlanPopulateBenchmark tracks the P3 warm re-populate path; it has no gh-pages
+        # baseline until the first master run records one, so it only starts alerting after that.
         run: >
           dotnet run -c Release
           --project performance/ExistForAll.SimpleSettings.Benchmark
           --
-          --filter "*ScanBenchmark*" "*EnumerateBenchmark*" "*EnvBinderBenchmark*" "*GenerateTypeBenchmark*"
+          --filter "*ScanBenchmark*" "*EnumerateBenchmark*" "*EnvBinderBenchmark*" "*GenerateTypeBenchmark*" "*PlanPopulateBenchmark*"
           --job short
           --exporters json
           --artifacts ${{ github.workspace }}/bdn

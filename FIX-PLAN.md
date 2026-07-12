@@ -5,8 +5,9 @@ _Derived from the 2026-07-10 three-part review (architecture · tests · perform
 ## Progress (2026-07-12)
 - **Done & merged:** B1, B2, B4, B5, B9 + T1, T2 (PR #8) · BindingContext test (#10) · D3 namespace typo (#11) · T3 DI integration tests (#12) · solution rename (#13) · **A2 naming → ExistForAll (#15)** · **P0 benchmark harness (#16)** · **P1 provider cache + C3 decided/implemented (#17)** · **P2 memoize `ExtractTypeProperties` + `HashSet` dedup (#18)** · **docs tutorials refresh (#20)** · **Q1–Q4 perf quick wins + M1 collision fix + micro-benchmarks (#21)**.
 - **Q1–Q4 proven** via isolated micro-benchmarks (macro `ScanBenchmark` can't resolve them): Q1 2.7× / 64 KB→88 B · Q3 2.65× / 152 B→0 · Q4 32× / 224 B→0. **Q5 was already resolved by B4.** **M1** (code-review finding): namespace-qualify the generated impl name in the generator only — `GetNormalizeInterfaceName` also backs the section name. Suite → **56 per TFM**.
-- **In flight:** **#22 benchmark-tracking CI** — runs BDN on push/PR, gates PRs on **allocation** regressions (>10%) via github-action-benchmark on `gh-pages`; time is informational. Green, ready to merge.
-- **Next:** P3 (cached compiled "settings plan") — the biggest remaining ceiling.
+- **Merged since:** **benchmark-tracking CI (#22)** — BDN on push/PR, gates PRs on **allocation** regressions (>10%) via github-action-benchmark on `gh-pages`; time informational. · **session-wrap docs (#23)**.
+- **In flight:** **P3 — cached "settings plan"** (`SettingsPlan` per type: section name resolved once + lazily, per-property key/default/converter precomputed). Warm re-populate **−52–56%** allocations (50 props 15,681→6,848 B); gated `ScanBenchmark` **+4.7%** (under the 10% gate). The emitted/compiled setter was built and measured but **reverted** — it regressed the gated cold scan **+25%** for **no** warm gain (net10 reflective `SetValue` is already allocation-free for the args). A new gated `PlanPopulateBenchmark` tracks the warm path.
+- **Next:** P4 (de-reflect array/enumerable converters) → P5 (resolve config section once per type).
 - **C3 — DECIDED (option 2):** cache in the provider only; Core `SettingsBuilder.GetSettings` unchanged; no reload. See #17.
 - **Held — do NOT delete (feature work coming):** D1 Validations (reconcile with the `validate-settings` branch) · D2 EqualityCompererCreator.
 - Running status lives in `SESSION-HANDOFF.md`.
@@ -55,7 +56,7 @@ _Derived from the 2026-07-10 three-part review (architecture · tests · perform
 - [x] P0 · Upgrade the benchmark harness (MemoryDiagnoser + phase-split + fixtures) — do first, to measure P1–P3
 - [x] P1 · Cache built instance on the `ISettingsProvider` resolve path · Sev High · Eff S
 - [x] P2 · Memoize `ExtractTypeProperties` + fix O(n²) dedup · Sev High · Eff S
-- [ ] P3 · Cached compiled “settings plan” (emit setters, hoist names, cache converters) · Sev High · Eff L
+- [x] P3 · Cached “settings plan” — hoist section (lazy) + keys, precompute/cache converters, plan per type. Reflective `SetValue` kept; compiled setter deferred (regressed the gated cold scan for no warm gain) · Sev High · Eff L
 - [x] Q1–Q5 · Quick wins (GetEnumerator, OrdinalIgnoreCase, env-binder, type-cache; Q5 dead ctor checks already done by B4)
 - [ ] P4 · De-reflect array/enumerable converters · Sev Med · Eff M
 - [ ] P5 · Resolve config section once per type, not per property · Sev Med · Eff M
@@ -207,6 +208,8 @@ if (settingsOptions.AttributeType != null &&
 
 ### P3 · Cached compiled “settings plan”  — Sev High · Eff L (biggest ceiling)
 The populate loop (`src/Core/ExistForAll.SimpleSettings/ValuesPopulator.cs:36-55`) is reflection-saturated: reflective `property.SetValue` (`:55`, boxes value types); `GetSectionName` recomputed inside both loops though it’s constant per type; `GetPropertyName` recomputed per binder; `SettingsPropertyAttribute` read ~3×/property (`:36-40` + `TypeConverter.cs:36`). Build a per-interface `SettingsPlan` once (`ConcurrentDictionary<Type, SettingsPlan>`) holding: section name (once), and per property — resolved key, default value, chosen converter, and a **compiled setter** (emit the populate into the generated class in `PropertyCreator`, or a compiled `Action<object,object?>`). Folds in converter caching (below).
+
+**Resolved (this PR):** `SettingsPlan` cached per type on the `ValuesPopulator` instance — section name resolved once and **lazily** (a no-binder scan never pays for it), per-property `PropertyPlan`/`PropertyConversion` as `readonly struct`s (one array alloc, no per-property object), converter chosen once (manual walk, not LINQ `First`, so the `LinkedList` enumerator isn't boxed). **Warm re-populate −52–56%** (50 props 15,681→6,848 B); gated `ScanBenchmark` **+4.66%**. The **compiled setter was dropped**: both variants (emit `__Set` into the generated type, and a compiled `Action`) regressed the *gated* cold `ScanBenchmark` (+25% for the emitted `__Set`) because the extra per-type codegen isn't amortized on a populate-once scan — and it bought **nothing** on the warm path, since net10's reflective `PropertyInfo.SetValue` no longer allocates an args array. **Follow-up (P3b, if ever needed):** tiered/lazy setter compilation (compile on the 2nd+ populate) would keep the cold scan flat while de-reflecting the hot path; only worth it if a future profile shows `SetValue` time (not allocation) matters.
 
 ### Quick wins  — Eff S each
 - **Q1** `SettingsCollection.GetEnumerator` (`SettingsCollection.cs:52`) rebuilds a whole `Dictionary` per enumeration → `yield return` over the existing dictionary.

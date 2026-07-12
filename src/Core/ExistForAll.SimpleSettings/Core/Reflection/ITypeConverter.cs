@@ -1,9 +1,10 @@
 using System.Reflection;
+using ExistForAll.SimpleSettings.Conversion;
 
 namespace ExistForAll.SimpleSettings.Core.Reflection
 {
 	internal interface ITypeConverter
 	{
-		object? ConvertValue(object? value, PropertyInfo propertyInfo, SettingsOptions options);
+		PropertyConversion CreateConversion(PropertyInfo propertyInfo, SettingsOptions options);
 	}
 }
