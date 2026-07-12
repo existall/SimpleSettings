@@ -19,8 +19,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 		}
 
 		public SettingsClassGenerator()
-			: this(new TypePropertiesExtractor(),
-				new PropertyCreator())
+			: this(new TypePropertiesExtractor(), new PropertyCreator())
 		{
 			var assemblyName = new AssemblyName(Guid.NewGuid().ToString());
 			var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
