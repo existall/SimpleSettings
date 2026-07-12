@@ -30,16 +30,18 @@ namespace ExistForAll.SimpleSettings.Extensions.GenericHost
                 action?.Invoke(options);
             });
 
-            var settingsProvider = settingsBuilder.ScanAssemblies(options!.Assemblies);
+            var settingsCollection = settingsBuilder.ScanAssemblies(options!.Assemblies);
 
-            // replace this with a replaceable settings provider to support time based Settingsuration
-
-            foreach (var settings in settingsProvider)
+            // Register each scanned interface as its startup-built instance, and hand that same
+            // collection to the provider so ISettingsProvider.GetSettings<T>() returns the very same
+            // instance as GetService<T>() (a lookup, not a re-bind). A future reload / IOptionsMonitor
+            // path would swap these snapshots out here.
+            foreach (var settings in settingsCollection)
             {
                 services.AddSingleton(settings.Key, settings.Value);
             }
 
-            services.AddSingleton<ISettingsProvider>(new SettingsProvider(settingsBuilder));
+            services.AddSingleton<ISettingsProvider>(new SettingsProvider(settingsCollection, settingsBuilder));
         }
     }
 }
