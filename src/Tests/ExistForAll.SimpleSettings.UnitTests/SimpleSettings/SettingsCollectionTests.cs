@@ -11,7 +11,9 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
         {
             var sut = SettingsBuilder.CreateBuilder();
 
-            await Assert.That(() => sut.GetSettings<SettingsBuilder>()).Throws<InvalidOperationException>();
+            // C2: a non-interface type now throws the typed SettingsTypeNotInterfaceException (was an untyped
+            // InvalidOperationException), so it's catchable as part of the SimpleSettingsException family.
+            await Assert.That(() => sut.GetSettings<SettingsBuilder>()).Throws<SettingsTypeNotInterfaceException>();
         }
 
         [Test]

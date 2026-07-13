@@ -2,9 +2,10 @@ using System;
 
 namespace ExistForAll.SimpleSettings
 {
-	public class SettingsOptionsArgumentNullException : Exception
+	public class SettingsOptionsArgumentNullException : SimpleSettingsException
 	{
-		public SettingsOptionsArgumentNullException() : base(Resources.SettingsOptionsArgumentNullMessage)
+		public SettingsOptionsArgumentNullException()
+			: base(Resources.SettingsOptionsArgumentNullMessage)
 		{
 		}
 	}

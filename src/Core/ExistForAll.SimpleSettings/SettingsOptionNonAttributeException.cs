@@ -2,11 +2,14 @@ using System;
 
 namespace ExistForAll.SimpleSettings
 {
-    public class SettingsOptionNonAttributeException : Exception
-    {
-        public SettingsOptionNonAttributeException(Type type) 
-            : base(Resources.SettingsOptionAttributeTypeMessage(type))
-        {
-        }
-    }
+	public class SettingsOptionNonAttributeException : SimpleSettingsException
+	{
+		public SettingsOptionNonAttributeException(Type optionType)
+			: base(Resources.SettingsOptionAttributeTypeMessage(optionType))
+		{
+			OptionType = optionType;
+		}
+
+		public Type OptionType { get; }
+	}
 }
