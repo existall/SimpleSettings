@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Concurrent;
+using Microsoft.Extensions.Configuration;
 
 namespace ExistForAll.SimpleSettings.Binders
 {
@@ -8,28 +9,35 @@ namespace ExistForAll.SimpleSettings.Binders
 
 		private readonly IConfiguration _configuration;
 
+		// Resolve each config section once and reuse it across every property of every settings type. P3 makes
+		// context.Section the same per-type string, so all but the first property (and every repeated resolve)
+		// is a cache hit. Reload-safe: GetSection returns a live view over the configuration root, so indexing
+		// the cached section re-reads the providers on each access — a config reload is still reflected. Ordinal
+		// key; bounded by the number of settings sections, so no eviction is needed (same shape as the P1–P3
+		// caches).
+		private readonly ConcurrentDictionary<string, IConfigurationSection> _sections = new();
+
 		public ConfigurationBinder(IConfiguration configuration, string? rootSection = null)
 		{
 			RootSection = rootSection;
 			_configuration = configuration;
 		}
 
-		private string GetSection(BindingContext context)
-		{
-			if (string.IsNullOrWhiteSpace(RootSection))
-				return context.Section;
-
-			return $"{RootSection}:{context.Section}";
-		}
-
 		public void BindPropertySettings(BindingContext context)
 		{
-			var configurationSection = _configuration.GetSection(GetSection(context));
+			// static factory + factoryArgument overload so no per-call closure over `this` is allocated — a
+			// capturing lambda would build a fresh delegate on every call and eat most of the win.
+			var section = _sections.GetOrAdd(context.Section, static (name, self) => self.ResolveSection(name), this);
 
-			var value = configurationSection?[context.Key];
+			var value = section[context.Key];
 
 			if (value != null)
 				context.SetNewValue(value);
+		}
+
+		private IConfigurationSection ResolveSection(string section)
+		{
+			return _configuration.GetSection(string.IsNullOrWhiteSpace(RootSection) ? section : $"{RootSection}:{section}");
 		}
 	}
 }
