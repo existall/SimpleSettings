@@ -120,13 +120,9 @@ namespace ExistForAll.SimpleSettings
 			{
 				return propertyPlan.Conversion.Convert(value);
 			}
-			catch (SettingsPropertyNullException)
-			{
-				// The "required value missing" signal — its message carries no bound value, so surface it as-is
-				// rather than redacting it into a value-conversion exception.
-				throw;
-			}
-			catch (Exception e)
+			// SettingsPropertyNullException is the value-free "required value missing" signal — the filter skips
+			// this catch so it propagates as-is, rather than being redacted into a value-conversion exception.
+			catch (Exception e) when (e is not SettingsPropertyNullException)
 			{
 				// e (and its message) may embed the raw bound value, which could be a secret — never chain it
 				// or put the value in the message. Only the failure's type name is surfaced. See S1.
