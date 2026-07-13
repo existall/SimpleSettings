@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +12,12 @@ namespace ExistForAll.SimpleSettings
 		private readonly ITypePropertiesExtractor _typePropertiesExtractor;
 		private readonly ITypeConverter _typeConverter;
 
+		// One plan per settings interface, reused across every populate. Instance field (not static): a plan
+		// bakes in this builder's SettingsOptions (section formatter, converters, per-property converters), and
+		// exactly one ValuesPopulator is created per SettingsBuilder, so Options is fixed for this cache's
+		// lifetime. Same reasoning as the TypePropertiesExtractor cache (P2).
+		private readonly ConcurrentDictionary<Type, SettingsPlan> _plans = new();
+
 		public ValuesPopulator() :
 			this(new TypePropertiesExtractor(), new TypeConverter())
 		{
@@ -22,23 +29,27 @@ namespace ExistForAll.SimpleSettings
 			_typeConverter = typeConverter;
 		}
 
-		public void PopulateInstanceWithValues(object instance, 
+		public void PopulateInstanceWithValues(object instance,
 			Type settings,
 			SettingsOptions options,
 			IEnumerable<ISectionBinder> binders)
-        {
-            var sectionBinders = binders as ISectionBinder[] ?? binders.ToArray();
-            foreach (var property in _typePropertiesExtractor.ExtractTypeProperties(settings))
-            {
-	            var tempValue = property.GetDefaultValue();
+		{
+			var sectionBinders = binders as ISectionBinder[] ?? binders.ToArray();
+
+			var plan = GetOrBuildPlan(settings, options);
+
+			foreach (var propertyPlan in plan.Properties)
+			{
+				var tempValue = propertyPlan.DefaultValue;
+
 				foreach (var binder in sectionBinders)
 				{
-					var context = new BindingContext(settings.GetSectionName(options),
-						property.GetPropertyName(),
+					var context = new BindingContext(plan.SectionName,
+						propertyPlan.Key,
 						settings,
-						property,
+						propertyPlan.Property,
 						tempValue);
-					
+
 					try
 					{
 						binder.BindPropertySettings(context);
@@ -51,25 +62,66 @@ namespace ExistForAll.SimpleSettings
 					}
 				}
 
-				var propertyValue = ConvertPropertyValue(settings, tempValue, property, options);
-				property.SetValue(instance, propertyValue);
+				var propertyValue = ConvertPropertyValue(settings, tempValue, propertyPlan);
+				propertyPlan.Property.SetValue(instance, propertyValue);
 			}
-        }
+		}
 
-		private object? ConvertPropertyValue(Type settingsType,
-			object? value,
-			PropertyInfo property,
-			SettingsOptions options)
+		private SettingsPlan GetOrBuildPlan(Type settings, SettingsOptions options)
+		{
+			if (_plans.TryGetValue(settings, out var existing))
+				return existing;
+
+			var extracted = _typePropertiesExtractor.ExtractTypeProperties(settings);
+			var properties = extracted as PropertyInfo[] ?? extracted.ToArray();
+
+			var propertyPlans = new PropertyPlan[properties.Length];
+			for (var i = 0; i < properties.Length; i++)
+			{
+				var property = properties[i];
+
+				// Read [SettingsProperty] once and thread it into key/default/conversion — GetCustomAttribute
+				// re-materializes the attribute + its backing array on every call, and this runs per property
+				// for every type at cold-scan scale. inherit:true matches the prior key-resolution behavior
+				// (a no-op for interface members, which is all settings types are).
+				var attribute = property.GetCustomAttribute<SettingsPropertyAttribute>(inherit: true);
+
+				try
+				{
+					var key = !string.IsNullOrWhiteSpace(attribute?.Name) ? attribute.Name : property.Name;
+
+					propertyPlans[i] = new PropertyPlan(property,
+						key,
+						attribute?.DefaultValue,
+						_typeConverter.CreateConversion(property, attribute, options));
+				}
+				catch (Exception e)
+				{
+					// Restore the original exception contract: converter-setup failures used to surface inside
+					// the per-populate convert try as SettingsPropertyValueException. The bound value isn't
+					// known at plan build, hence null.
+					throw new SettingsPropertyValueException(settings, null, property, e);
+				}
+			}
+
+			var plan = new SettingsPlan(settings, options, propertyPlans);
+
+			// Concurrent builds would produce equivalent plans, so last-writer-wins is harmless. A build that
+			// throws is never cached (we don't reach here), so the next call retries — matching the old
+			// re-throw-every-time behavior.
+			_plans[settings] = plan;
+			return plan;
+		}
+
+		private static object? ConvertPropertyValue(Type settingsType, object? value, in PropertyPlan propertyPlan)
 		{
 			try
 			{
-				var propertyValue = _typeConverter.ConvertValue(value, property, options);
-
-				return propertyValue;
+				return propertyPlan.Conversion.Convert(value);
 			}
 			catch (Exception e)
 			{
-				throw new SettingsPropertyValueException(settingsType, value, property, e);
+				throw new SettingsPropertyValueException(settingsType, value, propertyPlan.Property, e);
 			}
 		}
 	}
