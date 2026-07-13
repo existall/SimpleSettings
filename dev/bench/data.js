@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783939706589,
+  "lastUpdate": 1783945485497,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -205,6 +205,80 @@ window.BENCHMARK_DATA = {
           {
             "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
             "value": 17573336,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "498fc8161ce91bbcf5304d5d09aec4d7e1ce877e",
+          "message": "Resolve the config section once per type (P5) (#26)\n\nConfigurationBinder called _configuration.GetSection(...) on every property,\nthough the section is constant per settings type. Cache the resolved\nIConfigurationSection per section name in a ConcurrentDictionary, using a\nzero-capture GetOrAdd (static factory + factoryArgument) so no per-call\ndelegate is allocated. Reload-safe: GetSection returns a live view over the\nconfiguration root, so the cached section re-reads providers on each access.\nDrop the dead ?. (GetSection never returns null) and strip a stray BOM.\n\nChosen over threading the section through the ISectionBinder contract: that\nwould be a layering violation (Core must not reference\nMicrosoft.Extensions.Configuration) and the optimization is single-implementer.\nPlan reviewed by the architect/perf/security agents; code reviewed via\n/code-review.\n\nProof (new gated ConfigBinderBenchmark): BindNoRoot 80->40 B (-50%),\nBindWithRoot 144->56 B (-61%). Adds 3 tests (multi-property with/without\nRootSection, plus a cached-section-reflects-later-change live-view test). Also\nwires P4's ConvertArrayBenchmark into the CI filter (it was never gated) and\nadds Microsoft.Extensions.Configuration to the benchmark project.\n\nRefreshes SESSION-HANDOFF.md + FIX-PLAN.md and logs a pre-existing secret-leak\nfinding surfaced by the security review (S1: Resources.cs interpolates the raw\nbound value into the SettingsPropertyValueException message).\n\nSuite: 71 tests per TFM.",
+          "timestamp": "2026-07-13T15:22:43+03:00",
+          "tree_id": "3338cc21f23038b58e7a8f713741f6fa1d989698",
+          "url": "https://github.com/existall/SimpleSettings/commit/498fc8161ce91bbcf5304d5d09aec4d7e1ce877e"
+        },
+        "date": 1783945485109,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17572784,
             "unit": "bytes"
           }
         ]
