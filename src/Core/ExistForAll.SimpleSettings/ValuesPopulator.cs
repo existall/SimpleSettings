@@ -98,9 +98,10 @@ namespace ExistForAll.SimpleSettings
 				catch (Exception e)
 				{
 					// Restore the original exception contract: converter-setup failures used to surface inside
-					// the per-populate convert try as SettingsPropertyValueException. The bound value isn't
-					// known at plan build, hence null.
-					throw new SettingsPropertyValueException(settings, null, property, e);
+					// the per-populate convert try as SettingsPropertyValueException. No bound value exists at
+					// plan build, and setup failures describe types/converters, not a value — so nothing sensitive
+					// is dropped by the redacting exception (which never carries the value or chains the inner).
+					throw new SettingsPropertyValueException(settings, property, e);
 				}
 			}
 
@@ -119,9 +120,17 @@ namespace ExistForAll.SimpleSettings
 			{
 				return propertyPlan.Conversion.Convert(value);
 			}
+			catch (SettingsPropertyNullException)
+			{
+				// The "required value missing" signal — its message carries no bound value, so surface it as-is
+				// rather than redacting it into a value-conversion exception.
+				throw;
+			}
 			catch (Exception e)
 			{
-				throw new SettingsPropertyValueException(settingsType, value, propertyPlan.Property, e);
+				// e (and its message) may embed the raw bound value, which could be a secret — never chain it
+				// or put the value in the message. Only the failure's type name is surfaced. See S1.
+				throw new SettingsPropertyValueException(settingsType, propertyPlan.Property, e);
 			}
 		}
 	}

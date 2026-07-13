@@ -33,7 +33,7 @@ namespace ExistForAll.SimpleSettings.Conversion
 			if (value == null)
 			{
 				if (_throwOnNull)
-					throw new Exception(Resources.PropertyNotAllowNullMessage(_propertyName));
+					throw new SettingsPropertyNullException(_propertyName);
 
 				return _nullResult;
 			}
