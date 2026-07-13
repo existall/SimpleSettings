@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783951817317,
+  "lastUpdate": 1783954841923,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -303,6 +303,80 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/existall/SimpleSettings/commit/5277c6075ebfb17ab94a6ad636073a1035f4bb31"
         },
         "date": 1783951816657,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17573344,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "13b78dd4b0b3b229abe7f3f9e046aff6d645717c",
+          "message": "Add a public exception hierarchy (C2) (#28)\n\nThe library's exceptions derived straight from Exception with no common base,\nso consumers couldn't catch (SimpleSettingsException); four were internal yet\nescaped the public build path (uncatchable by type); context lived only in\nmessage strings; and the reachable not-an-interface guard threw an untyped\nInvalidOperationException.\n\n- New public abstract SimpleSettingsException : Exception (protected (message)\n  and (message, inner) ctors; no parameterless or [Serializable] ctor -\n  BinaryFormatter is obsolete on the net8/net10 targets). All 10 library\n  exceptions now derive from it.\n- Promote the four build-path escapees to public: SettingsPropertyValueException,\n  SettingsPropertyNullException, TypeGenerationException,\n  SettingsPropertyExtractionException.\n- Flatten three mis-namespaced types to the root namespace so the public\n  surface is coherent: SettingsExtractionException (was .Core),\n  TypeGenerationException and SettingsPropertyExtractionException\n  (were .Core.Reflection).\n- Expose leak-safe structured properties instead of forcing consumers to parse\n  messages: SettingsBindingException.{BinderType,Section,Key};\n  SettingsPropertyValueException.{SettingsType,PropertyName,TargetType,\n  ConversionErrorType}; SettingsType / OptionType / ArgumentName on the rest.\n- Replace the untyped InvalidOperationException(TypeIsNotInterface) throws with\n  a typed SettingsTypeNotInterfaceException (the one runtime-behavior break -\n  see release notes). The two documented-unreachable \"No converter found\"\n  InvalidOperationExceptions are left as internal invariant guards.\n\nS1 secret-redaction is now structural, not conventional:\nSettingsPropertyValueException's ctor takes the failure's Type (not the\nException), so a value-bearing object cannot cross its boundary; and\nSettingsBindingException stores primitives instead of retaining the\nBindingContext, which holds the bound value.\n\nReviewed: plan by security-auditor + dotnet-architect (both\nENDORSE-WITH-CHANGES; adopted the Type-not-Exception hardening, namespace\nflattening, Section/ConversionErrorType naming, and reflection-based\naccessibility tests since InternalsVisibleTo masks it); code by /code-review\nplus Roslyn detect_antipatterns (0).\n\nTests: SimpleSettings/ExceptionHierarchyTests.cs (+6) - base is public+abstract,\na reflection invariant that every library exception derives from the base, the\nfour promotions are public, non-interface -> typed + catchable as base,\nconversion failure -> structured metadata + InnerException == null, and\nbinder-throws -> binder context. The existing not-interface test updated to the\nnew type. Suite 82 net10 (was 76).\n\nAlso refreshes FIX-PLAN.md (C2 marked done, stale \"bare Exception\" line fixed)\nand SESSION-HANDOFF.md.",
+          "timestamp": "2026-07-13T17:58:27+03:00",
+          "tree_id": "b815a0d2c8efc5adc395280a86daaec0df5f501d",
+          "url": "https://github.com/existall/SimpleSettings/commit/13b78dd4b0b3b229abe7f3f9e046aff6d645717c"
+        },
+        "date": 1783954841501,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
