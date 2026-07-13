@@ -63,7 +63,7 @@ jobs:
           dotnet run -c Release
           --project performance/ExistForAll.SimpleSettings.Benchmark
           --
-          --filter "*ScanBenchmark*" "*EnumerateBenchmark*" "*EnvBinderBenchmark*" "*GenerateTypeBenchmark*" "*PlanPopulateBenchmark*"
+          --filter "*ScanBenchmark*" "*EnumerateBenchmark*" "*EnvBinderBenchmark*" "*GenerateTypeBenchmark*" "*PlanPopulateBenchmark*" "*ConvertArrayBenchmark*" "*ConfigBinderBenchmark*"
           --job short
           --exporters json
           --artifacts ${{ github.workspace }}/bdn
