@@ -31,9 +31,10 @@ namespace ExistForAll.SimpleSettings
 			$@"While trying to generate a class from interface [{type.FullName}] something went wrong.
 				please see inner exception for more details";
 
-		public static string PropertySetterExceptionMessage(Type interfaceType, object? value, PropertyInfo property) =>
-			$@"failed to to set the value [{value}] within the property [{property.Name}] for interface [{interfaceType.Name}].
-see inner exception for more details";
+		// The bound value is deliberately omitted (it may be a secret): we report only the property, its target
+		// type, and the failing converter's exception type. See S1 in FIX-PLAN.md and SettingsPropertyValueException.
+		public static string PropertySetterExceptionMessage(Type interfaceType, PropertyInfo property, string failureType) =>
+			$@"Failed to set property [{property.Name}] of type [{property.PropertyType.Name}] on interface [{interfaceType.Name}]: the bound value could not be converted ([{failureType}]). The value is omitted to avoid leaking secrets into logs.";
 
 		public static string SettingsPropertiesExtractionMessage(Type type) =>
 			$@"An error has occurred while trying to extract
