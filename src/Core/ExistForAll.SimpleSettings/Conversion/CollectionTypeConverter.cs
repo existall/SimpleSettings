@@ -57,9 +57,10 @@ namespace ExistForAll.SimpleSettings.Conversion
 			// Manual walk over the concrete LinkedList (not LINQ First) so the struct enumerator isn't boxed
 			// onto the heap and no predicate closure is allocated — this runs per element-typed collection on
 			// every populate.
-			foreach (var converter in _converters.Where(converter => converter.CanConvert(elementType)))
+			foreach (var converter in _converters)
 			{
-				return converter;
+				if (converter.CanConvert(elementType))
+					return converter;
 			}
 
 			// Unreachable in practice: DefaultTypeConverter.CanConvert always returns true. Kept so every path
