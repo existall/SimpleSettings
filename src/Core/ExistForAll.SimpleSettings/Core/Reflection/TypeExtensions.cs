@@ -8,7 +8,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 	{
 		public static string GetNormalizeInterfaceName(this Type target)
 		{
-			return target.Name[0] == 'I' ? target.Name.Substring(1) : target.Name;
+			return target.Name[0] == 'I' ? target.Name[1..] : target.Name;
 		}
 
 		public static string GetSectionName(this Type settingsClass, SettingsOptions options)
