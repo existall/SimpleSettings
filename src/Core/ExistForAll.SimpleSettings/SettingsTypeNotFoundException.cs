@@ -1,12 +1,15 @@
-﻿using System;
+using System;
 
 namespace ExistForAll.SimpleSettings
 {
-	public class SettingsTypeNotFoundException : Exception
+	public class SettingsTypeNotFoundException : SimpleSettingsException
 	{
 		public SettingsTypeNotFoundException(Type settingsType)
-			:base(Resources.GetSettingsNotFoundMessageFormatMessage(settingsType))
+			: base(Resources.GetSettingsNotFoundMessageFormatMessage(settingsType))
 		{
+			SettingsType = settingsType;
 		}
+
+		public Type SettingsType { get; }
 	}
 }

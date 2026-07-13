@@ -68,7 +68,7 @@ namespace ExistForAll.SimpleSettings
 
             if (!settingsType.GetTypeInfo().IsInterface)
             {
-                throw new InvalidOperationException(Resources.TypeIsNotInterface(settingsType.Name));
+                throw new SettingsTypeNotInterfaceException(settingsType);
             }
 
             return InnerBuild(settingsType);

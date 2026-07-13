@@ -101,7 +101,7 @@ namespace ExistForAll.SimpleSettings
 					// the per-populate convert try as SettingsPropertyValueException. No bound value exists at
 					// plan build, and setup failures describe types/converters, not a value — so nothing sensitive
 					// is dropped by the redacting exception (which never carries the value or chains the inner).
-					throw new SettingsPropertyValueException(settings, property, e);
+					throw new SettingsPropertyValueException(settings, property, e.GetType());
 				}
 			}
 
@@ -126,7 +126,7 @@ namespace ExistForAll.SimpleSettings
 			{
 				// e (and its message) may embed the raw bound value, which could be a secret — never chain it
 				// or put the value in the message. Only the failure's type name is surfaced. See S1.
-				throw new SettingsPropertyValueException(settingsType, propertyPlan.Property, e);
+				throw new SettingsPropertyValueException(settingsType, propertyPlan.Property, e.GetType());
 			}
 		}
 	}

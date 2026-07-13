@@ -18,7 +18,7 @@ namespace ExistForAll.SimpleSettings
 		{
 			if (!type.GetTypeInfo().IsInterface)
 			{
-				throw new InvalidOperationException(Resources.TypeIsNotInterface(type.Name));
+				throw new SettingsTypeNotInterfaceException(type);
 			}
 			
 			return _settingsHolders.TryGetValue(type, out var holder) ? holder.SettingsImplementation : throw new SettingsTypeNotFoundException(type);
@@ -28,7 +28,7 @@ namespace ExistForAll.SimpleSettings
         {
             if (!type.GetTypeInfo().IsInterface)
             {
-                throw new InvalidOperationException(Resources.TypeIsNotInterface(type.Name));
+                throw new SettingsTypeNotInterfaceException(type);
             }
 
             if(_settingsHolders.TryGetValue(type, out var holder))
