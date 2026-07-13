@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783929526697,
+  "lastUpdate": 1783939706589,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -111,6 +111,65 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/existall/SimpleSettings/commit/faa48d9e9cf123b44782c1957a863efd22137e37"
         },
         "date": 1783929526137,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17573336,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f9a3061aea1a5ae6a3e1f547e0860a4b0dc4b7e5",
+          "message": "De-reflect + DRY the array/enumerable converters (P4) (#25)\n\n* De-reflect + DRY the array/enumerable converters (P4)\n\nIntroduce a shared CollectionTypeConverter base that builds collection\nresults with Array.CreateInstance + indexed fill and selects the element\nconverter by walking the concrete LinkedList (struct enumerator) rather\nthan LINQ First. ArrayTypeConverter/EnumerableTypeConverter collapse to\nthin subclasses that differ only in CanConvert + element-type extraction;\nboth now return T[] (safe: IsEnumerable() matches only IEnumerable<T>,\nwhich a T[] satisfies). This drops the per-convert List<T> + its backing\narray, the reflected Enumerable.ToArray (MakeGenericMethod + Invoke +\nargs array), and the First predicate closure.\n\nTypeConverter.CreateNullResult swaps the Enumerable.Empty<T>() reflection\nfor Array.CreateInstance(t, 0), and GetConverter is now a true manual walk\n(matching its own comment). Also strips a stray UTF-8 BOM from the file.\n\nProof via the new gated ConvertArrayBenchmark (isolates the hot path like\nQ1/Q3/Q4): 1.33 KB -> 688 B (-49%), 1,247 -> 219 ns (5.7x). The residual\n688 B is the split-substrings + per-element boxing + result array shared\nby both the old and new code.\n\nAdds 7 collection-converter parity tests (delimited string -> int[] /\nstring[] / IEnumerable<int>, empty-entry removal, custom delimiter,\ndefault-array passthrough, and that the enumerable path materializes a\nT[]). Suite: 63 tests per TFM (was 56).\n\nAlso refreshes SESSION-HANDOFF.md + FIX-PLAN.md and carries the pre-P4\npost-P3 style tweaks to TypeConverter.cs / TypeExtensions.cs.\n\n* Harden P4 converter tests per code review\n\nAdds 5 collection-converter tests the dotnet code-reviewer suggested:\n- CreateNullResult null path: an unbound IEnumerable<T> with no default now\n  yields an empty T[] -- the one line P4 changed in TypeConverter.cs that no\n  existing test exercised (all others bind a value or supply a default).\n- Element-converter parity: DayOfWeek[], DateTime[], Uri[] (the shipped tests\n  only covered int/string, both routed to DefaultTypeConverter).\n- Negative: a non-numeric element for an int[] surfaces as the expected\n  SettingsPropertyValueException, pinning the exception-wrapping contract.\n\nSuite: 68 per TFM (was 63). No production changes. Refreshes\nSESSION-HANDOFF.md + FIX-PLAN.md (counts, PR #25, code-review outcome).\n\n* making it nicer a bit\n\n* bring it back",
+          "timestamp": "2026-07-13T13:46:38+03:00",
+          "tree_id": "3c45745a96cc0c0a525cc4f77a04aeba216e88fb",
+          "url": "https://github.com/existall/SimpleSettings/commit/f9a3061aea1a5ae6a3e1f547e0860a4b0dc4b7e5"
+        },
+        "date": 1783939706354,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
