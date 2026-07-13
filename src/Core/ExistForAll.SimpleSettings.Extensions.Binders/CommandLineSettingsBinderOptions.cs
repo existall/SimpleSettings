@@ -6,8 +6,8 @@ namespace ExistForAll.SimpleSettings.Binders
 {
     public class CommandLineSettingsBinderOptions
     {
-        private readonly List<char> _argumentPrefixes = new List<char>(new[] {'-', '/'});
-        private readonly List<string> _delimiters = new List<string>(new[] {":", "="});
+        private readonly List<char> _argumentPrefixes = [..new[] { '-', '/' }];
+        private readonly List<string> _delimiters = [..new[] { ":", "=" }];
 
         public NameFormatter? NameFormatter { get; set; }
 
@@ -19,13 +19,15 @@ namespace ExistForAll.SimpleSettings.Binders
 
         public void AddArgumentPrefix(char prefix)
         {
-            if (prefix <= 0) throw new ArgumentOutOfRangeException(nameof(prefix));
+            if (prefix <= 0) 
+                throw new ArgumentOutOfRangeException(nameof(prefix));
             _argumentPrefixes.Add(prefix);
         }
 
         public void AddDelimiter(string prefix)
         {
-            if (prefix == null) throw new ArgumentNullException(nameof(prefix));
+            if (prefix == null) 
+                throw new ArgumentNullException(nameof(prefix));
             _delimiters.Add(prefix);
         }
 

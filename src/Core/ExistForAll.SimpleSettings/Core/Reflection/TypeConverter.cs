@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reflection;
 using ExistForAll.SimpleSettings.Conversion;
 
@@ -15,7 +14,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 		{
 			var propertyType = propertyInfo.PropertyType;
 
-			var throwOnNull = attribute != null && !attribute.AllowEmpty;
+			var throwOnNull = attribute is { AllowEmpty: false };
 			var nullResult = CreateNullResult(propertyType);
 
 			var strippedType = StripIfNullable(propertyType);
@@ -31,9 +30,10 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			if (!propertyType.IsEnumerable())
 				return propertyType.GetTypeInfo().IsValueType ? Activator.CreateInstance(propertyType) : null;
 
-			var genericType = propertyType.GetTypeInfo().GetGenericArguments().First();
-			var method = typeof(Enumerable).GetTypeInfo().GetMethod("Empty")!.MakeGenericMethod(genericType);
-			return method.Invoke(null, null);
+			// An empty IEnumerable<T> is just an empty T[] (arrays implement IEnumerable<T>). Array.CreateInstance
+			// replaces the old Enumerable.Empty<T>() built via GetMethod("Empty").MakeGenericMethod().Invoke().
+			var elementType = propertyType.GetTypeInfo().GetGenericArguments()[0];
+			return Array.CreateInstance(elementType, 0);
 		}
 
 		private static ISettingsTypeConverter GetConverter(Type strippedType,
@@ -43,8 +43,9 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			if (attribute?.ConverterType != null)
 				return (ISettingsTypeConverter)Activator.CreateInstance(attribute.ConverterType)!;
 
-			// Manual walk over the concrete LinkedList (not LINQ First) so the struct enumerator isn't boxed
-			// onto the heap — this runs once per property at plan build.
+			// Manual walk over the concrete LinkedList (not LINQ First/Where) so the struct enumerator isn't
+			// boxed onto the heap and no predicate closure is allocated — this runs once per property at plan
+			// build.
 			foreach (var converter in options.Converters)
 			{
 				if (converter.CanConvert(strippedType))

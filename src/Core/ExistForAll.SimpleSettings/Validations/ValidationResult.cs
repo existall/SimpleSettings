@@ -6,7 +6,7 @@ namespace ExistForAll.SimpleSettings.Validations
 {
     public class ValidationResult
     {
-        private readonly List<ValidationError> _errors = new List<ValidationError>();
+        private readonly List<ValidationError> _errors = [];
 
         public IEnumerable<ValidationError> Errors => _errors;
 

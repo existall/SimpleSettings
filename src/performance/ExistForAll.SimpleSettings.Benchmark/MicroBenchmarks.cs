@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using ExistForAll.SimpleSettings.Binders;
+using ExistForAll.SimpleSettings.Conversion;
 using ExistForAll.SimpleSettings.Core.Reflection;
 
 namespace ExistForAll.SimpleSettings.Benchmark
@@ -83,5 +84,33 @@ namespace ExistForAll.SimpleSettings.Benchmark
 
 		[Benchmark]
 		public Type GenerateWarm() => _generator.GenerateType(typeof(IProps50));
+	}
+
+	/// <summary>
+	/// P4 — <c>ArrayTypeConverter.Convert</c>, the collection path now shared by the array and IEnumerable&lt;T&gt;
+	/// converters. The old code selected the element converter with LINQ <c>First</c> (boxes the
+	/// <c>LinkedList</c> enumerator + a predicate closure), built a <c>List&lt;T&gt;</c> via
+	/// <c>Activator.CreateInstance(typeof(List&lt;&gt;)…)</c>, then produced the array with a reflected
+	/// <c>Enumerable.ToArray</c> (<c>MakeGenericMethod</c> + <c>Invoke</c> + an args array). The new code walks
+	/// the concrete <c>LinkedList</c> (struct enumerator, no boxing) and fills an <c>Array.CreateInstance</c>
+	/// directly. A ten-element delimited string exercises split + per-element convert + build; the converter is
+	/// built once in setup so only <c>Convert</c> is measured.
+	/// </summary>
+	[MemoryDiagnoser]
+	public class ConvertArrayBenchmark
+	{
+		private const string Value = "1,2,3,4,5,6,7,8,9,10";
+
+		private ISettingsTypeConverter _converter = null!;
+
+		[GlobalSetup]
+		public void Setup()
+		{
+			var options = new SettingsOptions();
+			_converter = new ArrayTypeConverter(options, options.Converters);
+		}
+
+		[Benchmark]
+		public object ConvertArray() => _converter.Convert(Value, typeof(int[]));
 	}
 }

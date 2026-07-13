@@ -12,7 +12,8 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			if (typeBuilder == null) throw new ArgumentNullException(nameof(typeBuilder));
 			if (fields == null) throw new ArgumentNullException(nameof(fields));
 
-			var method = typeBuilder.DefineMethod("Equals", MethodAttributes.Public | MethodAttributes.ReuseSlot | MethodAttributes.Virtual | MethodAttributes.HideBySig, typeof(bool), new[] { typeof(object) });
+			var method = typeBuilder.DefineMethod("Equals", MethodAttributes.Public | MethodAttributes.ReuseSlot | MethodAttributes.Virtual | MethodAttributes.HideBySig, typeof(bool),
+				[typeof(object)]);
 
 			var methodGenerator = method.GetILGenerator();
 			var other = methodGenerator.DeclareLocal(typeBuilder.DeclaringType!);
@@ -33,7 +34,8 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 				methodGenerator.Emit(OpCodes.Ldarg_0);
 				methodGenerator.Emit(OpCodes.Ldfld, field);
 				methodGenerator.Emit(OpCodes.Ldloc, other);
-				methodGenerator.EmitCall(OpCodes.Callvirt, comparerType.GetMethod("Equals", new[] { field.FieldType, field.FieldType })!, null);
+				methodGenerator.EmitCall(OpCodes.Callvirt, comparerType.GetMethod("Equals", [field.FieldType, field.FieldType
+				])!, null);
 				methodGenerator.Emit(OpCodes.Brtrue_S, next);
 				methodGenerator.Emit(OpCodes.Ldc_I4);
 				methodGenerator.Emit(OpCodes.Ret);
@@ -59,7 +61,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 				methodGenerator.EmitCall(OpCodes.Call, comparerType.GetMethod("get_Default")!, null);
 				methodGenerator.Emit(OpCodes.Ldarg_0);
 				methodGenerator.Emit(OpCodes.Ldfld, field);
-				methodGenerator.EmitCall(OpCodes.Callvirt, comparerType.GetMethod("GetHashCode", new[] { field.FieldType })!, null);
+				methodGenerator.EmitCall(OpCodes.Callvirt, comparerType.GetMethod("GetHashCode", [field.FieldType])!, null);
 				methodGenerator.Emit(OpCodes.Xor);
 			}
 
