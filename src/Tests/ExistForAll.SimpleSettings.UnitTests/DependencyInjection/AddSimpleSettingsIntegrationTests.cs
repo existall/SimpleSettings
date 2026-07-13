@@ -19,7 +19,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 			var services = new ServiceCollection();
 			services.AddSimpleSettings(o =>
 			{
-				o.AddAssemblies(new[] { typeof(IDiExampleSettings).Assembly });
+				o.AddAssemblies([typeof(IDiExampleSettings).Assembly]);
 				o.AddSectionBinder(new InMemoryBinder(collection));
 			});
 
@@ -33,7 +33,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 		public async Task AddSimpleSettings_RegistersSettingsAsSingleton()
 		{
 			var services = new ServiceCollection();
-			services.AddSimpleSettings(o => o.AddAssemblies(new[] { typeof(IDiExampleSettings).Assembly }));
+			services.AddSimpleSettings(o => o.AddAssemblies([typeof(IDiExampleSettings).Assembly]));
 
 			var provider = services.BuildServiceProvider();
 			var first = provider.GetRequiredService<IDiExampleSettings>();
@@ -52,7 +52,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 			var services = new ServiceCollection();
 			services.AddSimpleSettings(o =>
 			{
-				o.AddAssemblies(new[] { typeof(IDiExampleSettings).Assembly });
+				o.AddAssemblies([typeof(IDiExampleSettings).Assembly]);
 				o.AddSectionBinder(new InMemoryBinder(collection));
 			});
 
@@ -68,7 +68,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 		public async Task AddSimpleSettings_Provider_ReturnsTheSameInstanceAsTheContainer()
 		{
 			var services = new ServiceCollection();
-			services.AddSimpleSettings(o => o.AddAssemblies(new[] { typeof(IDiExampleSettings).Assembly }));
+			services.AddSimpleSettings(o => o.AddAssemblies([typeof(IDiExampleSettings).Assembly]));
 
 			var provider = services.BuildServiceProvider();
 			var fromContainer = provider.GetRequiredService<IDiExampleSettings>();

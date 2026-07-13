@@ -54,7 +54,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 		private IEnumerable<Assembly> MockAssemblies(Type returnType)
 		{
-			return new Assembly[] {returnType.GetTypeInfo().Assembly};
+			return [returnType.GetTypeInfo().Assembly];
 		}
 
 		public interface INonDefaultSuffixIndicationInterfaceSomeSuffix

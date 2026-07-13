@@ -24,7 +24,8 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 									   MethodAttributes.Virtual | MethodAttributes.Final;
 
 				var getter = typeBuilder.DefineMethod($"get_{property.Name}", methodAttributes, property.PropertyType, Type.EmptyTypes);
-				var setter = typeBuilder.DefineMethod($"set_{property.Name}", methodAttributes, null, new[] { property.PropertyType });
+				var setter = typeBuilder.DefineMethod($"set_{property.Name}", methodAttributes, null, [property.PropertyType
+				]);
 
 				var getterGenerator = getter.GetILGenerator();
 				getterGenerator.Emit(OpCodes.Ldarg_0);

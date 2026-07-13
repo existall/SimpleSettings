@@ -7,7 +7,7 @@ namespace ExistForAll.SimpleSettings.Extensions.GenericHost
     public class SettingsBuilderOptions : ISettingsBuilderOptions
     {
         private readonly ISettingsBuilderFactory _settingsBuilderFactory;
-        private readonly List<Assembly> _assemblies = new List<Assembly>();
+        private readonly List<Assembly> _assemblies = [];
         public SettingsOptions Options => _settingsBuilderFactory.Options;
         public IEnumerable<Assembly> Assemblies => _assemblies;
 

@@ -46,10 +46,10 @@ namespace ExistForAll.SimpleSettings.Conversion
 		{
 			if (value is string text)
 			{
-				return text.Split(new[] { _settingsOptions.ArraySplitDelimiter }, StringSplitOptions.RemoveEmptyEntries);
+				return text.Split([_settingsOptions.ArraySplitDelimiter], StringSplitOptions.RemoveEmptyEntries);
 			}
 
-			return value is Array array ? array : new[] { value };
+			return value as Array ?? new[] { value };
 		}
 
 		private ISettingsTypeConverter GetElementConverter(Type elementType)
@@ -57,10 +57,9 @@ namespace ExistForAll.SimpleSettings.Conversion
 			// Manual walk over the concrete LinkedList (not LINQ First) so the struct enumerator isn't boxed
 			// onto the heap and no predicate closure is allocated — this runs per element-typed collection on
 			// every populate.
-			foreach (var converter in _converters)
+			foreach (var converter in _converters.Where(converter => converter.CanConvert(elementType)))
 			{
-				if (converter.CanConvert(elementType))
-					return converter;
+				return converter;
 			}
 
 			// Unreachable in practice: DefaultTypeConverter.CanConvert always returns true. Kept so every path

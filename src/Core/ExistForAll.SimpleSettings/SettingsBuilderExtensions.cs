@@ -12,10 +12,10 @@ namespace ExistForAll.SimpleSettings
 
             if (assemblies == null)
             {
-                assemblies = new Assembly[0];
+                assemblies = [];
             }
 
-            assemblies = assemblies.Concat(new[] { assembly }).ToArray();
+            assemblies = assemblies.Concat([assembly]).ToArray();
 
             return target.ScanAssemblies(assemblies);
         }

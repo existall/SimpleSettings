@@ -17,7 +17,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 		{
 			var result = Build<IIntArray>("IntArray", nameof(IIntArray.Values), "1,2,3,4");
 
-			await Assert.That(result.Values.SequenceEqual(new[] { 1, 2, 3, 4 })).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([1, 2, 3, 4])).IsTrue();
 		}
 
 		[Test]
@@ -54,7 +54,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 		{
 			var result = Build<IIntArray>("IntArray", nameof(IIntArray.Values), "1,,2,");
 
-			await Assert.That(result.Values.SequenceEqual(new[] { 1, 2 })).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([1, 2])).IsTrue();
 		}
 
 		[Test]
@@ -62,7 +62,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 		{
 			var result = Build<IIntArray>("IntArray", nameof(IIntArray.Values), "10;20;30", delimiter: ";");
 
-			await Assert.That(result.Values.SequenceEqual(new[] { 10, 20, 30 })).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([10, 20, 30])).IsTrue();
 		}
 
 		[Test]
@@ -73,7 +73,7 @@ namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 
 			var result = sut.GetSettings<IDefaultIntArray>();
 
-			await Assert.That(result.Values.SequenceEqual(new[] { 7, 8, 9 })).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([7, 8, 9])).IsTrue();
 		}
 
 		[Test]

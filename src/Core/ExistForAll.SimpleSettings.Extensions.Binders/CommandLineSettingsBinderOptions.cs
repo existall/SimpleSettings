@@ -6,8 +6,8 @@ namespace ExistForAll.SimpleSettings.Binders
 {
     public class CommandLineSettingsBinderOptions
     {
-        private readonly List<char> _argumentPrefixes = new List<char>(new[] {'-', '/'});
-        private readonly List<string> _delimiters = new List<string>(new[] {":", "="});
+        private readonly List<char> _argumentPrefixes = [..new[] { '-', '/' }];
+        private readonly List<string> _delimiters = [..new[] { ":", "=" }];
 
         public NameFormatter? NameFormatter { get; set; }
 
