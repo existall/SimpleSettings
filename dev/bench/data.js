@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783945485497,
+  "lastUpdate": 1783951817317,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -279,6 +279,80 @@ window.BENCHMARK_DATA = {
           {
             "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
             "value": 17572784,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5277c6075ebfb17ab94a6ad636073a1035f4bb31",
+          "message": "Redact secret values from conversion-failure exceptions (S1) (#27)\n\n* Redact secret values from conversion-failure exceptions (S1)\n\nA bound configuration value that failed type conversion could reach logs\ntwo ways: our own SettingsPropertyValueException message interpolated the\nraw value, and the failing converter's framework inner exception\n(FormatException/ArgumentException for int/enum/DateTime) embeds the raw\ninput and was chained in. A secret on a typed property (e.g. a credentialed\nUri, or a secret mis-bound to int/enum) therefore leaked into logs.\n\nFix (full — plan review chose this over redact-message-only and over an\nopt-in \"restore diagnostics\" flag, which was rejected as insecure-by-config):\n\n- Resources.PropertySetterExceptionMessage: no longer includes the value;\n  reports property name, target type, and the failing converter's exception\n  type name (a compile-time identifier that cannot carry a secret). Fixes the\n  \"to to\" double-word typo.\n- SettingsPropertyValueException: ctor drops the value parameter and no longer\n  chains the framework inner exception. Invariant: this type never carries a\n  value and never chains an inner, so it is auditably leak-proof.\n- New SettingsPropertyNullException (internal): the \"AllowEmpty = false with no\n  value\" path is value-free, so it keeps its full, useful message instead of\n  being redacted into a value-conversion exception; ConvertPropertyValue\n  rethrows it unredacted.\n- ISectionBinder: doc note that custom binders must not throw exceptions whose\n  message embeds a fetched value (the public SettingsBindingException chains\n  the binder's inner). The built-in binders don't.\n\nBoth changed exceptions are internal, so this is non-breaking.\n\nTests: new Conversion/ExceptionRedactionTests.cs binds a sentinel secret to\nint/enum/DateTime/Uri and to a hostile custom converter, asserting the secret\nis absent from the entire exception ToString() chain while the property name\nand target type remain; the existing null-not-allowed test now expects\nSettingsPropertyNullException and asserts its message. Suite 76 net10 (was 71).\n\nAlso refreshes FIX-PLAN.md (S1 marked done) and SESSION-HANDOFF.md.\n\n* Use an exception filter for the null-exception passthrough\n\nAddress PR #27 review: replace the separate catch(SettingsPropertyNullException)\n{ throw; } with a filter on the general catch — catch (Exception e) when\n(e is not SettingsPropertyNullException). Same behavior, more concise, and the\nfilter never unwinds into the catch so the null exception's throw context is\nuntouched.",
+          "timestamp": "2026-07-13T17:08:01+03:00",
+          "tree_id": "74127d53e6cbae7e3c99ed81dc3d77f2440c9d0b",
+          "url": "https://github.com/existall/SimpleSettings/commit/5277c6075ebfb17ab94a6ad636073a1035f4bb31"
+        },
+        "date": 1783951816657,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17573344,
             "unit": "bytes"
           }
         ]
