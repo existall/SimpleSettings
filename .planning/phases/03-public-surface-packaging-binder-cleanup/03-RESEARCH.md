@@ -13,7 +13,7 @@
 - **D-02b:** Project is packable by SDK default. If a `Core.AspNet` prerelease alpha was pushed to NuGet, it stops publishing on removal; note deprecation/unlisting if it exists (pre-stable → low stakes).
 - **D-03 (PKG-02):** Float the floor **per-TFM via CPM conditional `PackageVersion`** in `src/Directory.Packages.props` (`:8-12`): **net8 → latest `8.0.x` patch**, **net10 → `10.0.x` (currently `10.0.9`)**. All four packages: `Microsoft.Extensions.Configuration`, `.Configuration.Json`, `.DependencyInjection`, `.DependencyInjection.Abstractions`. Verify build + full suite green on **both** TFMs.
 - **D-04 (SRC-02):** Add **space-separated `--key value`** support (lookahead pairing) *in addition to* inline `--key=value` / `--key:value`. Rule: a prefixed key followed by a **non-prefixed** token consumes it as value; a following token starting with a prefix (`-`/`/`) is a **new key**, not a value (current key then has no value → not stored, preserving today's "no value ⇒ skip" semantics).
-- **D-05 (SRC-02):** **Skip `arg[0]` (exe path) by default**, exposed as a toggle on `CommandLineSettingsBinderOptions` (e.g. `SkipFirstArgument`, default `true`) so `Main(string[])` callers (which already exclude the exe) can turn it off.
+- **D-05 (SRC-02) — REFINED (see "## Open Questions (RESOLVED)" below; authoritative in 03-CONTEXT.md):** Skip the exe path **at the entry point that carries it**. `AddCommandLine()` (reads `Environment.GetCommandLineArgs()`, `[0]` = exe) enables the skip internally; `AddArguments(string[])` binds exactly what it is handed. `SkipFirstArgument` on `CommandLineSettingsBinderOptions` is an explicit override with default **`false`** (a shared default `true` would silently drop `args[0]` for `AddArguments` callers).
 - **D-06 (SRC-02):** Preserve existing options (prefixes `-`/`/`, delimiters `:`/`=`, `IsCaseSensitive`, `NameFormatter`). No manual quote-stripping (shell already unquotes).
 
 ### Claude's Discretion
@@ -44,7 +44,7 @@ All four items are small, well-scoped, and independently verifiable; three are p
 
 The one genuinely non-obvious finding: the **latest `8.0.x` patch differs per package** (`Configuration` = `8.0.0`, `.Configuration.Json` = `8.0.1`, `.DependencyInjection` = `8.0.1`, `.DependencyInjection.Abstractions` = `8.0.2`), so the four conditional entries carry three different net8 versions. Conditional `<PackageVersion Include=... Condition="'$(TargetFramework)'=='net8.0'">` duplicated per TFM is valid CPM and produces **no NU1504** because NuGet restore is per-TFM and evaluates the conditions — I confirmed this with a live restore that resolved net8→8.0.x and net10→10.0.9. A second finding for SRC-02: `Core.AspNet` **has been published** to NuGet.org as `1.0.0` and a long run of `2.0.0-alpha.0.N` prereleases, so removal should be paired with unlisting the alphas (low stakes, pre-stable).
 
-For the CLI binder, the decided lookahead rule (**D-04**) *deliberately diverges* from Microsoft's `CommandLineConfigurationProvider`, which consumes the next token as a value **unconditionally** (even if it starts with a prefix). SimpleSettings instead treats a prefixed next-token as a new key. This is a correct, intentional design choice — plan the tests around SimpleSettings' rule, not exact Microsoft parity. Separately, the `AddCommandLine()` convenience method's `Environment.CommandLine.Trim().Split(' ')` is the real reason `SkipFirstArgument` defaults to `true` (arg[0] is the exe path) — and it is itself quote-unsafe (see Pitfall 3).
+For the CLI binder, the decided lookahead rule (**D-04**) *deliberately diverges* from Microsoft's `CommandLineConfigurationProvider`, which consumes the next token as a value **unconditionally** (even if it starts with a prefix). SimpleSettings instead treats a prefixed next-token as a new key. This is a correct, intentional design choice — plan the tests around SimpleSettings' rule, not exact Microsoft parity. Separately, the `AddCommandLine()` convenience method's `Environment.CommandLine.Trim().Split(' ')` is the real reason `AddCommandLine()` must skip `arg[0]` (the exe path) — under refined D-05 it sets `SkipFirstArgument = true` internally (the option default is `false`) — and that split is itself quote-unsafe (see Pitfall 3), which is why it moves to `GetCommandLineArgs()`.
 
 **Primary recommendation:** Ship all four as one PR on `chore/gsd-ownership-cutover` (never direct to `master` — every master push publishes a throwaway alpha). Use conditional `PackageVersion` items (two per package) for PKG-02; validate PKG-02 by inspecting `obj/project.assets.json` per TFM. Keep the binder fix inside `Parse`/`SplitByDelimiter` + one new option; add TUnit tests under `Binders/CommandLine/`.
 
@@ -122,7 +122,7 @@ Environment.CommandLine (exe + args)                │
                                        new CommandLineSettingsBinder(args, options)
                                                      │
                                           Parse(args):                (SRC-02 change here)
-                                          ├─ [SkipFirstArgument] skip args[0] (default true)   ◄── D-05
+                                          ├─ [SkipFirstArgument] skip args[0] (AddCommandLine sets true; option default false)   ◄── D-05 (refined)
                                           └─ for each arg (with lookahead):                    ◄── D-04
                                              ├─ inline "--k=v" / "--k:v"  → store (existing)
                                              ├─ "--k" + next non-prefixed → store k=next
@@ -241,15 +241,15 @@ data[key] = value;                                 // last-writer-wins
 **What goes wrong:** `AddCommandLine()` uses `Environment.CommandLine.Trim().Split(' ')` — this (a) splits a quoted value/path with spaces into multiple tokens, and (b) includes the **exe path** as `args[0]`.
 **Why it happens:** `Environment.CommandLine` is the raw, un-tokenized string; naive `Split(' ')` ignores quoting.
 **How to avoid:**
-- `SkipFirstArgument` default **true** is correct for the `AddCommandLine()` path (drops the exe path).
-- For the `AddArguments(Main(string[] args))` path, `Main` args **exclude** the exe, so a caller must set `SkipFirstArgument = false` or the first real arg is dropped — document this on the option.
+- `AddCommandLine()` sets `SkipFirstArgument = true` internally — its `GetCommandLineArgs()` source has the exe at `[0]`. The option default is **`false`**.
+- The `AddArguments(Main(string[] args))` path keeps the default `false` and binds exactly what it is handed (`Main` args already exclude the exe) — no silent `arg[0]` drop. Document the option's behavior either way.
 - **Strongly consider** switching `AddCommandLine()` to `Environment.GetCommandLineArgs()` (properly tokenized, `[0]` = exe) so D-04's quoted-value fix actually helps the `AddCommandLine()` path too. This is arguably in-scope for "quoted value with spaces binds correctly" (see Open Questions).
 **Warning signs:** `--name "John Doe"` binds `Name="John"` (or nothing) instead of `John Doe`.
 
 ### Pitfall 4: existing `ArgumentsTests` under the new default (SRC-02)
-**What goes wrong:** Adding `SkipFirstArgument` default-true silently drops a real first arg and breaks a test.
+**What goes wrong (historical — resolved by refined D-05):** A *shared* `SkipFirstArgument` default-true silently drops a real first arg for `AddArguments`. Refined D-05 defaults the option to `false` (only `AddCommandLine` sets it true internally), so this no longer occurs.
 **Why it happens (and why it's fine here):** The existing test uses `" name=value age:3".Split(' ')` = `["", "name=value", "age:3"]` — the **leading space** makes `args[0]` an empty string. Skipping `""` is harmless; `name`/`age` are at `[1]`/`[2]`. The suite stays green.
-**How to avoid:** Keep the leading-space fixture as-is, **or** rewrite it to `["name=value","age:3"]` and pass `SkipFirstArgument=false`. Either preserves intent. Add new cases for the space-separated form.
+**How to avoid:** With the refined default `false`, the existing leading-space fixture stays green as-is (arg[0] is `""`, parsed safely and not stored). Add new cases for the space-separated form.
 **Warning signs:** `Build_WhenNameMatchKey_ShouldPlaceValue` fails after the option lands.
 
 ### Pitfall 5: TUnit filter (project-wide, from TESTING.md)
@@ -282,7 +282,7 @@ The test project's own `Core/AspNet/Environments.cs` (namespace `...UnitTests.Co
 /// <summary>Skip args[0] (the executable path) when parsing.
 /// Default true — correct for Environment.CommandLine / GetCommandLineArgs().
 /// Set false when passing Main(string[] args), which already excludes the exe.</summary>
-public bool SkipFirstArgument { get; set; } = true;
+public bool SkipFirstArgument { get; set; } = false; // AddCommandLine() sets true internally (refined D-05)
 ```
 
 ## State of the Art

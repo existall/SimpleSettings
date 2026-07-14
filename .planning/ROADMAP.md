@@ -77,8 +77,12 @@ value: config → typed settings maps accurately, and never leaks a secret doing
   4. A quoted command-line value containing spaces binds correctly and the executable path (`arg[0]`) is skipped.
 
 **Plans**: 2 plans
+**Wave 1**
 
 - [ ] 03-01-PLAN.md — Public surface & packaging cleanup: SettingsHolder → internal sealed (API-01), drop dead Core.AspNet package (PKG-01), per-TFM Microsoft.Extensions.* floor (PKG-02) [Wave 1]
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 03-02-PLAN.md — Command-line binder cleanup: SkipFirstArgument option + space-separated `--k v` lookahead + arg[0] skip + AddCommandLine tokenization (SRC-02) [Wave 2, depends on 03-01]
 
 ### Phase 4: AOT/Trim Honesty & Documentation
