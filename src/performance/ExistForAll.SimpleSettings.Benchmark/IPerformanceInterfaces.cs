@@ -1,5 +1,3 @@
-using ExistForAll.SimpleSettings;
-
 namespace ExistForAll.SimpleSettings.Benchmark
 {
 	[SettingsSection] public interface IPerformanceInterface0 {[SettingsProperty(DefaultValue = "name_0")] string Name { get; set; } }

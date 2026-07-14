@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ExistForAll.SimpleSettings.Conversion
+﻿namespace ExistForAll.SimpleSettings.Conversion
 {
 	internal class TypeConvertersCollections : LinkedList<ISettingsTypeConverter>
 	{

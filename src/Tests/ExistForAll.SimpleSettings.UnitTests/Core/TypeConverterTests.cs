@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using ExistForAll.SimpleSettings.Conversion;
 using ExistForAll.SimpleSettings.Core.Reflection;

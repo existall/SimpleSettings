@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings
 {
 	// Raised when a type handed to the builder/collection is not an interface (SimpleSettings generates its

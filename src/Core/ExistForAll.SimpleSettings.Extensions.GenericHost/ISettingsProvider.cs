@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ExistForAll.SimpleSettings.Extensions.GenericHost
+﻿namespace ExistForAll.SimpleSettings.Extensions.GenericHost
 {
     public interface ISettingsProvider
     {

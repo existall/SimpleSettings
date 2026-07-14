@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings.Binders
 {
     public class EnvironmentVariableBinderOptions

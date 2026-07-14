@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings.Conversion
 {
 	// Shared conversion for the two collection shapes — arrays and IEnumerable<T> properties. Both split a

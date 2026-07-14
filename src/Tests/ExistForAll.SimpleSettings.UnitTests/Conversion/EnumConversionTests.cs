@@ -1,4 +1,3 @@
-using System;
 using ExistForAll.SimpleSettings.Binder;
 
 namespace ExistForAll.SimpleSettings.UnitTests.Conversion

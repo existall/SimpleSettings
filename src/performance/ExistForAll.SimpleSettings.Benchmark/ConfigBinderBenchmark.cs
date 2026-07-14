@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
 using ExistForAll.SimpleSettings.Binders;
 using Microsoft.Extensions.Configuration;

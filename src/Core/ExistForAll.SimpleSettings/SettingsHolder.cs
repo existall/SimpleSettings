@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ExistForAll.SimpleSettings
+﻿namespace ExistForAll.SimpleSettings
 {
 	internal sealed class SettingsHolder : ISettingsHolder
 	{

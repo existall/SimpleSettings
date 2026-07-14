@@ -1,5 +1,4 @@
-using System;
-using System.Reflection;
+﻿using System.Reflection;
 using ExistForAll.SimpleSettings.Core.Reflection;
 
 namespace ExistForAll.SimpleSettings.Conversion

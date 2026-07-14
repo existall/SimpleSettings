@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ExistForAll.SimpleSettings.Conversion
+﻿namespace ExistForAll.SimpleSettings.Conversion
 {
 	/// <summary>
 	/// Converts a bound settings value to a property's target type.

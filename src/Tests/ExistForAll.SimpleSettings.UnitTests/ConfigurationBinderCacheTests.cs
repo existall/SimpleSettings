@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using ExistForAll.SimpleSettings.Binders;
 using Microsoft.Extensions.Configuration;
 

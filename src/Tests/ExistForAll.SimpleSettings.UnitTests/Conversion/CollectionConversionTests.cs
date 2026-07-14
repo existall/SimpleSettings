@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using ExistForAll.SimpleSettings.Binder;
-using ExistForAll.SimpleSettings.Binders;
 
 namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 {

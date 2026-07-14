@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings
 {
 	// Common base for every exception the library throws, so consumers can catch the whole family with a single

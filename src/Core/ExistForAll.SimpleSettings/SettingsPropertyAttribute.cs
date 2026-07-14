@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ExistForAll.SimpleSettings
+﻿namespace ExistForAll.SimpleSettings
 {
 	[AttributeUsage(AttributeTargets.Property)]
 	public class SettingsPropertyAttribute : Attribute

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-
-namespace ExistForAll.SimpleSettings.UnitTests
+﻿namespace ExistForAll.SimpleSettings.UnitTests
 {
 	internal class DisposableEnvironmentVariable : IDisposable
 	{

@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings
 {
     public static class SettingsCollectionExtensions

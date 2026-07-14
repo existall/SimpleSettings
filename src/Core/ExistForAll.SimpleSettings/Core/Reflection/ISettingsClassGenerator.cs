@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ExistForAll.SimpleSettings.Core.Reflection
+﻿namespace ExistForAll.SimpleSettings.Core.Reflection
 {
 	internal interface ISettingsClassGenerator
 	{
