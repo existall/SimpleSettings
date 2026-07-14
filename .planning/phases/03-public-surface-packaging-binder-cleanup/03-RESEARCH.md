@@ -304,7 +304,11 @@ public bool SkipFirstArgument { get; set; } = true;
 
 **Note:** A1/A2 are the only non-VERIFIED items; both are low-risk registry/graph hygiene, not code correctness.
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> **Resolved 2026-07-14 (Phase-3 planning, owner-approved):**
+> 1. **Q1 — RESOLVED:** `AddCommandLine()` switches to `Environment.GetCommandLineArgs()` (in-scope). The exe-skip is owned by `AddCommandLine()` internally (split-by-entry-point per refined D-05), *not* a shared `SkipFirstArgument` default — so `AddArguments(mainArgs)` binds exactly what it is handed. The "quoted value with spaces" success criterion holds end-to-end for the `AddCommandLine()` path.
+> 2. **Q2 — RESOLVED:** net8 floor = **latest-patch-per-package** (Option 1): `Configuration` 8.0.0, `Configuration.Json` 8.0.1, `DependencyInjection` 8.0.1, `DependencyInjection.Abstractions` 8.0.2; net10 stays 10.0.9.
 
 1. **Should `AddCommandLine()` switch from `Environment.CommandLine.Split(' ')` to `Environment.GetCommandLineArgs()`?**
    - What we know: the current split is quote-unsafe; the success criterion is "a quoted command-line value with spaces binds correctly". The D-04 lookahead fix only helps callers who pass already-tokenized args (`Main`/`GetCommandLineArgs`), **not** the `Environment.CommandLine.Split(' ')` path.

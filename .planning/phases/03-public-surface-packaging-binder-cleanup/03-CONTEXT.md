@@ -50,9 +50,16 @@ REL-01 (cut the beta) — Phase 5; COLL-01 (`List<T>` support, still owner-defer
   is a **new key**, not a value (the current key then has no value → not stored, preserving today's
   string-only "no value ⇒ skip" semantics). This is the real "quoted value with spaces" fix — such a
   value arrives shell-unquoted as its own token, which the current parser drops.
-- **D-05:** **Skip `arg[0]` (exe path) by default**, exposed as a toggle on
-  `CommandLineSettingsBinderOptions` (e.g. `SkipFirstArgument`, default `true`) so callers passing
-  `Main(string[])` args — which already exclude the exe — can turn it off.
+- **D-05:** **Skip the exe path at the entry point that actually carries it — not via a shared
+  default.** `AddCommandLine()` (which reads `Environment.GetCommandLineArgs()`, where `[0]` is the
+  exe) skips the first token internally; `AddArguments(string[])` binds exactly what it is handed
+  (no skip — `Main(string[])` args already exclude the exe). A `SkipFirstArgument` toggle on
+  `CommandLineSettingsBinderOptions` remains for explicit override.
+  *(Refined 2026-07-14 during Phase-3 planning, owner-approved: the original wording was a single
+  shared `SkipFirstArgument` default `true`, but architect review showed one shared default silently
+  drops `args[0]` for `AddArguments(mainArgs)` callers while being correct for `AddCommandLine()`.
+  Splitting the responsibility by entry point removes that footgun and keeps the intent — skip the
+  exe only where an exe is present.)*
 - **D-06:** Preserve existing options (prefixes `-`/`/`, delimiters `:`/`=`, `IsCaseSensitive`,
   `NameFormatter`). No manual quote-stripping needed (the shell already unquotes).
 
