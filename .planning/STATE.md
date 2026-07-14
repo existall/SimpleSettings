@@ -1,6 +1,14 @@
 ---
-gsd_state_version: '1.0'  # placeholder; syncStateFrontmatter overwrites on first state.* call
+gsd_state_version: 1.0
+milestone: v2.0.0
+milestone_name: milestone
+current_phase: 2
+current_phase_name: Binding Correctness & Engine Test Hardening
 status: planning
+stopped_at: "Phase 1 (S1 #27, C2 #28) shipped; reconciled ROADMAP/STATE/REQUIREMENTS to mark Phase 1 complete. Next: plan Phase 2."
+last_updated: "2026-07-14T09:49:18.804Z"
+last_activity: 2026-07-14
+last_activity_desc: "ENG-01/T7 merged (#29, master @ 10f9275); GSD ownership cutover: .planning reconciled to reality, FIX-PLAN.md frozen as a historical reference (GSD is now source of truth)"
 progress:
   total_phases: 5
   completed_phases: 1
@@ -21,15 +29,16 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 2 of 5 (Binding Correctness & Engine Test Hardening)
-Plan: 0 of TBD in current phase
-Status: In progress — ENG-01/T7 done (#29); COLL-01 (C1, deferred) + TEST-01/02/03 remain to plan
-Last activity: 2026-07-14 — ENG-01/T7 merged (#29, master @ 10f9275); GSD ownership cutover: .planning reconciled to reality, FIX-PLAN.md frozen as a historical reference (GSD is now source of truth)
+Plan: 0 of 2 executed in current phase (both planned + verified)
+Status: Ready to execute — 2 plans (wave 1, parallel): TEST-01/02/03 + ENG-01 verify-only; COLL-01 deferred
+Last activity: 2026-07-14 — Phase 2 planned via GSD (2 plans, plan-checker PASSED); prior: ENG-01/T7 merged (#29) + GSD ownership cutover (.planning is source of truth, FIX-PLAN.md frozen)
 
 Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: —
 - Total execution time: 0 hours
@@ -41,6 +50,7 @@ Progress: [██░░░░░░░░] 20%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: —
 - Trend: —
 
