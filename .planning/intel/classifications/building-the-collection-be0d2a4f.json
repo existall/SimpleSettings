@@ -1,0 +1,17 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/docs/building_the_collection.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Building The Collection",
+  "summary": "Guide for building the SimpleSettings collection by scanning assemblies, configuring options, and adding section binders.",
+  "scope": ["SettingsBuilder", "ScanAssemblies", "SettingsOptions", "Binders", "settings collection"],
+  "cross_refs": [
+    "https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md",
+    "https://github.com/existall/SimpleSettings/blob/master/docs/Build%20a%20SectionBinder.md",
+    "https://github.com/existall/SimpleSettings/blob/master/docs/Build%20Config%20Interface.md"
+  ],
+  "locked": false,
+  "precedence": 3,
+  "notes": ""
+}

@@ -1,0 +1,28 @@
+docs:
+  - path: FIX-PLAN.md
+    type: SPEC
+    precedence: 0
+  - path: SESSION-HANDOFF.md
+    type: DOC
+    precedence: 1
+  - path: README.md
+    type: DOC
+    precedence: 2
+  - path: "docs/getting_started.md"
+    type: DOC
+    precedence: 3
+  - path: "docs/Build a SectionBinder.md"
+    type: DOC
+    precedence: 3
+  - path: "docs/Default Values.md"
+    type: DOC
+    precedence: 3
+  - path: "docs/Build Config Interface.md"
+    type: DOC
+    precedence: 3
+  - path: "docs/Extend Simple Config.md"
+    type: DOC
+    precedence: 3
+  - path: "docs/building_the_collection.md"
+    type: DOC
+    precedence: 3

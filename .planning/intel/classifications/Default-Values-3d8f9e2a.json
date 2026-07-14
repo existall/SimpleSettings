@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/docs/Default Values.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Default Values",
+  "summary": "Explains how SimpleSettings applies DefaultValue and other SettingsProperty attribute options during property binding.",
+  "scope": ["SettingsProperty attribute", "DefaultValue", "type conversion", "SettingsOptions.DateTimeFormat", "SectionBinder"],
+  "cross_refs": ["https://github.com/existall/SimpleSettings/blob/master/docs/Build%20a%20SectionBinder.md"],
+  "locked": false,
+  "precedence": 3,
+  "notes": ""
+}

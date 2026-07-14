@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/docs/Build a SectionBinder.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Build a SectionBinder",
+  "summary": "Guide explaining how to implement a custom ISectionBinder to feed property values into SimpleSettings from external data sources.",
+  "scope": ["SectionBinder", "ISectionBinder", "BindingContext", "InMemoryCollection", "ConfigurationBinder", "EnvironmentVariableBinder", "command line binder", "SettingsBuilder"],
+  "cross_refs": ["https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md"],
+  "locked": false,
+  "precedence": 3,
+  "notes": ""
+}

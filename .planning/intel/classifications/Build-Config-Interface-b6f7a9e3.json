@@ -1,0 +1,16 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/docs/Build Config Interface.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Build a Settings Interface",
+  "summary": "Tutorial explaining the three ways to declare a SimpleSettings settings interface (base interface, attribute, or name suffix).",
+  "scope": ["ISettingsSection", "SettingsSection attribute", "SettingsProperty attribute", "SettingsOptions", "settings interface conventions"],
+  "cross_refs": [
+    "https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md",
+    "https://github.com/existall/SimpleSettings/blob/master/docs/Default%20Values.md"
+  ],
+  "locked": false,
+  "precedence": 3,
+  "notes": ""
+}

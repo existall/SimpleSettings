@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/docs/getting_started.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Getting Started",
+  "summary": "Tutorial for using SimpleSettings' SettingsBuilder to scan assemblies, define settings interfaces, and wire them into dependency injection.",
+  "scope": ["SettingsBuilder", "ISettingsCollection", "SettingsSection attribute", "SettingsProperty attribute", "ISettingsProvider", "GenericHost integration", "dependency injection"],
+  "cross_refs": ["https://github.com/existall/SimpleSettings/blob/master/docs/building_the_collection.md"],
+  "locked": false,
+  "precedence": 3,
+  "notes": ""
+}

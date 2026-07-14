@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/SESSION-HANDOFF.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "SESSION HANDOFF — SimpleSettings",
+  "summary": "Session handoff for SimpleSettings capturing git state, the S1 secret-redaction fix, merged perf track, and ranked next priorities.",
+  "scope": ["SimpleSettings", "S1 secret redaction", "exception messages", "SettingsPropertyValueException", "SettingsPropertyNullException", "ValuesPopulator", "perf track P0-P5", "benchmark tracking CI", "release/versioning workflow"],
+  "cross_refs": ["FIX-PLAN.md"],
+  "locked": false,
+  "precedence": 1,
+  "notes": ""
+}

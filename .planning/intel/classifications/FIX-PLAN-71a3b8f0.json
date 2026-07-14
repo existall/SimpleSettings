@@ -1,0 +1,25 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/FIX-PLAN.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "SimpleSettings — Fix Plan",
+  "summary": "Ordered, verified work-item plan derived from a three-part (architecture/tests/performance) review of the SimpleSettings library, with progress tracking.",
+  "scope": [
+    "ExistForAll.SimpleSettings Core",
+    "type converters (Enum/Default/Array/Enumerable/Collection)",
+    "ValuesPopulator and SettingsPlan",
+    "ConfigurationBinder / section binders",
+    "DI / Generic-Host integration and ISettingsProvider",
+    "SettingsClassGenerator (Reflection.Emit)",
+    "exception hierarchy and secret redaction",
+    "benchmark harness and CI allocation gating",
+    "namespace consolidation and AOT/trim strategy"
+  ],
+  "cross_refs": [
+    "SESSION-HANDOFF.md"
+  ],
+  "locked": false,
+  "precedence": 0,
+  "notes": ""
+}

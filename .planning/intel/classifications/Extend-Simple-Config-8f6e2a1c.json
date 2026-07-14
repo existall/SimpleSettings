@@ -1,0 +1,13 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/docs/Extend Simple Config.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "Extend SimpleSettings",
+  "summary": "Guide explaining how to customize SimpleSettings behavior via SettingsOptions, custom attributes/interfaces, type converters, and section name formatters.",
+  "scope": ["SettingsOptions", "SettingsBuilder", "AttributeType", "InterfaceBase", "SettingsSuffix", "ArraySplitDelimiter", "DateTimeFormat", "ISettingsTypeConverter", "SectionNameFormatter", "Binders"],
+  "cross_refs": [],
+  "locked": false,
+  "precedence": 3,
+  "notes": ""
+}

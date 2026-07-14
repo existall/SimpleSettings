@@ -1,0 +1,20 @@
+{
+  "source_path": "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/README.md",
+  "type": "DOC",
+  "confidence": "high",
+  "manifest_override": true,
+  "title": "ExistForAll.SimpleSettings (previously SimpleConfig)",
+  "summary": "Introduction and usage guide for the SimpleSettings library, a framework-independent alternative to ASP.NET Core IOptions<>.",
+  "scope": ["SimpleSettings", "SimpleConfig", "IOptions", "configuration binding", "dependency injection"],
+  "cross_refs": [
+    "https://github.com/existall/SimpleConfig/blob/master/docs/getting_started.md",
+    "https://github.com/existall/SimpleConfig/blob/master/docs/building_the_collection.md",
+    "https://github.com/existall/SimpleConfig/blob/master/docs/Build%20Config%20Interface.md",
+    "https://github.com/existall/SimpleConfig/blob/master/docs/Default%20Values.md",
+    "https://github.com/existall/SimpleConfig/blob/master/docs/Build%20a%20SectionBinder.md",
+    "https://github.com/existall/SimpleConfig/blob/master/docs/Extend%20Simple%20Config.md"
+  ],
+  "locked": false,
+  "precedence": 2,
+  "notes": ""
+}
