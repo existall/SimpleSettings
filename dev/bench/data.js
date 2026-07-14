@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1783954841923,
+  "lastUpdate": 1784015294616,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -377,6 +377,80 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/existall/SimpleSettings/commit/13b78dd4b0b3b229abe7f3f9e046aff6d645717c"
         },
         "date": 1783954841501,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17573344,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "guy-lud",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "guy.lud@gmail.com",
+            "name": "guy-lud",
+            "username": "guy-lud"
+          },
+          "distinct": false,
+          "id": "6ee61d464ef517dbd7e5f7862e041de1fd3d814c",
+          "message": "chore: bootstrap GSD planning (.planning/)",
+          "timestamp": "2026-07-14T10:38:08+03:00",
+          "tree_id": "51170d90140e23d33d6a8714db7943b6b70ea0d0",
+          "url": "https://github.com/existall/SimpleSettings/commit/6ee61d464ef517dbd7e5f7862e041de1fd3d814c"
+        },
+        "date": 1784015293950,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
