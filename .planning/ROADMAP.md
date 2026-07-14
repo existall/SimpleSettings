@@ -121,6 +121,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Exception Safety & Public Hierarchy | n/a (shipped) | ✓ Complete | 2026-07-14 (#27/#28) |
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
-| 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete   | 2026-07-14 |
+| 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete    | 2026-07-14 |
 | 4. AOT/Trim Honesty & Documentation | 0/TBD | Not started | - |
 | 5. First v2.0.0-beta Release | 0/TBD | Not started | - |
