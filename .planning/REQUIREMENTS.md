@@ -44,7 +44,7 @@ Remaining open work (from `FIX-PLAN.md`), batched toward the first `v2.0.0-beta`
 
 ### Binding Correctness & Engine Tests
 
-- [ ] **COLL-01**: `List<T>`/`IList<T>`/`ICollection<T>` support decision — broaden the converter or document + throw a clear error, with a positive test (C1)
+- [x] **COLL-01**: `List<T>`/`IList<T>`/`ICollection<T>` support decision — broaden the converter or document + throw a clear error, with a positive test (C1)
 - [x] **TEST-01**: `ValuesPopulator` tests — binder precedence + bind/convert exception-wrapper contracts (T4)
 - [x] **TEST-02**: `TypeConverter` tests — null/nullable/empty-enumerable/`AllowEmpty`/attribute-`ConverterType` paths (T5)
 - [x] **TEST-03**: Converter tests residual — `Uri`/`DateTime` + `List<T>` doc test tied to C1 (T6)
@@ -95,7 +95,7 @@ Deferred / held. Tracked but not in the current roadmap.
 | SEC-01 | Phase 1 | ✓ Complete (#27) |
 | SEC-02 | Phase 1 | ✓ Complete |
 | EXC-01 | Phase 1 | ✓ Complete (#28) |
-| COLL-01 | Phase 2 | Pending |
+| COLL-01 | Phase 2 | Complete |
 | TEST-01 | Phase 2 | Complete |
 | TEST-02 | Phase 2 | Complete |
 | TEST-03 | Phase 2 | Complete |
