@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings.Extensions.GenericHost
 {
     internal class SettingsProvider : ISettingsProvider

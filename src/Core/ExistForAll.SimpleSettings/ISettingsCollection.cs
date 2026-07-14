@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ExistForAll.SimpleSettings
+﻿namespace ExistForAll.SimpleSettings
 {
 	public interface ISettingsCollection : IEnumerable<KeyValuePair<Type, object>>
 	{

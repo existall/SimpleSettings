@@ -39,7 +39,11 @@
 
 ---
 
-## Recommended integration (after Phase 3)
-1. `/gsd-new-milestone` OR extend the current milestone: add these as REQUIREMENTS.md entries (finalize IDs).
-2. Insert a **new engine phase** (collections + validation) before the beta; renumber: current Phase 4 (AOT/docs) and Phase 5 (beta) shift out so the beta stays last.
-3. Discuss-phase for the new phase (COLL-02/03 sequencing, VAL-01 pipeline hook point, the S1 re-verification gate for COLL-03).
+## Integration decision — APPROVED 2026-07-14 (owner)
+**Chosen: new engine phase before the beta** (renumber, beta stays last). Phase 3 shipped separately as PR #31.
+
+1. Add these as `REQUIREMENTS.md` entries (finalize IDs COLL-02/COLL-03/VAL-01/VAL-02/API-02).
+2. Insert as **new Phase 4 "Collection & Validation Binding"** via `/gsd-phase`; renumber current Phase 4 (AOT/docs) → **Phase 5**, current Phase 5 (beta) → **Phase 6**.
+3. `/gsd-discuss-phase 4` → plan → execute. Discussion must cover: COLL-02/03 sequencing, VAL-01 pipeline hook point, the **S1 secret-redaction re-verification gate for COLL-03** (it edits `BindPropertySettings`), and the load-bearing comma-scalar compatibility.
+
+Staged on branch `gsd/phase-4-collection-validation-binding` (forked off the Phase 3 tip; rebase onto `master` after PR #31 merges).

@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
 	public class BindingContextTests

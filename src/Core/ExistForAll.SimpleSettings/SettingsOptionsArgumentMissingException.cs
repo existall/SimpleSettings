@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings
 {
 	public class SettingsOptionsArgumentMissingException : SimpleSettingsException

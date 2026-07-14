@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Reflection;
 
 namespace ExistForAll.SimpleSettings.Extensions.GenericHost

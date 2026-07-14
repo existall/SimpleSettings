@@ -1,6 +1,4 @@
-using System;
-
-namespace ExistForAll.SimpleSettings.Conversion
+﻿namespace ExistForAll.SimpleSettings.Conversion
 {
 	internal class ArrayTypeConverter : CollectionTypeConverter
 	{

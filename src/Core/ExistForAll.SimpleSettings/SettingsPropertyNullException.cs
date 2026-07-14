@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings
 {
 	// Raised when a property marked [SettingsProperty(AllowEmpty = false)] resolves to no value. Distinct from

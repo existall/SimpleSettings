@@ -1,4 +1,3 @@
-using System;
 using System.Reflection;
 using ExistForAll.SimpleSettings.Conversion;
 using ExistForAll.SimpleSettings.Core.Reflection;

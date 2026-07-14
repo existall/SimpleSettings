@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using ExistForAll.SimpleSettings;
-using ExistForAll.SimpleSettings.Binders;
-
 namespace ExistForAll.SimpleSettings.Binders
 {
    public class CommandLineSettingsBinder : ISectionBinder
@@ -26,6 +20,7 @@ namespace ExistForAll.SimpleSettings.Binders
 
       public void BindPropertySettings(BindingContext context)
       {
+         
          var key = _options.NameFormatter != null ? _options.NameFormatter(context.Section, context.Key) : context.Key;
          
          if(_argumentStore.TryGetValue(key, out var value))
@@ -34,7 +29,7 @@ namespace ExistForAll.SimpleSettings.Binders
          }
       }
       
-      private void Parse(string[] args)
+      private void Parse(string[]? args)
       {
          _argumentStore.Clear();
 
@@ -61,7 +56,6 @@ namespace ExistForAll.SimpleSettings.Binders
             if (!tokenWasPrefixed || index + 1 >= args.Length) continue;
 
             var next = args[index + 1];
-            if (next is null) continue;
             if (next.Length > 0 && Array.IndexOf(prefixes, next[0]) >= 0) continue;
 
             _argumentStore[name] = next;
@@ -69,7 +63,7 @@ namespace ExistForAll.SimpleSettings.Binders
          }
       }
 
-      private static Tuple<string, string?>? SplitByDelimiter(string str, CommandLineSettingsBinderOptions options)
+      private static Tuple<string, string?>? SplitByDelimiter(string? str, CommandLineSettingsBinderOptions options)
       {
          if (str == null)
             return null;
@@ -77,31 +71,24 @@ namespace ExistForAll.SimpleSettings.Binders
          string key;
          string? value;
 
-         if (!options.Delimiters.Any())
+         if (!options.Delimiters.Any()) 
+            return new Tuple<string, string?>(str.Trim(), null);
+         
+         var indices = options.Delimiters
+            .Select(d => str.IndexOf(d, StringComparison.Ordinal))
+            .Where(d => d != -1).ToList();
+
+         if (indices.Count == 0)
          {
             key = str.Trim();
             value = null;
          }
          else
          {
-
-            var indices = options.Delimiters.Where(delimiter => delimiter != null)
-               .Select(d => str.IndexOf(d))
-               .Where(d => d != -1).ToList();
-
-            if (indices.Count == 0)
-            {
-               key = str.Trim();
-               value = null;
-            }
-            else
-            {
-               var idx = indices.OrderBy(i => i).First();
-               key = str.Substring(0, idx);
-               value = str.Substring(idx + 1);
-            }
+            var idx = indices.OrderBy(i => i).First();
+            key = str[..idx];
+            value = str[(idx + 1)..];
          }
-
          return new Tuple<string, string?>(key, value);
       }
    }

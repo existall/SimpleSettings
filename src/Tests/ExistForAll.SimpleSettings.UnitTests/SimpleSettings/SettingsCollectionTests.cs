@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
     public class SettingsCollectionTests

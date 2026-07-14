@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings
 {
 	// Moved to the root namespace (was ExistForAll.SimpleSettings.Core) so the public exception surface is

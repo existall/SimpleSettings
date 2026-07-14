@@ -1,5 +1,4 @@
 using BenchmarkDotNet.Attributes;
-using ExistForAll.SimpleSettings;
 
 namespace ExistForAll.SimpleSettings.Benchmark
 {

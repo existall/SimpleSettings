@@ -1,4 +1,3 @@
-using System;
 using BenchmarkDotNet.Attributes;
 using ExistForAll.SimpleSettings.Binder;
 

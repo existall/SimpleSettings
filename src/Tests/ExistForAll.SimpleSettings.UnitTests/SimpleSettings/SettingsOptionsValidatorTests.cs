@@ -1,4 +1,3 @@
-using System;
 using ExistForAll.SimpleSettings.Core;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings

@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using ExistForAll.SimpleSettings.Binder;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings

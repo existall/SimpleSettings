@@ -1,6 +1,4 @@
-using System;
-
-namespace ExistForAll.SimpleSettings
+﻿namespace ExistForAll.SimpleSettings
 {
 	// Raised when an ISectionBinder throws while binding a property. It carries the binder type, section, and
 	// key as primitives and deliberately does NOT retain the BindingContext — the context holds the bound value

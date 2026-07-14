@@ -1,5 +1,3 @@
-using System;
-
 namespace ExistForAll.SimpleSettings
 {
 	// Promoted to public and moved to the root namespace (was internal in ExistForAll.SimpleSettings.Core.Reflection):

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ExistForAll.SimpleSettings.Binder
+﻿namespace ExistForAll.SimpleSettings.Binder
 {
 	public class InMemoryCollection : IInMemoryCollection
 	{

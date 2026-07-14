@@ -1,4 +1,3 @@
-using System;
 using ExistForAll.SimpleSettings.Binder;
 using ExistForAll.SimpleSettings.Extensions.GenericHost;
 using Microsoft.Extensions.DependencyInjection;
