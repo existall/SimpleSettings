@@ -23,7 +23,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 
 - [x] **Phase 1: Exception Safety & Public Hierarchy** — ✓ COMPLETE (S1 #27, C2 #28 merged 2026-07-14) - No secret leaks; one catchable, structured `SimpleSettingsException` base
 - [x] **Phase 2: Binding Correctness & Engine Test Hardening** - Collections/nullable/converters verified; generator race closed by tests *(ENG-01/T7 done #29; COLL-01 + TEST-01/02/03 remain)* (completed 2026-07-14)
-- [ ] **Phase 3: Public Surface, Packaging & Binder Cleanup** - Meaningful public surface; per-TFM deps; correct command-line parsing
+- [x] **Phase 3: Public Surface, Packaging & Binder Cleanup** - Meaningful public surface; per-TFM deps; correct command-line parsing (completed 2026-07-14)
 - [ ] **Phase 4: AOT/Trim Honesty & Documentation** - Honest AOT/trim signals; canonically-named docs
 - [ ] **Phase 5: First v2.0.0-beta Release** - Batched breaking changes ship as an installable pre-release
 
@@ -76,14 +76,14 @@ value: config → typed settings maps accurately, and never leaks a secret doing
   3. A net8 consumer is no longer transitively forced onto `Microsoft.Extensions.* 10.x` (per-TFM floor), or the pin is documented with justification.
   4. A quoted command-line value containing spaces binds correctly and the executable path (`arg[0]`) is skipped.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 **Wave 1**
 
 - [x] 03-01-PLAN.md — Public surface & packaging cleanup: SettingsHolder → internal sealed (API-01), drop dead Core.AspNet package (PKG-01), per-TFM Microsoft.Extensions.* floor (PKG-02) [Wave 1]
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md — Command-line binder cleanup: SkipFirstArgument option + space-separated `--k v` lookahead + arg[0] skip + AddCommandLine tokenization (SRC-02) [Wave 2, depends on 03-01]
+- [x] 03-02-PLAN.md — Command-line binder cleanup: SkipFirstArgument option + space-separated `--k v` lookahead + arg[0] skip + AddCommandLine tokenization (SRC-02) [Wave 2, depends on 03-01]
 
 ### Phase 4: AOT/Trim Honesty & Documentation
 
@@ -121,6 +121,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Exception Safety & Public Hierarchy | n/a (shipped) | ✓ Complete | 2026-07-14 (#27/#28) |
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
-| 3. Public Surface, Packaging & Binder Cleanup | 1/2 | In Progress|  |
+| 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete   | 2026-07-14 |
 | 4. AOT/Trim Honesty & Documentation | 0/TBD | Not started | - |
 | 5. First v2.0.0-beta Release | 0/TBD | Not started | - |

@@ -55,7 +55,7 @@ Remaining open work (from `FIX-PLAN.md`), batched toward the first `v2.0.0-beta`
 - [x] **API-01**: Make `SettingsHolder`/`ISettingsHolder` internal (A5, breaking)
 - [x] **PKG-01**: `Core.AspNet` exposes a public type or the package is dropped (A3)
 - [x] **PKG-02**: Float `Microsoft.Extensions.*` floor per-TFM (`8.0.x` for net8) or justify the pin (A4)
-- [ ] **SRC-02**: Command-line binder parses quoted values with spaces correctly and skips `arg[0]` (A6)
+- [x] **SRC-02**: Command-line binder parses quoted values with spaces correctly and skips `arg[0]` (A6)
 
 ### AOT/Trim & Documentation
 
@@ -103,7 +103,7 @@ Deferred / held. Tracked but not in the current roadmap.
 | API-01 | Phase 3 | Complete |
 | PKG-01 | Phase 3 | Complete |
 | PKG-02 | Phase 3 | Complete |
-| SRC-02 | Phase 3 | Pending |
+| SRC-02 | Phase 3 | Complete |
 | AOT-01 | Phase 4 | Pending |
 | DOC-01 | Phase 4 | Pending |
 | REL-01 | Phase 5 | Pending |
