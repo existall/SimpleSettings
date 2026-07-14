@@ -47,7 +47,7 @@ Remaining open work (from `FIX-PLAN.md`), batched toward the first `v2.0.0-beta`
 - [ ] **COLL-01**: `List<T>`/`IList<T>`/`ICollection<T>` support decision — broaden the converter or document + throw a clear error, with a positive test (C1)
 - [x] **TEST-01**: `ValuesPopulator` tests — binder precedence + bind/convert exception-wrapper contracts (T4)
 - [x] **TEST-02**: `TypeConverter` tests — null/nullable/empty-enumerable/`AllowEmpty`/attribute-`ConverterType` paths (T5)
-- [ ] **TEST-03**: Converter tests residual — `Uri`/`DateTime` + `List<T>` doc test tied to C1 (T6)
+- [x] **TEST-03**: Converter tests residual — `Uri`/`DateTime` + `List<T>` doc test tied to C1 (T6)
 - [x] **ENG-01**: Fix the unsynchronized check-then-`DefineType` race in `SettingsClassGenerator` + concurrency stress tests (T7 — shipped pre-GSD via the FIX-PLAN track, merged #29: double-checked locking, one gate over all generation; same- + distinct-interface `Barrier` stress tests)
 
 ### Public Surface, Packaging & Binder Cleanup
@@ -98,7 +98,7 @@ Deferred / held. Tracked but not in the current roadmap.
 | COLL-01 | Phase 2 | Pending |
 | TEST-01 | Phase 2 | Complete |
 | TEST-02 | Phase 2 | Complete |
-| TEST-03 | Phase 2 | Pending |
+| TEST-03 | Phase 2 | Complete |
 | ENG-01 | Phase 2 | ✓ Complete (#29) |
 | API-01 | Phase 3 | Pending |
 | PKG-01 | Phase 3 | Pending |

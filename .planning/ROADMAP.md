@@ -22,7 +22,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Exception Safety & Public Hierarchy** — ✓ COMPLETE (S1 #27, C2 #28 merged 2026-07-14) - No secret leaks; one catchable, structured `SimpleSettingsException` base
-- [ ] **Phase 2: Binding Correctness & Engine Test Hardening** - Collections/nullable/converters verified; generator race closed by tests *(ENG-01/T7 done #29; COLL-01 + TEST-01/02/03 remain)*
+- [x] **Phase 2: Binding Correctness & Engine Test Hardening** - Collections/nullable/converters verified; generator race closed by tests *(ENG-01/T7 done #29; COLL-01 + TEST-01/02/03 remain)* (completed 2026-07-14)
 - [ ] **Phase 3: Public Surface, Packaging & Binder Cleanup** - Meaningful public surface; per-TFM deps; correct command-line parsing
 - [ ] **Phase 4: AOT/Trim Honesty & Documentation** - Honest AOT/trim signals; canonically-named docs
 - [ ] **Phase 5: First v2.0.0-beta Release** - Batched breaking changes ship as an installable pre-release
@@ -59,10 +59,10 @@ value: config → typed settings maps accurately, and never leaks a secret doing
   4. Concurrent first-touch generation of the same interface returns one `ReferenceEquals` implementation with no duplicate-`DefineType` race. ✓ Met by #29 (T7).
   5. `Uri`/`DateTime` and collection converters have parity tests passing on net8 and net10.
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 
 - [x] 02-01-PLAN.md — Engine-core correctness tests (TEST-01 ValuesPopulator precedence/default; TEST-02 TypeConverter null/nullable/ConverterType-over-collection) + ENG-01 concurrency verify
-- [ ] 02-02-PLAN.md — Converter scalar residual (TEST-03 scalar Uri/DateTime positive + one format-mismatch negative); COLL-01 documented as owner-deferred
+- [x] 02-02-PLAN.md — Converter scalar residual (TEST-03 scalar Uri/DateTime positive + one format-mismatch negative); COLL-01 documented as owner-deferred
 
 ### Phase 3: Public Surface, Packaging & Binder Cleanup
 
@@ -113,7 +113,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Exception Safety & Public Hierarchy | n/a (shipped) | ✓ Complete | 2026-07-14 (#27/#28) |
-| 2. Binding Correctness & Engine Test Hardening | 1/2 | In Progress|  |
+| 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete   | 2026-07-14 |
 | 3. Public Surface, Packaging & Binder Cleanup | 0/TBD | Not started | - |
 | 4. AOT/Trim Honesty & Documentation | 0/TBD | Not started | - |
 | 5. First v2.0.0-beta Release | 0/TBD | Not started | - |

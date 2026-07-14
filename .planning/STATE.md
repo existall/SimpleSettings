@@ -4,17 +4,17 @@ milestone: v2.0.0
 milestone_name: milestone
 current_phase: 02
 current_phase_name: binding-correctness-engine-test-hardening
-status: executing
+status: verifying
 stopped_at: "Phase 1 (S1 #27, C2 #28) shipped; reconciled ROADMAP/STATE/REQUIREMENTS to mark Phase 1 complete. Next: plan Phase 2."
-last_updated: "2026-07-14T10:03:51.219Z"
+last_updated: "2026-07-14T10:09:40.509Z"
 last_activity: 2026-07-14
 last_activity_desc: Phase 02 execution started
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 0
+  completed_plans: 2
+  percent: 20
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 
 Phase: 02 (binding-correctness-engine-test-hardening) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-14 — Phase 02 execution started
 
 Progress: [██░░░░░░░░] 20%
@@ -56,6 +56,7 @@ Progress: [██░░░░░░░░] 20%
 
 *Updated after each plan completion*
 | Phase 02 P01 | 2min | 3 tasks | 2 files |
+| Phase 02 P02 | 3min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,7 @@ Recent decisions affecting current work:
 - [Phase 02]: TEST-01/TEST-02 (Plan 01): engine-core correctness gaps locked — ValuesPopulator precedence (last-writer-wins, later-silent-preserves, attribute-default-survives) via integration binders; TypeConverter null->default, Nullable<int> strip+convert, ConverterType-over-collection via the direct CreateConversion seam.
 - [Phase 02]: ENG-01 verified (not re-implemented): SettingsClassGenerator _generationGate + both concurrency stress tests green — Phase 2 success criterion #4 met by pre-GSD #29.
 - [Phase 02]: TUnit invocation uses --treenode-filter (Microsoft.Testing.Platform); legacy --filter returns zero tests / exit 5.
+- [Phase 02]: TEST-03 (Plan 02) scalar Uri/DateTime conversion locked via ScalarConversionTests (Uri->new Uri, DateTime->ParseExact yyyy-MM-dd, one format-mismatch negative asserting exception type only); no array-of-* or redaction duplication. Phase 2 success criterion #5 scalar coverage met on net10 (net8 via CI).
 
 ### Pending Todos
 
@@ -93,6 +95,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-07-14T10:03:12.795Z
+Last session: 2026-07-14T10:08:58.479Z
 Stopped at: Phase 1 (S1 #27, C2 #28) shipped; reconciled ROADMAP/STATE/REQUIREMENTS to mark Phase 1 complete. Next: plan Phase 2.
 Resume file: None
