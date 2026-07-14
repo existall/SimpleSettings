@@ -3,61 +3,66 @@
 _Last updated: 2026-07-14 · owner: Guy Ludvig (guy@frontegg.com)_
 
 ## TL;DR
-We're working the three-specialist review fix plan (**`FIX-PLAN.md`**, repo root — per-item file:line detail). Perf track **P0–P5 merged**; **S1 (#27) + C2 (#28) merged**; **T7 (generator concurrency race) is now done and in an open PR** on branch **`test/t7-generator-concurrency`** (run `gh pr list` for the number). `master` @ `13b78dd`. Suite **84 tests net10** (CI runs net8 + net10).
+**GSD is the source of truth** (`.planning/`); `FIX-PLAN.md` is frozen historical reference only.
+**PR #30 merged** (squash, via `guy-lud`) — "GSD planning cutover + Phase 2 binding-correctness engine test hardening". `master` @ **`67aa72f`**, clean, **no open PRs, no work branch**. Suite **94 tests net10** (CI runs net8 + net10).
 
-T7 closed a real concurrency bug: `SettingsClassGenerator.GenerateType` had an unsynchronized check-then-`DefineType`, so concurrent first-resolves of a settings interface raced the shared `ModuleBuilder` (`System.Reflection.Emit` isn't thread-safe — for both same- and distinct-interface generation). Fixed with double-checked locking + a single generation gate; the warm cache-hit path stays lock-free.
+Milestone **v2.0.0** has 5 phases. **Phase 1** (S1 #27 / C2 #28 exception work) ✓ and **Phase 2** (engine test hardening) ✓ are complete and merged. **Next: Phase 3 — Public Surface, Packaging & Binder Cleanup.**
 
-Still **pre-stable** (no `v*` tag; only auto-alphas), so breaking changes remain free — a good window to finish the breaking cleanups (A5 / C1 / A6 / A3 / A4) before the first `v2.0.0-beta`.
+Still **pre-stable** (no `v*` tag; only auto-alphas) — breaking changes are free, which is the point of Phase 3 (make `SettingsHolder` internal, decide `List<T>` support, etc.) before the first `v2.0.0-beta`.
 
 ## Do this first (new session)
-1. **Verify git state** (`git log`, `gh pr list`) — expect `master` @ `13b78dd`, branch **`test/t7-generator-concurrency`** pushed with the T7 commit, and **its PR open**. If T7 already merged, `master` advanced — reconcile.
-2. **If the T7 PR is open:** check CI (build+test net8/10 + the benchmark allocation gate — T7 is off the hot path, so nothing should move). Merge when green (squash, via `guy-lud`). T7 carries this handoff + `FIX-PLAN.md` refresh in the same commit.
-3. **Then pick the next item** (ranked below) and follow the workflow (project memory `[[dotnet-review-workflow]]`): plan → review the plan with `dotnet-architect`/`performance-analyst`/`security-auditor` → implement → review the diff with the **`/code-review` skill**. ⚠️ Kit plan-agents are **intermittently** flaky (see the sub-agent gotcha) — verify each returns real tool calls; fall back in-context if one misfires.
+1. **Verify git state** (`git log -3`, `gh pr list`) — expect `master` @ `67aa72f` (PR #30 merged), **no open PRs**, clean tree except this uncommitted handoff refresh + untracked `.claude/`/`.codex/`.
+2. **Run `/gsd-progress`** to see the roadmap and reconcile STATE.md. ⚠️ `.planning/STATE.md` has minor cosmetic drift from the phase-2 completion write (`completed_phases: 1` should read 2; `status: verifying` is stale) — GSD reconciles it on the next workflow command; don't hand-edit + commit it to `master` (see the doc-only-alpha gotcha).
+3. **Start Phase 3:** `/gsd-discuss-phase 3` (recommended — no CONTEXT.md exists yet) → `/gsd-plan-phase 3` → `/gsd-execute-phase 3`. Ship it on a **feature branch + PR** (see gotchas), not on `master`.
 
 ## Current state
-- On branch **`test/t7-generator-concurrency`** with the T7 commit (code + tests + this docs refresh). **PR open** (see `gh pr list`). `master` @ `13b78dd`.
-- **Perf track P0–P5, S1, C2 complete + merged; T7 in an open PR.** Build clean (0 warnings, both TFMs). Suite **84 net10** (the 2 new concurrency stress tests ran 5× green — deterministic).
-- A **`gh-pages`** branch holds benchmark data (`dev/bench/`); do **not** delete it — the allocation baseline lives there. The remote also still has merged `perf/*`, `security/s1-*`, `refactor/c2-*` branches (optional cleanup) plus legacy/held branches. Deleting remote branches needs the `guy-lud` push identity.
+- On **`master`** @ `67aa72f`, clean. The merged branch `chore/gsd-ownership-cutover` is deleted locally; **it still exists on `origin`** (GitHub didn't auto-delete) — optional cleanup: `git push origin --delete chore/gsd-ownership-cutover` (needs the `guy-lud` push identity; origin already uses the alias).
+- **Phases 1–2 complete + merged.** Build clean (0 warnings, both TFMs). Suite **94 net10** (Phase 2 added +7 engine-core + +3 scalar-converter over the prior 84).
+- A **`gh-pages`** branch holds benchmark data (`dev/bench/`); do **not** delete it — the allocation baseline lives there.
 
-## What shipped (recent → older)
-- **T7 — close the SettingsClassGenerator concurrency race (branch `test/t7-generator-concurrency`, PR open).** `GenerateType` did a lock-free `TryGetValue` then, on a miss, `_moduleBuilder.DefineType(name)` + cache write — so two threads racing the same interface both `DefineType` the same name (second throws "Duplicate type name" → resolve/scan aborts), and (Reflection.Emit being not thread-safe) two threads generating *different* interfaces corrupt the shared module. **Fix:** double-checked locking — lock-free `TryGetValue` fast path; on a miss take a single `_generationGate`, re-check, run the whole emit sequence (`DefineImplementationType`) + cache write inside the lock; failures still wrap as `TypeGenerationException` (uncached). One gate over ALL generation (scope matches the shared `_moduleBuilder`); the warm path stays lock-free. **Reachable in production:** GenericHost registers `ISettingsProvider` as a process-wide singleton over one `SettingsBuilder`, and cache-miss resolves fall through to lazy generation on the shared `ModuleBuilder` from concurrent DI resolutions. **Plan reviewed** by `dotnet-architect` (ENDORSE-WITH-CHANGES: lock-all is *required* not just safer; `Lazy`-per-type rejected because it only serializes same-key and leaves the distinct-type module race open) + perf/security in-context; **code by `/code-review`** (high) + Roslyn `detect_antipatterns` (0). **+2 tests** in `SettingsClassGeneratorTests.cs`: same-interface `Parallel.For` (single shared impl) and a distinct+same `Barrier`/32-thread stress across 8 interfaces (regression-guards the lock-all decision). Suite **84 net10** (was 82); ran 5× green.
-- **C2 — public exception hierarchy (merged, #28).** `public abstract SimpleSettingsException` base; reparent all 10; promote the 4 build-path escapees to public; flatten 3 to root ns; leak-safe structured properties; new `SettingsTypeNotInterfaceException` replaces the untyped `InvalidOperationException(TypeIsNotInterface)`. **S1 made structural** (value exception takes the failure `Type`, not the `Exception`; `SettingsBindingException` stores primitives, not the `BindingContext`). +6 tests incl. a reflection invariant that every library exception derives from the base.
-- **S1 — redact secret values from conversion-failure exceptions (merged, #27).** Our message no longer interpolates the value and the value-bearing framework inner is no longer chained; value-free `SettingsPropertyNullException` for the "AllowEmpty=false, no value" path. +5 redaction tests.
-- **P5 — resolve config section once per type (merged, #26).** `ConfigurationBinder` caches the `IConfigurationSection` per section name. **BindNoRoot 80→40 B (−50%), BindWithRoot 144→56 B (−61%).** Its security review surfaced S1.
-- **P4 — de-reflect + DRY the array/enumerable converters (merged, #25).** Shared `CollectionTypeConverter`. **1.33 KB→688 B (−49%), 5.7×.**
-- **P3 — cached "settings plan" (#24).** Warm re-populate **−55–61%**; gated `ScanBenchmark` ≈flat. Compiled setter reverted. Follow-up P3b (only if set *time* matters).
-- **#23** wrap docs · **#22** benchmark-tracking CI (gates PRs on allocation regressions via `gh-pages`) · **#21** perf quick wins Q1–Q4 + M1 + micro-benchmarks · **#20** docs tutorials · **#18** P2 · **#17** P1+C3 · **#16** P0 harness · earlier #8/#10–#15.
+## What shipped in Phase 2 (this session — test-only, zero `src/` production changes)
+- **TEST-01** `Core/ValuesPopulatorTests.cs` — binder last-writer-wins, earlier-survives-when-later-silent, attribute `DefaultValue` survives.
+- **TEST-02** `Core/TypeConverterTests.cs` — `null→0`, `int?` null→null, `"42"→42`, `ConverterType` bypasses the collection converter (via the internal `TypeConverter.CreateConversion` seam).
+- **TEST-03** `Conversion/ScalarConversionTests.cs` — scalar `Uri` positive, `DateTime` positive, one format-mismatch negative (exception **type only** — redaction stays owned by `ExceptionRedactionTests`).
+- **ENG-01** verify-only — confirmed `SettingsClassGenerator._generationGate` + concurrency stress tests satisfy success criterion #4 (shipped in #29/T7). The load-bearing proof is `..._IsRaceFree` (Barrier, genuine contention), not `..._ReturnsSingleSharedType` (timing-dependent). No code change.
+- **COLL-01 owner-deferred** — the `List<T>`/`IList<T>`/`ICollection<T>` broaden-vs-document+throw decision is held; recorded in the plan's `<deferred>` section, `PROJECT.md`, and `02-VERIFICATION.md`. Not a gap.
+- **Quality gates:** plan reviewed up front by `dotnet-architect` + `performance-analyst` + `security-auditor` (all PASS, no blockers); finished tests reviewed by `code-reviewer` (clean, 2 cosmetic NITs); `gsd-verifier` **passed 10/10 must-haves**.
 
-## Key decisions & context (carry forward)
-- **Benchmark tracking gates on ALLOCATIONS, not time.** `gh-pages` (`dev/bench/`) holds the baseline.
-- **Generator concurrency (T7 done).** `SettingsClassGenerator.GenerateType` serializes **all** generation behind one gate (double-checked locking; warm cache-hit path lock-free). Do NOT "optimize" to `Lazy<Type>`-per-type: `System.Reflection.Emit` isn't thread-safe, so concurrent `DefineType` of *distinct* interfaces also races the shared `ModuleBuilder`; per-type Lazy would reopen that. A distinct-types stress test guards this.
-- **Exception-redaction invariant (S1+C2).** `SettingsPropertyValueException` **never carries the bound value and never chains an inner** — its ctor takes the failure `Type`, not the `Exception`, so this is structural. `SettingsBindingException` stores primitives (`BinderType`/`Section`/`Key`), never the `BindingContext` (holds `CurrentValue`). `SettingsPropertyNullException` is the distinct value-free "required value missing" case. Don't add a `Value` property, re-chain an inner, or retain a value-bearing object.
-- **Exception hierarchy (C2 done).** All library exceptions derive from `public abstract SimpleSettingsException` and live in the **root** namespace. A reflection invariant test enforces "all derive from base". The two "No converter found" `InvalidOperationException`s are deliberate unreachable guards (not part of the family).
-- **M1 / generated names.** The generated impl type name (`SettingsClassGenerator`) is namespace-qualified and must stay **separate** from `GetNormalizeInterfaceName` (drives the default config section name). Don't merge.
-- **C3 resolved — option 2 (provider-level cache).** Reload/`IOptionsMonitor` is the future "option 3".
-- **Validations (D1) — HELD, do NOT delete.** Public `Validations/*` + `SettingsPropertyAttribute.ValidatorType` are dead but intended for a feature; reconcile with the `validate-settings` branch.
-- **`EqualityCompererCreator` (D2) — HELD** (internal, dead, latent invalid-IL bug at `EqualityCompererCreator.cs:38`).
-- **Pre-stable window:** no `v*` stable tag. Breaking changes free until the first `v2.0.0-beta`.
+## Next priorities — Phase 3: Public Surface, Packaging & Binder Cleanup
+Goal: lock the public API surface and packaging before the first beta. Requirements (from ROADMAP / PROJECT.md Active):
+1. **API-01 (A5)** — make `SettingsHolder`/`ISettingsHolder` internal *(breaking)*.
+2. **PKG-01 (A3)** — `Core.AspNet` exposes a public type (`Environments` public) or drop the package.
+3. **PKG-02 (A4)** — float `Microsoft.Extensions.*` floor per-TFM (`8.0.x` for net8) or justify the pin.
+4. **SRC-02 (A6)** — command-line binder: parse quoted values with spaces, skip `arg[0]`.
+5. **AOT-01 (A1, HIGH)** — annotate reflection entry points (`[RequiresDynamicCode]`/`[RequiresUnreferencedCode]`) or document the AOT/trim limitation before stable.
+6. **DOC-01** — refresh README to canonical `ExistForAll.SimpleSettings` naming + current links.
+7. **REL-01** — cut the first `v2.0.0-beta` once the breaking changes are batched; suite green net8 + net10.
+- **COLL-01 (C1)** still pending the owner's broaden-vs-throw decision — surface it when Phase 3 is discussed.
 
-## Next priorities (ranked — detail in FIX-PLAN.md)
-1. **Merge the T7 PR** once CI is green (see Do this first).
-2. **Remaining engine tests:** T4 `ValuesPopulator` (binder precedence + exception wrappers), T5 `TypeConverter` (null/nullable/empty-enumerable/attribute). T6 converters largely done across P4+P5; T7 concurrency now closed (collection-not-found / binder edge-case tests remain as a minor optional leftover).
-3. **Breaking cleanups (batch while pre-stable):** A5 (make `SettingsHolder`/`ISettingsHolder` internal), C1 (`List<T>`/`IList<T>`/`ICollection<T>` support or a documented limit), A6 (command-line quoted-arg parsing + skip exe path), A3 (`Core.AspNet` — make `Environments` public or drop the package), A4 (float `Microsoft.Extensions.*` floor per-TFM).
-4. **A1 (HIGH):** AOT/trim annotations for the `Reflection.Emit` engine (or plan a source generator); at minimum document the limitation before stable.
-5. **README** — may still have stale `existall/SimpleConfig` links. Optional **P3b** compiled setter (only if a profile shows set *time* matters).
-6. **D1 validations feature** — owner-driven; reconcile the `validate-settings` branch.
-
-## How releasing works (unchanged — durable)
-- **`ci.yml`** — on PRs to `master`: build + test (net8.0 + net10.0). **`release.yml`**: push to `master` → auto-publishes a MinVer height-based `-alpha`; manual **Release** (`workflow_dispatch`, `channel` beta/rc/stable + `bump` patch/minor/major) computes the next version, tags `v*`, publishes, creates a GitHub Release (`dry_run: true` previews).
-- **`benchmark.yml`** — on push to `master` + PRs: runs BDN, gates PRs on allocation regressions.
-- **Versioning = MinVer**, tag prefix `v`, baseline **2.0.0**, keyless publish via NuGet Trusted Publishing (OIDC). First real release: Actions → Release → `channel: beta` (→ `v2.0.0-beta.1`); use `dry_run` first.
-- Workflows invoke the solution through the `SOLUTION` env var (**`SimpleSettings.slnx`**). **Any push to `master` publishes an alpha** — so everything goes through PRs.
+## How releasing works (durable)
+- **`ci.yml`** — PRs to `master`: build + test (net8.0 + net10.0). **`release.yml`**: push to `master` → auto-publishes a MinVer height-based `-alpha`; manual **Release** (`workflow_dispatch`, `channel` beta/rc/stable + `bump`) tags `v*`, publishes, creates a GitHub Release (`dry_run: true` previews).
+- **`benchmark.yml`** — push to `master` + PRs: runs BDN, gates PRs on allocation regressions (baseline in `gh-pages`).
+- **Versioning = MinVer**, tag prefix `v`, baseline **2.0.0**, keyless publish via NuGet Trusted Publishing (OIDC). Workflows use `SOLUTION=SimpleSettings.slnx`. **Every `master` push publishes an alpha → everything goes through PRs.**
 
 ## Gotchas a new session MUST know
-- **Pushing / PRs:** the active `git`/`gh` identity (`guy-frontegg`) is **read-only** on this repo; push/PR/merge via **`guy-lud`**. `origin` already uses the SSH alias **`github-guy-lud`** (→ `~/.ssh/guy-lud-account`), so **`git push` already uses guy-lud** — no change needed. For `gh` writes: `gh auth switch --user guy-lud`, then switch back to `guy-frontegg` after. Full recipe in the assistant's private project memory (`simplesettings-push-access`).
-- **Run `dotnet` from `src/`** (global.json opts into Microsoft.Testing.Platform for TUnit). Only the net10 runtime is installed locally → net8 is **build-only** locally; CI runs both. Do NOT prefix `cd <repo-root>` before `dotnet`. Run one test project on net10 with `dotnet test <proj> --framework net10.0 --no-build` (build first).
-- **Benchmarks:** run from `src/` — `dotnet run -c Release --project performance/ExistForAll.SimpleSettings.Benchmark -- --filter <glob> --job short`. Output dir (`BenchmarkDotNet.Artifacts/`) is gitignored.
-- **`FIX-PLAN.md`** (repo root) is the full, prioritized plan with per-item file:line detail — open it explicitly; it is not auto-injected.
-- **Wrap ritual — handoff branch rule:** refresh this file so it rides the session's real PR (the current work branch). If there is **no** open work branch at wrap (everything merged), **leave the refresh uncommitted** so the *next* session's first branch carries it. Do **not** commit docs to `master`, and do **not** create a dedicated docs branch/PR: `release.yml` fires on *every* `master` push with **no `paths` filter**, so a doc-only push burns a throwaway `-alpha`.
-- **Sub-agent flakiness (dotnet-claude-kit) — INTERMITTENT.** Kit agents sometimes misfire — returning a leaked skill/role preamble with **0 tool calls** instead of working. It's inconsistent: on S1 `dotnet-architect` + `performance-analyst` misfired (only `security-auditor` worked); on C2 both fired cleanly; on T7 `dotnet-architect` fired cleanly. So: spawn them, but **check each result has real tool calls / substance** — if one misfired, retry once or do that lens **in-context** (the reliable fallback). Always use the **`/code-review` skill** (not the `code-reviewer` agent) for the code-review step. Kit is at latest (0.10.0). For perf, `dotnet-diag:analyzing-dotnet-performance` (Microsoft-maintained) is a fallback.
+- **TUnit test filtering:** `dotnet test --filter "*Name*"` is **rejected** by Microsoft.Testing.Platform/TUnit — exits **5** with zero tests run (looks green at a glance). Use `--treenode-filter "/*/*/ClassNameTests/*"` or run unfiltered and confirm the expected methods appear. Several `*-PLAN.md` `<verify>` blocks still carry the wrong `--filter` form. (Both Phase-2 executors hit this.) See project memory `[[simplesettings-test-stack]]`.
+- **Run `dotnet` from `src/`** (global.json opts into Microsoft.Testing.Platform for TUnit). net10 runtime only locally → net8 is **build-only** locally; CI runs both. Don't `cd <repo-root>` before `dotnet`. Single project on net10: `dotnet test <proj> --framework net10.0 --no-build` (build first).
+- **Pushing / PRs:** active `git`/`gh` identity (`guy-frontegg`) is **read-only** here; push/PR/merge via **`guy-lud`**. `origin` already uses SSH alias **`github-guy-lud`**, so **`git push` already uses guy-lud**. For `gh` writes: `gh auth switch --user guy-lud`, then switch back to `guy-frontegg` after. See project memory `[[simplesettings-push-access]]`.
+- **Never commit docs to `master`:** `release.yml` fires on *every* `master` push with **no `paths` filter**, so a doc-only push burns a throwaway `-alpha`. **Wrap ritual:** refresh THIS file so it rides the next work branch; if everything is merged (no work branch), **leave it uncommitted** for the next session's first branch to carry — which is exactly its current state. See project memory `[[simplesettings-handoff-workflow]]`.
+- **GSD branching:** `.planning/config.json` has `branching_strategy: none`, so `/gsd-execute-phase` commits on the *current* branch. Do NOT execute Phase 3 on `master` — create a feature branch first (that's how Phase 2 shipped), then PR. See `[[simplesettings-gsd-source-of-truth]]`.
+- **Review workflow (per `[[dotnet-review-workflow]]`):** plan → review the plan with `dotnet-architect`/`performance-analyst`/`security-auditor` → implement → review finished code with `code-reviewer`. This session **all four kit agents fired cleanly** with real tool calls; historically they've been intermittently flaky (return a preamble with 0 tool calls), so still verify each returns substance — the `/code-review` skill is a reliable fallback for the code step.
+- **Benchmarks:** run from `src/` — `dotnet run -c Release --project performance/ExistForAll.SimpleSettings.Benchmark -- --filter <glob> --job short`.
 - Commits/PRs here **omit** the Co-Authored-By / Generated-with trailer (project preference).
+
+## Key decisions & context (carry forward)
+- **Exception-redaction invariant (S1+C2, locked).** `SettingsPropertyValueException` never carries the bound value and never chains an inner (ctor takes the failure `Type`, not the `Exception`). `SettingsBindingException` stores primitives, not the `BindingContext`. `SettingsPropertyNullException` is the value-free "required missing" case. Phase 2 tests were explicitly forbidden from re-asserting/weakening this.
+- **Exception hierarchy (C2, done #28).** All library exceptions derive from `public abstract SimpleSettingsException` in the root namespace; a reflection invariant test enforces it.
+- **Generator concurrency (ENG-01/T7, done #29).** `SettingsClassGenerator` serializes ALL generation behind one `_generationGate` (double-checked locking; warm path lock-free). Do NOT "optimize" to `Lazy<Type>`-per-type — `Reflection.Emit` isn't thread-safe, so concurrent `DefineType` of distinct interfaces also races the shared `ModuleBuilder`. Stress tests guard this.
+- **Benchmark tracking gates on ALLOCATIONS, not time.** `gh-pages` (`dev/bench/`) holds the baseline.
+- **C3 resolved — provider-level cache (option 2).** Reload/`IOptionsMonitor` is future "option 3".
+- **Validations (D1) + `EqualityCompererCreator` (D2) — HELD, do NOT delete** (dead today, reserved for feature work).
+- **Pre-stable window:** no `v*` stable tag; breaking changes free until the first `v2.0.0-beta`.
+
+## Minor tracked follow-ups (non-blocking)
+- **Cosmetic NITs** (from Phase 2 code review) in `Core/TypeConverterTests.cs`: add `using System;` (drop `System.Type` qualification); optionally rename `Convert_NullForNonNullableValueType_ReturnsTypeDefault` → `..._WithoutAttribute_...`.
+- **REQUIREMENTS.md traceability:** 13 brownfield baseline IDs (`BIND-01…NAME-01`) appear in the body but not the traceability table (pre-existing; surfaces in `/gsd-progress` and `/gsd-audit-uat`).

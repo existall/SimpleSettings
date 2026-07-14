@@ -1,0 +1,142 @@
+# GSD Agent Configuration — managed by gsd-core installer
+# GSD codex_hooks ownership: section
+
+[features]
+hooks = true
+
+[agents.gsd-advisor-researcher]
+description = "Researches a single gray area decision and returns a structured comparison table with rationale. Spawned by discuss-phase advisor mode."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-advisor-researcher.toml"
+
+[agents.gsd-ai-researcher]
+description = "Researches a chosen AI framework's official docs to produce implementation-ready guidance — best practices, syntax, core patterns, and pitfalls distilled for the specific use case. Writes the Framework Quick Reference and Implementation Guidance sections of AI-SPEC.md. Spawned by $gsd-ai-integration-phase orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-ai-researcher.toml"
+
+[agents.gsd-assumptions-analyzer]
+description = "Deeply analyzes codebase for a phase and returns structured assumptions with evidence. Spawned by discuss-phase assumptions mode."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-assumptions-analyzer.toml"
+
+[agents.gsd-code-fixer]
+description = "Applies fixes to code review findings from REVIEW.md. Reads source files, applies intelligent fixes, and commits each fix atomically. Spawned by $gsd-code-review --fix."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-code-fixer.toml"
+
+[agents.gsd-code-reviewer]
+description = "Reviews source files for bugs, security issues, and code quality problems. Produces structured REVIEW.md with severity-classified findings. Spawned by $gsd-code-review."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-code-reviewer.toml"
+
+[agents.gsd-codebase-mapper]
+description = "Explores codebase and writes structured analysis documents. Spawned by map-codebase with a focus area (tech, arch, quality, concerns). Writes documents directly to reduce orchestrator context load."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-codebase-mapper.toml"
+
+[agents.gsd-debug-session-manager]
+description = "Manages multi-cycle $gsd-debug checkpoint and continuation loop in isolated context. Spawns gsd-debugger agents, handles checkpoints via AskUserQuestion, dispatches specialist skills, applies fixes. Returns compact summary to main context. Spawned by $gsd-debug command."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-debug-session-manager.toml"
+
+[agents.gsd-debugger]
+description = "Investigates bugs using scientific method, manages debug sessions, handles checkpoints. Spawned by $gsd-debug orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-debugger.toml"
+
+[agents.gsd-doc-classifier]
+description = "Classifies a single planning document as ADR, PRD, SPEC, DOC, or UNKNOWN. Extracts title, scope summary, and cross-references. Spawned in parallel by $gsd-ingest-docs. Writes a JSON classification file and returns a one-line confirmation."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-doc-classifier.toml"
+
+[agents.gsd-doc-synthesizer]
+description = "Synthesizes classified planning docs into a single consolidated context. Applies precedence rules, detects cross-ref cycles, enforces LOCKED-vs-LOCKED hard-blocks, and writes INGEST-CONFLICTS.md with three buckets (auto-resolved, competing-variants, unresolved-blockers). Spawned by $gsd-ingest-docs."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-doc-synthesizer.toml"
+
+[agents.gsd-doc-verifier]
+description = "Verifies factual claims in generated docs against the live codebase. Returns structured JSON per doc."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-doc-verifier.toml"
+
+[agents.gsd-doc-writer]
+description = "Writes and updates project documentation. Spawned with a doc_assignment block specifying doc type, mode (create/update/supplement), and project context."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-doc-writer.toml"
+
+[agents.gsd-domain-researcher]
+description = "Researches the business domain and real-world application context of the AI system being built. Surfaces domain expert evaluation criteria, industry-specific failure modes, regulatory context, and what \"good\" looks like for practitioners in this field — before the eval-planner turns it into measurable rubrics. Spawned by $gsd-ai-integration-phase orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-domain-researcher.toml"
+
+[agents.gsd-eval-auditor]
+description = "Retroactive audit of an implemented AI phase's evaluation coverage. Checks implementation against the AI-SPEC.md evaluation plan. Scores each eval dimension as COVERED/PARTIAL/MISSING. Produces a scored EVAL-REVIEW.md with findings, gaps, and remediation guidance. Spawned by $gsd-eval-review orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-eval-auditor.toml"
+
+[agents.gsd-eval-planner]
+description = "Designs a structured evaluation strategy for an AI phase. Identifies critical failure modes, selects eval dimensions with rubrics, recommends tooling, and specifies the reference dataset. Writes the Evaluation Strategy, Guardrails, and Production Monitoring sections of AI-SPEC.md. Spawned by $gsd-ai-integration-phase orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-eval-planner.toml"
+
+[agents.gsd-executor]
+description = "Executes GSD plans with atomic commits, deviation handling, checkpoint protocols, and state management. Spawned by execute-phase orchestrator or execute-plan command."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-executor.toml"
+
+[agents.gsd-framework-selector]
+description = "Presents an interactive decision matrix to surface the right AI/LLM framework for the user's specific use case. Produces a scored recommendation with rationale. Spawned by $gsd-ai-integration-phase and $gsd-select-framework orchestrators."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-framework-selector.toml"
+
+[agents.gsd-integration-checker]
+description = "Verifies cross-phase integration and E2E flows. Checks that phases connect properly and user workflows complete end-to-end."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-integration-checker.toml"
+
+[agents.gsd-intel-updater]
+description = "Analyzes codebase and writes structured intel files to .planning/intel/."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-intel-updater.toml"
+
+[agents.gsd-mempalace-curator]
+description = "Ship-time MemPalace curation — writes the session diary, proposes/creates cross-project tunnels, mirrors extract-learnings into the temporal KG, and runs wing-scoped drawer pruning. Spawned at ship:post by the mempalace capability."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-mempalace-curator.toml"
+
+[agents.gsd-nyquist-auditor]
+description = "Fills Nyquist validation gaps by generating tests and verifying coverage for phase requirements"
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-nyquist-auditor.toml"
+
+[agents.gsd-pattern-mapper]
+description = "Analyzes codebase for existing patterns and produces PATTERNS.md mapping new files to closest analogs. Read-only codebase analysis spawned by $gsd-plan-phase orchestrator before planning."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-pattern-mapper.toml"
+
+[agents.gsd-phase-researcher]
+description = "Researches how to implement a phase before planning. Produces RESEARCH.md consumed by gsd-planner. Spawned by $gsd-plan-phase orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-phase-researcher.toml"
+
+[agents.gsd-plan-checker]
+description = "Verifies plans will achieve phase goal before execution. Goal-backward analysis of plan quality. Spawned by $gsd-plan-phase orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-plan-checker.toml"
+
+[agents.gsd-planner]
+description = "Creates executable phase plans with task breakdown, dependency analysis, and goal-backward verification. Spawned by $gsd-plan-phase orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-planner.toml"
+
+[agents.gsd-project-researcher]
+description = "Researches domain ecosystem before roadmap creation. Produces files in .planning/research/ consumed during roadmap creation. Spawned by $gsd-new-project or $gsd-new-milestone orchestrators."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-project-researcher.toml"
+
+[agents.gsd-research-synthesizer]
+description = "Synthesizes research outputs from parallel researcher agents into SUMMARY.md. Spawned by $gsd-new-project after 4 researcher agents complete."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-research-synthesizer.toml"
+
+[agents.gsd-roadmapper]
+description = "Creates project roadmaps with phase breakdown, requirement mapping, success criteria derivation, and coverage validation. Spawned by $gsd-new-project orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-roadmapper.toml"
+
+[agents.gsd-security-auditor]
+description = "Verifies threat mitigations from PLAN.md threat model exist in implemented code. Produces SECURITY.md. Spawned by $gsd-secure-phase."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-security-auditor.toml"
+
+[agents.gsd-ui-auditor]
+description = "Retroactive 6-pillar visual audit of implemented frontend code. Produces scored UI-REVIEW.md. Spawned by $gsd-ui-review orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-ui-auditor.toml"
+
+[agents.gsd-ui-checker]
+description = "Validates UI-SPEC.md design contracts against 6 quality dimensions. Produces BLOCK/FLAG/PASS verdicts. Spawned by $gsd-ui-phase orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-ui-checker.toml"
+
+[agents.gsd-ui-researcher]
+description = "Produces UI-SPEC.md design contract for frontend phases. Reads upstream artifacts, detects design system state, asks only unanswered questions. Spawned by $gsd-ui-phase orchestrator."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-ui-researcher.toml"
+
+[agents.gsd-user-profiler]
+description = "Analyzes extracted session messages across 8 behavioral dimensions to produce a scored developer profile with confidence levels and evidence. Spawned by profile orchestration workflows."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-user-profiler.toml"
+
+[agents.gsd-verifier]
+description = "Verifies phase goal achievement through goal-backward analysis. Checks codebase delivers what phase promised, not just that tasks completed. Creates VERIFICATION.md report."
+config_file = "/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/agents/gsd-verifier.toml"
+

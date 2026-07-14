@@ -1,0 +1,47 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/guyludvig/.nvm/versions/node/v22.18.0/bin/node\" \"/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/hooks/gsd-check-update.js\""
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/guyludvig/.nvm/versions/node/v22.18.0/bin/node\" \"/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/hooks/gsd-context-monitor.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/guyludvig/.nvm/versions/node/v22.18.0/bin/node\" \"/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/hooks/gsd-context-monitor.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/Users/guyludvig/.nvm/versions/node/v22.18.0/bin/node\" \"/Users/guyludvig/frontegg/development/open-source/SimpleSettings/.codex/hooks/gsd-context-monitor.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
