@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784025196307,
+  "lastUpdate": 1784025526815,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -649,6 +649,80 @@ window.BENCHMARK_DATA = {
           {
             "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
             "value": 17572816,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "guy-lud",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "guy.lud@gmail.com",
+            "name": "guy-lud",
+            "username": "guy-lud"
+          },
+          "distinct": true,
+          "id": "87503594d7975f3ba520df9fc59105b5878fbb6e",
+          "message": "pushing this crap now so i could remove them later",
+          "timestamp": "2026-07-14T13:36:37+03:00",
+          "tree_id": "ac1b5f873bdbe7999e292bbc3b4b0683b131963a",
+          "url": "https://github.com/existall/SimpleSettings/commit/87503594d7975f3ba520df9fc59105b5878fbb6e"
+        },
+        "date": 1784025526566,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17573376,
             "unit": "bytes"
           }
         ]
