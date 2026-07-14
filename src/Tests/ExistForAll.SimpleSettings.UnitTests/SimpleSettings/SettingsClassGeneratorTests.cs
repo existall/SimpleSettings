@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Threading;
 using ExistForAll.SimpleSettings.Core.Reflection;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
@@ -95,6 +99,71 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 			await Assert.That(result.GetProperty(nameof(IHidingChild.Extra))).IsNotNull();
 			await Assert.That(typeof(IHidingChild).IsInstanceOfType(Activator.CreateInstance(result)!)).IsTrue();
 		}
+
+		[Test]
+		public async Task GenerateType_ConcurrentSameInterface_ReturnsSingleSharedType()
+		{
+			// The reported T7 race: concurrent first-generation of the SAME interface used to let two threads
+			// both DefineType the same name (the second throws -> the resolve/scan aborts). Post-fix, every
+			// caller gets the one shared impl.
+			var generator = new SettingsClassGenerator();
+			var results = new ConcurrentBag<Type>();
+
+			Parallel.For(0, 128, _ => results.Add(generator.GenerateType(typeof(IStressA))));
+
+			await Assert.That(results.Count).IsEqualTo(128);
+			await Assert.That(results.Distinct().Count()).IsEqualTo(1);
+		}
+
+		[Test]
+		public async Task GenerateType_ConcurrentAcrossSameAndDistinctInterfaces_IsRaceFree()
+		{
+			// Guards the design decision (one lock over ALL generation): Reflection.Emit is not thread-safe, so
+			// concurrent DefineType of DISTINCT interfaces also races the single shared ModuleBuilder — a
+			// per-type Lazy would not catch that. Fixed threads + a Barrier align the DefineType calls for
+			// maximum contention (Parallel.For can't guarantee N concurrent workers, which would deadlock a
+			// Barrier(N)). Each thread hits one of 8 interfaces, so this exercises same-interface AND
+			// distinct-interface contention at once.
+			var generator = new SettingsClassGenerator();
+			var interfaces = new[]
+			{
+				typeof(IStressA), typeof(IStressB), typeof(IStressC), typeof(IStressD),
+				typeof(IStressE), typeof(IStressF), typeof(IStressG), typeof(IStressH),
+			};
+
+			const int threadCount = 32;
+			var barrier = new Barrier(threadCount);
+			var perInterface = new ConcurrentDictionary<Type, ConcurrentBag<Type>>();
+			var failures = new ConcurrentBag<Exception>();
+			var workers = new List<Thread>();
+
+			for (var i = 0; i < threadCount; i++)
+			{
+				var iface = interfaces[i % interfaces.Length];
+				var worker = new Thread(() =>
+				{
+					try
+					{
+						barrier.SignalAndWait();
+						perInterface.GetOrAdd(iface, _ => new ConcurrentBag<Type>()).Add(generator.GenerateType(iface));
+					}
+					catch (Exception e)
+					{
+						failures.Add(e);
+					}
+				});
+				workers.Add(worker);
+				worker.Start();
+			}
+
+			foreach (var worker in workers)
+				worker.Join();
+
+			await Assert.That(failures.Count).IsEqualTo(0);
+			await Assert.That(perInterface.Count).IsEqualTo(interfaces.Length);
+			foreach (var iface in interfaces)
+				await Assert.That(perInterface[iface].Distinct().Count()).IsEqualTo(1);
+		}
 	}
 
 	public interface IHidingChild : IRoot
@@ -102,6 +171,16 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 		new string Value { get; set; }
 		int Extra { get; set; }
 	}
+
+	// Distinct marker interfaces for the concurrency stress tests (GenerateType_Concurrent* above).
+	public interface IStressA { int Value { get; set; } }
+	public interface IStressB { int Value { get; set; } }
+	public interface IStressC { int Value { get; set; } }
+	public interface IStressD { int Value { get; set; } }
+	public interface IStressE { int Value { get; set; } }
+	public interface IStressF { int Value { get; set; } }
+	public interface IStressG { int Value { get; set; } }
+	public interface IStressH { int Value { get; set; } }
 }
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings.DupA
