@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784015294616,
+  "lastUpdate": 1784018078545,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -501,6 +501,80 @@ window.BENCHMARK_DATA = {
           {
             "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
             "value": 17573344,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "10f92754f8b3a5a838665bec4f6016cf7df2c9ca",
+          "message": "Close the SettingsClassGenerator concurrency race (T7) (#29)\n\nGenerateType did a lock-free TryGetValue and, on a miss, called\n_moduleBuilder.DefineType(name) then wrote the cache. Two threads racing the\nsame interface both missed the cache and both defined the same type name (the\nsecond throws \"Duplicate type name\" -> the resolve/scan aborts). And because\nSystem.Reflection.Emit is not thread-safe, two threads generating different\ninterfaces also race the shared ModuleBuilder's metadata. Q4's\nConcurrentDictionary made the cache thread-safe but never serialized the\ncheck-then-define.\n\nReachable in production: GenericHost registers ISettingsProvider as a\nprocess-wide singleton over one SettingsBuilder, and cache-miss resolves fall\nthrough to lazy generation on the shared ModuleBuilder from concurrent DI\nresolutions.\n\nFix: double-checked locking. The warm cache-hit path stays lock-free\n(TryGetValue before the lock); on a miss, take a single generation gate,\nre-check, run the whole emit sequence (extracted to DefineImplementationType)\nplus the cache write inside the lock, and still wrap failures as\nTypeGenerationException (uncached). One gate over all generation, matching the\nshared _moduleBuilder's scope - not a per-type Lazy, which would only serialize\nsame-interface generation and leave the distinct-interface module race open.\n\nTests (+2 in SettingsClassGeneratorTests.cs): a same-interface Parallel.For\nstress (asserts one shared impl) and a distinct+same Barrier/32-thread stress\nacross 8 interfaces (asserts no failures and exactly one impl per interface;\nregression-guards the lock-all decision against a future switch to Lazy). Suite\n84 net10 (was 82); ran 5x green.\n\nReviewed: plan by dotnet-architect (ENDORSE-WITH-CHANGES - lock-all required,\nLazy rejected) + perf/security in-context; code by /code-review plus Roslyn\ndetect_antipatterns (0).\n\nAlso refreshes FIX-PLAN.md (T7 marked done) and SESSION-HANDOFF.md.",
+          "timestamp": "2026-07-14T11:32:20+03:00",
+          "tree_id": "d9dad5e70c2739956c440f4c23637932e79d7a42",
+          "url": "https://github.com/existall/SimpleSettings/commit/10f92754f8b3a5a838665bec4f6016cf7df2c9ca"
+        },
+        "date": 1784018077900,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17573376,
             "unit": "bytes"
           }
         ]
