@@ -61,6 +61,7 @@ namespace ExistForAll.SimpleSettings.Binders
             if (!tokenWasPrefixed || index + 1 >= args.Length) continue;
 
             var next = args[index + 1];
+            if (next is null) continue;
             if (next.Length > 0 && Array.IndexOf(prefixes, next[0]) >= 0) continue;
 
             _argumentStore[name] = next;
