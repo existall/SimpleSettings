@@ -39,16 +39,16 @@ converters. When tradeoffs arise, binding correctness wins.
 - [x] **SEC-01**: Conversion-failure exceptions never leak the bound value or chain a value-bearing inner; only property name, target type, and failure type name surface; value-free "required missing" is `SettingsPropertyNullException` (S1, merged #27; structural via C2)
 - [x] **SEC-02**: Sibling exception wrappers (`SettingsBindingException`, `SettingsExtractionException`, `TypeGenerationException`) audited — none embed bound values (S1/C2, #27/#28)
 - [x] **EXC-01**: Public `abstract SimpleSettingsException` base in the root namespace; boundary exceptions public + structured (property/target/failure/binder/section/key); `SettingsTypeNotInterfaceException` replaces the `TypeIsNotInterface` throws (C2, merged #28, breaking)
+- [x] **TEST-01** (T4): `ValuesPopulator` tests — binder precedence (last-writer-wins, earlier-survives-when-later-silent) + attribute-default-survives *(validated Phase 2; exception-wrapper contract owned by ExceptionHierarchyTests, not re-asserted)*
+- [x] **TEST-02** (T5): `TypeConverter` tests — null→value-type default, `Nullable<int>` strip+convert, attribute-`ConverterType` bypasses the collection converter *(validated Phase 2; empty-enumerable + `AllowEmpty` covered by CollectionConversionTests/SettingsPropertyTests, not duplicated)*
+- [x] **TEST-03** (T6): Scalar `Uri`/`DateTime` positive + one format-mismatch negative *(validated Phase 2; array-of-Uri/DateTime owned by P4 CollectionConversionTests; the `List<T>` doc test defers with COLL-01)*
+- [x] **ENG-01** (T7): `SettingsClassGenerator` concurrency race closed (double-checked locking; one gate over all generation) + same/distinct-interface stress tests *(shipped #29; independently verified in Phase 2 — `...IsRaceFree` Barrier test is the load-bearing proof)*
 
 ### Active
 
 <!-- Remaining open work from FIX-PLAN.md, batched toward the first v2.0.0-beta. -->
 
-- [ ] **COLL-01** (C1): Decide + implement `List<T>`/`IList<T>`/`ICollection<T>` support (broaden converter) or document + throw a clear error, with a positive test
-- [ ] **TEST-01** (T4): `ValuesPopulator` tests — binder precedence + bind/convert exception-wrapper contracts
-- [ ] **TEST-02** (T5): `TypeConverter` tests — null/nullable/empty-enumerable/`AllowEmpty`/attribute-`ConverterType` paths
-- [ ] **TEST-03** (T6): Converter tests residual — `Uri`/`DateTime` + the `List<T>` doc test tied to C1
-- [x] **ENG-01** (T7): Fix the unsynchronized check-then-`DefineType` race in `SettingsClassGenerator` + concurrency stress tests *(merged #29 — double-checked locking; one gate over all generation)*
+- [ ] **COLL-01** (C1): Decide + implement `List<T>`/`IList<T>`/`ICollection<T>` support (broaden converter) or document + throw a clear error, with a positive test *(Phase 2: intentionally deferred — broaden-vs-document+throw decision held by owner; the `List<T>` doc test in TEST-03 defers with it)*
 - [ ] **API-01** (A5): Make `SettingsHolder`/`ISettingsHolder` internal *(breaking)*
 - [ ] **PKG-01** (A3): `Core.AspNet` exposes a public type (`Environments` public) or the package is dropped
 - [ ] **PKG-02** (A4): Float `Microsoft.Extensions.*` floor per-TFM (`8.0.x` for net8) or justify the pin
@@ -76,12 +76,12 @@ converters. When tradeoffs arise, binding correctness wins.
   consolidation (A2/D3), the provider-cache decision (C3/P1), the allocation-gated
   benchmark harness, S1 secret redaction (#27), the public exception hierarchy (C2, #28),
   and the generator concurrency-race fix (ENG-01/T7, #29).
-- **Test baseline:** 82 tests on net10 (incl. +5 S1 redaction, +6 C2 hierarchy). TUnit on
+- **Test baseline:** 94 tests on net10 (Phase 2 added +7 engine-core and +3 scalar-converter). TUnit on
   Microsoft.Testing.Platform; run from `src/`. net8 is build-only locally (net10 runtime
   installed); CI runs both.
-- **Known open concerns (source-verified):** missing engine tests (T4/T5),
-  `IEnumerable<T>`-only collection support (C1), no AOT/trim annotations (A1), and the
-  command-line quoted-value bug (A6). *(C2 public exception base — resolved #28; T7 generator race — resolved #29.)*
+- **Known open concerns (source-verified):** `IEnumerable<T>`-only collection support (C1, owner-deferred),
+  no AOT/trim annotations (A1), and the command-line quoted-value bug (A6). *(Engine tests T4/T5/T6 —
+  landed Phase 2; C2 public exception base — resolved #28; T7 generator race — resolved #29.)*
 
 ## Constraints
 
@@ -109,4 +109,4 @@ converters. When tradeoffs arise, binding correctness wins.
 | `Validations/*` (D1) and `EqualityCompererCreator` (D2) are HELD — do NOT delete | Dead today but reserved for coming feature work; D1 reconciles with the `validate-settings` branch | — Pending (owner-driven feature) |
 
 ---
-*Last updated: 2026-07-14 — ENG-01/T7 shipped (#29). GSD is now the source of truth; FIX-PLAN.md frozen as a historical reference. Reconciled from session handoff + git.*
+*Last updated: 2026-07-14 — Phase 2 complete: TEST-01/02/03 engine + scalar-converter tests landed and ENG-01/T7 verified (suite 94/94 net10, net8 via CI). COLL-01 owner-deferred. GSD is the source of truth; FIX-PLAN.md frozen as a historical reference.*
