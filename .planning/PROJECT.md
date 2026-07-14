@@ -48,7 +48,7 @@ converters. When tradeoffs arise, binding correctness wins.
 - [ ] **TEST-01** (T4): `ValuesPopulator` tests — binder precedence + bind/convert exception-wrapper contracts
 - [ ] **TEST-02** (T5): `TypeConverter` tests — null/nullable/empty-enumerable/`AllowEmpty`/attribute-`ConverterType` paths
 - [ ] **TEST-03** (T6): Converter tests residual — `Uri`/`DateTime` + the `List<T>` doc test tied to C1
-- [ ] **ENG-01** (T7): Fix the unsynchronized check-then-`DefineType` race in `SettingsClassGenerator` + concurrency stress tests
+- [x] **ENG-01** (T7): Fix the unsynchronized check-then-`DefineType` race in `SettingsClassGenerator` + concurrency stress tests *(merged #29 — double-checked locking; one gate over all generation)*
 - [ ] **API-01** (A5): Make `SettingsHolder`/`ISettingsHolder` internal *(breaking)*
 - [ ] **PKG-01** (A3): `Core.AspNet` exposes a public type (`Environments` public) or the package is dropped
 - [ ] **PKG-02** (A4): Float `Microsoft.Extensions.*` floor per-TFM (`8.0.x` for net8) or justify the pin
@@ -74,13 +74,14 @@ converters. When tradeoffs arise, binding correctness wins.
   `v2.0.0-beta`.
 - **Recently completed & merged:** performance track P0–P5, quick wins Q1–Q5, naming
   consolidation (A2/D3), the provider-cache decision (C3/P1), the allocation-gated
-  benchmark harness, S1 secret redaction (#27), and the public exception hierarchy (C2, #28).
+  benchmark harness, S1 secret redaction (#27), the public exception hierarchy (C2, #28),
+  and the generator concurrency-race fix (ENG-01/T7, #29).
 - **Test baseline:** 82 tests on net10 (incl. +5 S1 redaction, +6 C2 hierarchy). TUnit on
   Microsoft.Testing.Platform; run from `src/`. net8 is build-only locally (net10 runtime
   installed); CI runs both.
-- **Known open concerns (source-verified):** the generator concurrency race (T7), missing
-  engine tests (T4/T5), `IEnumerable<T>`-only collection support (C1), no AOT/trim
-  annotations (A1), and the command-line quoted-value bug (A6). *(C2 public exception base — resolved #28.)*
+- **Known open concerns (source-verified):** missing engine tests (T4/T5),
+  `IEnumerable<T>`-only collection support (C1), no AOT/trim annotations (A1), and the
+  command-line quoted-value bug (A6). *(C2 public exception base — resolved #28; T7 generator race — resolved #29.)*
 
 ## Constraints
 
@@ -100,6 +101,7 @@ converters. When tradeoffs arise, binding correctness wins.
 | Secret-safe exception invariant: `SettingsPropertyValueException` carries no value and chains no inner; value-free "required missing" is a separate `SettingsPropertyNullException`; opt-in restore rejected | Bound values (secrets) reach logs via `Exception.ToString()`; a config flag to restore them is insecure-by-configuration | ✓ Good (merged #27; made structural by C2 #28) |
 | Public exception hierarchy: all library exceptions derive from `public abstract SimpleSettingsException` in the root namespace (reflection invariant test enforces it); `SettingsTypeNotInterfaceException` replaces the `TypeIsNotInterface` `InvalidOperationException` throws | Consumers need one catchable category; the two unreachable "no converter" guards stay outside the family | ✓ Good (C2 #28; one runtime break → release notes) |
 | Provider caches the built instance per type (C3 option 2); Core `GetSettings` unchanged; no reload path | Consistent objects between DI singletons and `provider.GetSettings<T>()`; `IOptionsMonitor`-style reload deferred as future "option 3" | ✓ Good (P1, #17) |
+| Generator serializes ALL type generation behind one gate (double-checked locking; warm path lock-free); NOT `Lazy`-per-type | `Reflection.Emit` isn't thread-safe — concurrent `DefineType` of distinct interfaces also races the shared `ModuleBuilder`; per-type Lazy would reopen that race | ✓ Good (T7 #29; same/distinct-interface stress tests) |
 | Benchmark CI gates on allocated bytes, not wall-clock time | Allocations are deterministic; time is noisy/informational | ✓ Good (merged #22) |
 | Canonical naming `ExistForAll.SimpleSettings`; package renamed from legacy `SimpleConfig` | Consolidate three historical spellings onto one identity before stable | ✓ Good (A2 #15, D3 #11) |
 | Keep the generated impl type name separate from `GetNormalizeInterfaceName` (section name) | The two serve different purposes (collision-safe impl name vs. config section name); merging would break section resolution | ✓ Good (M1 #21) |
@@ -107,4 +109,4 @@ converters. When tradeoffs arise, binding correctness wins.
 | `Validations/*` (D1) and `EqualityCompererCreator` (D2) are HELD — do NOT delete | Dead today but reserved for coming feature work; D1 reconciles with the `validate-settings` branch | — Pending (owner-driven feature) |
 
 ---
-*Last updated: 2026-07-14 after Phase 1 (S1 #27, C2 #28) shipped — reconciled from session handoff*
+*Last updated: 2026-07-14 — ENG-01/T7 shipped (#29). GSD is now the source of truth; FIX-PLAN.md frozen as a historical reference. Reconciled from session handoff + git.*

@@ -22,8 +22,8 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 
 Phase: 2 of 5 (Binding Correctness & Engine Test Hardening)
 Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-07-14 — Phase 1 (S1 #27, C2 #28) merged to master @ 13b78dd; marked complete, roadmap reconciled from session handoff
+Status: In progress — ENG-01/T7 done (#29); COLL-01 (C1, deferred) + TEST-01/02/03 remain to plan
+Last activity: 2026-07-14 — ENG-01/T7 merged (#29, master @ 10f9275); GSD ownership cutover: .planning reconciled to reality, FIX-PLAN.md frozen as a historical reference (GSD is now source of truth)
 
 Progress: [██░░░░░░░░] 20%
 
@@ -53,6 +53,7 @@ Progress: [██░░░░░░░░] 20%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- Generator concurrency (T7/ENG-01, merged #29): `SettingsClassGenerator.GenerateType` serializes ALL generation behind one gate (double-checked locking; warm cache-hit path lock-free). NOT `Lazy<Type>`-per-type — `Reflection.Emit` isn't thread-safe, so concurrent `DefineType` of *distinct* interfaces also races the shared `ModuleBuilder`; a distinct-interface stress test guards this.
 - Secret-safe exception invariant (S1, merged #27; made structural by C2): `SettingsPropertyValueException` takes the failure `Type` not the `Exception` — no bound value, no chained inner. `SettingsPropertyNullException` for value-free "required missing"; opt-in restore rejected.
 - Public exception hierarchy (C2, merged #28): all library exceptions derive from `public abstract SimpleSettingsException` in the root namespace, enforced by a reflection invariant test; `SettingsTypeNotInterfaceException` replaces the `TypeIsNotInterface` throws (one runtime break → release notes).
 - Breaking changes are free until the first `v2.0.0-beta` and are batched before cutting it.
@@ -64,7 +65,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- Open concern (Phase 2 target): the `SettingsClassGenerator` check-then-`DefineType` concurrency race (T7/ENG-01) is not yet closed — the highest-value correctness item remaining.
+- None blocking. (T7/ENG-01 `SettingsClassGenerator` concurrency race **closed** — shipped pre-GSD via #29: double-checked locking, warm path lock-free, same/distinct-interface `Barrier` stress tests.)
 
 ## Deferred Items
 

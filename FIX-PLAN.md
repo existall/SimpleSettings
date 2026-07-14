@@ -1,5 +1,15 @@
 # SimpleSettings — Fix Plan
 
+> **⚠ FROZEN — HISTORICAL REFERENCE (2026-07-14).** This file is no longer the working source of
+> truth. Project tracking has migrated to **GSD** (`.planning/`):
+> - **Requirements & status** → `.planning/REQUIREMENTS.md`
+> - **Phases, goals & success criteria** → `.planning/ROADMAP.md`
+> - **Project overview & key decisions** → `.planning/PROJECT.md`
+> - **Current state / session position** → `.planning/STATE.md`
+>
+> Retained only for its per-item file:line implementation detail, which each GSD phase's
+> CONTEXT/PLAN mines as it is planned. **Do not update this file** — record new work in GSD.
+
 _Derived from the 2026-07-10 three-part review (architecture · tests · performance). Every finding below was verified against source with file:line. Work items are self-contained and ordered so they can be implemented one at a time._
 
 ## Progress (2026-07-13)
@@ -11,8 +21,8 @@ _Derived from the 2026-07-10 three-part review (architecture · tests · perform
 - **Perf track P0–P5 = COMPLETE + merged.** `master` @ `498fc81`.
 - **S1 shipped + merged (#27).** Conversion-failure exceptions no longer carry the bound value **or** chain the value-bearing framework inner; the value-free "required value missing" case split into its own `SettingsPropertyNullException`. `master` @ `5277c60`. Detail in §S1 below.
 - **C2 merged (#28).** **Public exception hierarchy**: `SimpleSettingsException` base, reparent all 10, promote the 4 escapees to public, flatten 3 to root namespace, leak-safe structured properties, retype the `TypeIsNotInterface` throw. Plan reviewed by `security-auditor` + `dotnet-architect` (both ENDORSE-WITH-CHANGES, both fired cleanly) + perf in-context; code by `/code-review`. Suite **82 net10** (was 76; +6). `master` @ `13b78dd`. Detail in §C2 below.
-- **T7 (generator concurrency race) shipped** (branch `test/t7-generator-concurrency`, PR open) — `SettingsClassGenerator.GenerateType` now uses double-checked locking + a single generation gate (Reflection.Emit isn't thread-safe: concurrent `DefineType` races the shared `ModuleBuilder` for both same- and distinct-interface generation). Fast cache-hit path stays lock-free. Plan reviewed by `dotnet-architect` (ENDORSE-WITH-CHANGES — lock-all required, `Lazy`-per-type rejected) + perf/security in-context; code by `/code-review`. +2 concurrency stress tests; suite **84 net10** (was 82; 5× green).
-- **In flight:** T7 PR open (branch `test/t7-generator-concurrency`) — carries this fix-plan + handoff refresh.
+- **T7 (generator concurrency race) merged (#29).** `SettingsClassGenerator.GenerateType` now uses double-checked locking + a single generation gate (Reflection.Emit isn't thread-safe: concurrent `DefineType` races the shared `ModuleBuilder` for both same- and distinct-interface generation). Fast cache-hit path stays lock-free. **Perf verified same-machine before/after: 0 B allocation delta (16.81 MB cold both, 0 B warm both), no measurable time change.** Plan reviewed by `dotnet-architect` (ENDORSE-WITH-CHANGES — lock-all required, `Lazy`-per-type rejected) + perf/security in-context; code by `/code-review`. +2 concurrency stress tests; suite **84 net10** (was 82; 5× green). `master` @ `10f9275`.
+- **In flight:** none. This fix-plan + handoff refresh sit **uncommitted** in the working tree (session wrap) to ride the next work branch — no doc-only `master` push.
 - **Next:** engine tests T4 `ValuesPopulator` / T5 `TypeConverter` (+ optional T7 leftovers: collection not-found / binder edge cases) **or** continue the pre-stable breaking cleanups (A5 make `SettingsHolder` internal / C1 `List<T>` support / A6 command-line quoting / A3 `Core.AspNet` / A4 dependency floor) · **A1 (HIGH)** AOT/trim story · optional P3b.
 - **C3 — DECIDED (option 2):** cache in the provider only; Core `SettingsBuilder.GetSettings` unchanged; no reload. See #17.
 - **Held — do NOT delete (feature work coming):** D1 Validations (reconcile with the `validate-settings` branch) · D2 EqualityCompererCreator.

@@ -48,7 +48,7 @@ Remaining open work (from `FIX-PLAN.md`), batched toward the first `v2.0.0-beta`
 - [ ] **TEST-01**: `ValuesPopulator` tests — binder precedence + bind/convert exception-wrapper contracts (T4)
 - [ ] **TEST-02**: `TypeConverter` tests — null/nullable/empty-enumerable/`AllowEmpty`/attribute-`ConverterType` paths (T5)
 - [ ] **TEST-03**: Converter tests residual — `Uri`/`DateTime` + `List<T>` doc test tied to C1 (T6)
-- [ ] **ENG-01**: Fix the unsynchronized check-then-`DefineType` race in `SettingsClassGenerator` + concurrency stress tests (T7)
+- [x] **ENG-01**: Fix the unsynchronized check-then-`DefineType` race in `SettingsClassGenerator` + concurrency stress tests (T7 — shipped pre-GSD via the FIX-PLAN track, merged #29: double-checked locking, one gate over all generation; same- + distinct-interface `Barrier` stress tests)
 
 ### Public Surface, Packaging & Binder Cleanup
 
@@ -99,7 +99,7 @@ Deferred / held. Tracked but not in the current roadmap.
 | TEST-01 | Phase 2 | Pending |
 | TEST-02 | Phase 2 | Pending |
 | TEST-03 | Phase 2 | Pending |
-| ENG-01 | Phase 2 | Pending |
+| ENG-01 | Phase 2 | ✓ Complete (#29) |
 | API-01 | Phase 3 | Pending |
 | PKG-01 | Phase 3 | Pending |
 | PKG-02 | Phase 3 | Pending |
@@ -112,9 +112,9 @@ Deferred / held. Tracked but not in the current roadmap.
 - v1 requirements: 15 total
 - Mapped to phases: 15
 - Unmapped: 0 ✓
-- Complete: 3 (Phase 1 — SEC-01/SEC-02/EXC-01, shipped #27/#28); Pending: 12
+- Complete: 4 (Phase 1 SEC-01/SEC-02/EXC-01 #27/#28 + ENG-01/T7 #29); Pending: 11
 - Validated (shipped, no phase): 13
 
 ---
 *Requirements defined: 2026-07-13*
-*Last updated: 2026-07-14 after Phase 1 (S1 #27, C2 #28) shipped — reconciled from session handoff*
+*Last updated: 2026-07-14 — ENG-01/T7 marked complete (#29). GSD is now the source of truth; FIX-PLAN.md frozen as a historical reference. Reconciled from session handoff + git.*
