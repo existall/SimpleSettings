@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784025526815,
+  "lastUpdate": 1784037002296,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -673,6 +673,80 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/existall/SimpleSettings/commit/87503594d7975f3ba520df9fc59105b5878fbb6e"
         },
         "date": 1784025526566,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17573376,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "630319992ca42459396916505cb2a8b26d8581a2",
+          "message": "Phase 3: Public Surface, Packaging & Binder Cleanup (#31)\n\n* docs(03): capture phase context\n\n* docs(state): record phase 3 context session\n\n* docs(03): research public-surface/packaging/binder cleanup phase\n\n* docs: refresh session handoff (Phase 3 — discuss+research done, planner next)\n\n* docs(phase-3): add validation strategy\n\n* docs(03): create phase plan (public surface, packaging & binder cleanup)\n\n* docs(03): refine D-05 (split exe-skip by entry point) + resolve open questions\n\n* docs(03): finalize phase 3 plan (2 plans) after plan-check + architect/security/perf review\n\n* refactor(03-01): make SettingsHolder internal sealed (API-01/D-01)\n\n- Flip public class SettingsHolder to internal sealed\n- Removes an internal DTO from the public API surface\n- Reachable from tests/benchmark via existing InternalsVisibleTo\n\n* chore(03-01): remove dead Core.AspNet package (PKG-01/D-02)\n\n- Drop Core.AspNet Project entry from SimpleSettings.slnx\n- Drop Core.AspNet ProjectReference from UnitTests.csproj\n- Delete src/Core/ExistForAll.SimpleSettings.Core.AspNet/ directory\n- Test-local Core/AspNet/Environments.cs duplicate untouched\n- Published 2.0.0-alpha.0.* alphas: unlist is owner-optional follow-up\n\n* chore(03-01): float Microsoft.Extensions.* floor per-TFM (PKG-02/D-03)\n\n- Split four Microsoft.Extensions.* pins into per-TFM conditional ItemGroups\n- net8 floors: Configuration 8.0.0, Configuration.Json 8.0.1, DI 8.0.1, DI.Abstractions 8.0.2\n- net10 stays 10.0.9 for all four\n- Frees net8 consumers of the packable Binders + GenericHost packages from 10.x\n\n* docs(03-01): complete public-surface/packaging/binder-cleanup plan\n\n* test(03-02): add failing CLI binder cases for lookahead + SkipFirstArgument\n\n- space-separated --k v, quoted-with-spaces single token\n- prefixed-next-token = new key, prefixed-value non-binding\n- SkipFirstArgument true/false, empty-token no-crash\n- CLI-path secret-redaction regression (S2)\n\n* feat(03-02): add SkipFirstArgument option + lookahead CLI parse (SRC-02/D-04,D-05)\n\n- SkipFirstArgument (default false, explicit override; no silent arg[0] drop)\n- Parse rewritten to index/lookahead loop; space-separated --k v binds\n- empty-safe zero-alloc prefix detection (length-delta + Array.IndexOf, cached prefix array)\n- prefixed next-token treated as new key; ArgumentPrefixes XML-doc note\n\n* feat(03-02): AddCommandLine sources GetCommandLineArgs + owns exe skip (SRC-02/Open Q #1)\n\n- replace Environment.CommandLine.Split(' ') with Environment.GetCommandLineArgs()\n- wrap caller action to enable SkipFirstArgument=true (exe skip owned by this entry point)\n- quoted-value-with-spaces criterion now holds end-to-end unconditionally\n\n* docs(03-02): complete command-line binder cleanup plan\n\n* fix(03-02): null-guard CLI lookahead value token (post-review hardening)\n\n* docs(phase-03): complete phase execution (verified 4/4, review clean)\n\n* docs(backlog): capture client pre-beta engine requirements (COLL/VAL/API)",
+          "timestamp": "2026-07-14T16:47:58+03:00",
+          "tree_id": "9345fe4ec63e1c68f37596870b7533580691bd76",
+          "url": "https://github.com/existall/SimpleSettings/commit/630319992ca42459396916505cb2a8b26d8581a2"
+        },
+        "date": 1784037001621,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
