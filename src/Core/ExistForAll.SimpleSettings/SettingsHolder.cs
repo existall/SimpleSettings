@@ -2,7 +2,7 @@
 
 namespace ExistForAll.SimpleSettings
 {
-	public class SettingsHolder : ISettingsHolder
+	internal sealed class SettingsHolder : ISettingsHolder
 	{
 		public SettingsHolder(Type settingsType, object settingsImplementation)
 		{
