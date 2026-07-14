@@ -40,16 +40,32 @@ namespace ExistForAll.SimpleSettings.Binders
 
          if (args == null) return;
 
-         foreach (var arg in args)
-         {
-            var (key, value) = SplitByDelimiter(arg, _options)!;
+         var prefixes = _options.ArgumentPrefixes.ToArray();
+         var start = _options.SkipFirstArgument && args.Length > 0 ? 1 : 0;
 
-            var name = key.TrimStart(_options.ArgumentPrefixes.ToArray());
+         for (var index = start; index < args.Length; index++)
+         {
+            var split = SplitByDelimiter(args[index], _options);
+            if (split == null) continue;
+
+            var (key, value) = split;
+            var name = key.TrimStart(prefixes);
 
             if (value != null)
             {
                _argumentStore[name] = value;
+               continue;
             }
+
+            var tokenWasPrefixed = name.Length != key.Length;
+            if (!tokenWasPrefixed || index + 1 >= args.Length) continue;
+
+            var next = args[index + 1];
+            if (next is null) continue;
+            if (next.Length > 0 && Array.IndexOf(prefixes, next[0]) >= 0) continue;
+
+            _argumentStore[name] = next;
+            index++;
          }
       }
 

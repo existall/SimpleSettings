@@ -10,7 +10,6 @@
   </Folder>
   <Folder Name="/Extensions/">
     <Project Path="Core/ExistForAll.SimpleSettings.Extensions.Binders/ExistForAll.SimpleSettings.Binders.csproj" />
-    <Project Path="Core/ExistForAll.SimpleSettings.Core.AspNet/ExistForAll.SimpleSettings.Core.AspNet.csproj" />
     <Project Path="Core/ExistForAll.SimpleSettings.Extensions.GenericHost/ExistForAll.SimpleSettings.Extensions.GenericHost.csproj" />
   </Folder>
   <Folder Name="/Tests/">
