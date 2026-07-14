@@ -52,7 +52,9 @@ value: config → typed settings maps accurately, and never leaks a secret doing
   3. `TypeConverter` null / nullable / empty-enumerable / `AllowEmpty` / attribute-`ConverterType` paths are verified by tests.
   4. Concurrent first-touch generation of the same interface returns one `ReferenceEquals` implementation with no duplicate-`DefineType` race. ✓ Met by #29 (T7).
   5. `Uri`/`DateTime` and collection converters have parity tests passing on net8 and net10.
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 02-01-PLAN.md — Engine-core correctness tests (TEST-01 ValuesPopulator precedence/default; TEST-02 TypeConverter null/nullable/ConverterType-over-collection) + ENG-01 concurrency verify
+- [ ] 02-02-PLAN.md — Converter scalar residual (TEST-03 scalar Uri/DateTime positive + one format-mismatch negative); COLL-01 documented as owner-deferred
 
 ### Phase 3: Public Surface, Packaging & Binder Cleanup
 **Goal**: The public API and packages carry only meaningful, correctly-scoped surface, and the command-line binder parses real-world arguments correctly — the remaining breaking changes batched before beta.
