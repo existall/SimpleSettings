@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784018078545,
+  "lastUpdate": 1784025196307,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -575,6 +575,80 @@ window.BENCHMARK_DATA = {
           {
             "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
             "value": 17573376,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "67aa72f901d66defc6903cf24ad06c101315e5ac",
+          "message": "GSD planning cutover + Phase 2: binding-correctness engine test hardening (#30)\n\n* docs(gsd): reconcile .planning with merged T7 (#29); freeze FIX-PLAN.md\n\nGSD is now the source of truth for project tracking. Reconcile .planning to\nthe real git state and retire FIX-PLAN.md as the working doc.\n\n- Mark ENG-01/T7 complete across REQUIREMENTS/ROADMAP/STATE/PROJECT (shipped\n  pre-GSD via #29 — double-checked locking + same/distinct-interface stress tests)\n- Clear the stale \"T7 race open\" concern in STATE; log the generator-serialization\n  decision (one gate over all generation; not Lazy-per-type)\n- Phase 2 now: ENG-01 done; COLL-01 (C1, deferred) + TEST-01/02/03 remain\n- Freeze FIX-PLAN.md with a banner pointing at .planning/ (kept for its per-item\n  file:line detail, mined by each phase's CONTEXT/PLAN)\n\nLocal branch only (no push) — rides the next work branch to avoid a doc-only\nmaster alpha. SESSION-HANDOFF.md left uncommitted (living handoff).\n\n* docs(02): synthesize phase context from FIX-PLAN (COLL-01 deferred, ENG-01 verify-only)\n\n* docs(02): research binding-correctness engine test hardening\n\n* docs(02): add validation strategy\n\n* docs(02): create Phase 2 binding-correctness test-hardening plans\n\n* docs(02): add phase artifacts inventory to plan 01\n\n* docs(02): add pattern map; mark phase planned (2 plans, ready to execute)\n\n* test(02-01): add ValuesPopulator precedence + default-survives tests\n\n- last-writer-wins across two ordered binders\n- later silent binder does not clobber earlier set value\n- [SettingsProperty] DefaultValue survives when no binder sets the property\n\n* test(02-01): add TypeConverter null/nullable/ConverterType tests\n\n- null for non-nullable int resolves to 0\n- Nullable<int> null resolves to null; \"42\" strips and converts to 42\n- ConverterType on IEnumerable<int> bypasses the collection converter (sentinel wins)\n\n* docs(02-01): complete engine-core correctness test-hardening plan\n\n* test(02-02): add scalar Uri/DateTime conversion coverage (TEST-03)\n\n- Scalar Uri positive: bound URL string resolves to new Uri(value)\n- Scalar DateTime positive: yyyy-MM-dd string resolves via ParseExact\n- One DateTime format-mismatch negative asserts SettingsPropertyValueException type only\n- No array-of-* duplication (owned by CollectionConversionTests); no redaction re-proof (ExceptionRedactionTests)\n\n* docs(02-02): complete scalar converter-coverage (TEST-03) plan\n\n* docs(phase-02): complete phase execution\n\n* docs(phase-02): evolve PROJECT.md after phase completion",
+          "timestamp": "2026-07-14T13:30:37+03:00",
+          "tree_id": "8fea055c29ad07440635b812f46d88367f596268",
+          "url": "https://github.com/existall/SimpleSettings/commit/67aa72f901d66defc6903cf24ad06c101315e5ac"
+        },
+        "date": 1784025195670,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17572816,
             "unit": "bytes"
           }
         ]
