@@ -76,10 +76,10 @@ value: config → typed settings maps accurately, and never leaks a secret doing
   3. A net8 consumer is no longer transitively forced onto `Microsoft.Extensions.* 10.x` (per-TFM floor), or the pin is documented with justification.
   4. A quoted command-line value containing spaces binds correctly and the executable path (`arg[0]`) is skipped.
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Public surface & packaging cleanup: SettingsHolder → internal sealed (API-01), drop dead Core.AspNet package (PKG-01), per-TFM Microsoft.Extensions.* floor (PKG-02) [Wave 1]
+- [x] 03-01-PLAN.md — Public surface & packaging cleanup: SettingsHolder → internal sealed (API-01), drop dead Core.AspNet package (PKG-01), per-TFM Microsoft.Extensions.* floor (PKG-02) [Wave 1]
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -121,6 +121,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Exception Safety & Public Hierarchy | n/a (shipped) | ✓ Complete | 2026-07-14 (#27/#28) |
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
-| 3. Public Surface, Packaging & Binder Cleanup | 0/2 | Not started | - |
+| 3. Public Surface, Packaging & Binder Cleanup | 1/2 | In Progress|  |
 | 4. AOT/Trim Honesty & Documentation | 0/TBD | Not started | - |
 | 5. First v2.0.0-beta Release | 0/TBD | Not started | - |
