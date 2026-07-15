@@ -26,7 +26,7 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			typeof(TypeConverter).GetMethod(nameof(CreateEmptyList), BindingFlags.NonPublic | BindingFlags.Static)!;
 
 		// The value a null bound value converts to per shape: a shared empty array for arrays and IEnumerable<T>,
-		// a fresh-per-bind empty List<T> for the List family (review B-3: a mutable list must not be shared), a
+		// a fresh-per-bind empty List<T> for the List family (a mutable list must not be shared), a
 		// default instance for a value type, otherwise null. Resolved once at plan build; the list branch bakes a
 		// factory delegate (cold reflection here, plain new List<T>() per call) rather than a shared instance.
 		private static object? CreateNullResult(Type propertyType)

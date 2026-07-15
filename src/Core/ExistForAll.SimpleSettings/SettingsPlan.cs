@@ -45,7 +45,7 @@ namespace ExistForAll.SimpleSettings
 		public Type? ObjectValidatorType { get; }
 
 		// Computed once at plan build so the post-populate hook can short-circuit with a single field read
-		// before allocating anything on the validator-free warm path (review B-2).
+		// before allocating anything on the validator-free warm path.
 		public bool HasValidators { get; }
 	}
 

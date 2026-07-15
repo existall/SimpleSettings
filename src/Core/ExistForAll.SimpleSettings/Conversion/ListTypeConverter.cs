@@ -7,7 +7,7 @@ namespace ExistForAll.SimpleSettings.Conversion
 	// Handles the List<T> family (List/IList/ICollection/IReadOnlyList/IReadOnlyCollection<T>) by reusing the
 	// base array-build path and copying the result into a List<T>. Materialization uses a cached per-element
 	// delegate (built once, invoked on every populate) so the warm path carries no MakeGenericType/Activator
-	// reflection (review S-4/A1).
+	// reflection.
 	internal class ListTypeConverter : CollectionTypeConverter
 	{
 		private static readonly MethodInfo CreateListMethod =
