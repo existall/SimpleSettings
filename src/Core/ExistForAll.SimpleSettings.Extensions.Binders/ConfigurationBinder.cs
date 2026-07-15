@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using ExistForAll.SimpleSettings.Core.Reflection;
 using Microsoft.Extensions.Configuration;
 
@@ -49,34 +49,28 @@ namespace ExistForAll.SimpleSettings.Binders
 				context.SetNewValue(value);
 		}
 
-		// Child-section sequence path (COLL-03): a collection property may be expressed as an indexed
-		// sub-section (Key:0, Key:1, ...) rather than a delimited scalar. Materialize the element values into a
-		// right-sized string[] with a manual two-pass walk (no LINQ projection on the bind path) so the element
-		// converter chain runs per item. Children win over the scalar; an empty sequence falls through to the
-		// scalar path. No element value is placed in any exception (S1/D-06).
+		// Child-section sequence path (COLL-03): a collection property may be an indexed sub-section
+		// (Key:0, Key:1, ...) rather than a delimited scalar. Enumerate the live config view ONCE (a second
+		// pass could race a reload), collecting non-empty element values into a string[] so the element
+		// converter chain runs per item. Empty entries are dropped for parity with the comma-scalar split
+		// (RemoveEmptyEntries). Children win over the scalar; an all-empty sequence falls through to the scalar
+		// path. No element value is placed in any exception (S1).
 		private static bool TrySetChildSequence(IConfigurationSection section, BindingContext context)
 		{
 			var childSection = section.GetSection(context.Key);
 
-			var count = 0;
+			List<string>? values = null;
 			foreach (var child in childSection.GetChildren())
 			{
-				if (child.Value != null)
-					count++;
+				var childValue = child.Value;
+				if (!string.IsNullOrEmpty(childValue))
+					(values ??= new List<string>()).Add(childValue);
 			}
 
-			if (count == 0)
+			if (values is null)
 				return false;
 
-			var values = new string[count];
-			var index = 0;
-			foreach (var child in childSection.GetChildren())
-			{
-				if (child.Value != null)
-					values[index++] = child.Value;
-			}
-
-			context.SetNewValue(values);
+			context.SetNewValue(values.ToArray());
 			return true;
 		}
 
