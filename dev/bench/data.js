@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784139218852,
+  "lastUpdate": 1784140156917,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -895,6 +895,80 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/existall/SimpleSettings/commit/52a2c6f06901384fdd35fe8e9882bdde19337bc9"
         },
         "date": 1784139218390,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17909680,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1388c5c03bd2d9d67da90f1a57980a0fd6304f71",
+          "message": "Phase 4: land planning/execution records + child-sequence collection-expression tweak (#34)\n\n* just using [] instead of new\n\n* docs(04): land Phase 4 planning + execution records on master",
+          "timestamp": "2026-07-15T21:26:49+03:00",
+          "tree_id": "0af39e18f9e2c35b5f0ecfafc64c6f6238e51d48",
+          "url": "https://github.com/existall/SimpleSettings/commit/1388c5c03bd2d9d67da90f1a57980a0fd6304f71"
+        },
+        "date": 1784140156480,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
