@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using ExistForAll.SimpleSettings.Core.Reflection;
 using Microsoft.Extensions.Configuration;
 
 namespace ExistForAll.SimpleSettings.Binders
@@ -29,10 +30,54 @@ namespace ExistForAll.SimpleSettings.Binders
 			// capturing lambda would build a fresh delegate on every call and eat most of the win.
 			var section = _sections.GetOrAdd(context.Section, static (name, self) => self.ResolveSection(name), this);
 
+			var isCollection = context.PropertyType.IsCollectionShape();
+
+			if (isCollection && TrySetChildSequence(section, context))
+				return;
+
 			var value = section[context.Key];
+
+			if (isCollection)
+			{
+				if (!string.IsNullOrWhiteSpace(value))
+					context.SetNewValue(value);
+
+				return;
+			}
 
 			if (value != null)
 				context.SetNewValue(value);
+		}
+
+		// Child-section sequence path (COLL-03): a collection property may be expressed as an indexed
+		// sub-section (Key:0, Key:1, ...) rather than a delimited scalar. Materialize the element values into a
+		// right-sized string[] with a manual two-pass walk (no LINQ projection on the bind path) so the element
+		// converter chain runs per item. Children win over the scalar; an empty sequence falls through to the
+		// scalar path. No element value is placed in any exception (S1/D-06).
+		private static bool TrySetChildSequence(IConfigurationSection section, BindingContext context)
+		{
+			var childSection = section.GetSection(context.Key);
+
+			var count = 0;
+			foreach (var child in childSection.GetChildren())
+			{
+				if (child.Value != null)
+					count++;
+			}
+
+			if (count == 0)
+				return false;
+
+			var values = new string[count];
+			var index = 0;
+			foreach (var child in childSection.GetChildren())
+			{
+				if (child.Value != null)
+					values[index++] = child.Value;
+			}
+
+			context.SetNewValue(values);
+			return true;
 		}
 
 		private IConfigurationSection ResolveSection(string section)
