@@ -22,17 +22,34 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 			return new PropertyConversion(converter, strippedType, throwOnNull, nullResult, propertyInfo.Name);
 		}
 
-		// The value a null bound value converts to: an empty sequence for IEnumerable<T>, a default instance
-		// for a value type, otherwise null. Constant per property, so it is materialized once at plan build.
+		private static readonly MethodInfo EmptyListFactoryMethod =
+			typeof(TypeConverter).GetMethod(nameof(CreateEmptyList), BindingFlags.NonPublic | BindingFlags.Static)!;
+
+		// The value a null bound value converts to per shape: a shared empty array for arrays and IEnumerable<T>,
+		// a fresh-per-bind empty List<T> for the List family (a mutable list must not be shared), a
+		// default instance for a value type, otherwise null. Resolved once at plan build; the list branch bakes a
+		// factory delegate (cold reflection here, plain new List<T>() per call) rather than a shared instance.
 		private static object? CreateNullResult(Type propertyType)
 		{
-			if (!propertyType.IsEnumerable())
-				return propertyType.GetTypeInfo().IsValueType ? Activator.CreateInstance(propertyType) : null;
+			if (propertyType.IsArray)
+				return Array.CreateInstance(propertyType.GetElementType()!, 0);
 
-			// An empty IEnumerable<T> is just an empty T[] (arrays implement IEnumerable<T>). Array.CreateInstance
-			// replaces the old Enumerable.Empty<T>() built via GetMethod("Empty").MakeGenericMethod().Invoke().
-			var elementType = propertyType.GetTypeInfo().GetGenericArguments()[0];
-			return Array.CreateInstance(elementType, 0);
+			if (propertyType.IsEnumerable())
+				return Array.CreateInstance(propertyType.GetTypeInfo().GetGenericArguments()[0], 0);
+
+			if (propertyType.IsListLike())
+			{
+				var elementType = propertyType.GetTypeInfo().GetGenericArguments()[0];
+				return (Func<object>)EmptyListFactoryMethod.MakeGenericMethod(elementType)
+					.CreateDelegate(typeof(Func<object>));
+			}
+
+			return propertyType.GetTypeInfo().IsValueType ? Activator.CreateInstance(propertyType) : null;
+		}
+
+		private static object CreateEmptyList<TElement>()
+		{
+			return new List<TElement>();
 		}
 
 		private static ISettingsTypeConverter GetConverter(Type strippedType,

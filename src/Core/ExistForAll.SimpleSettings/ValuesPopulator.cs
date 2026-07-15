@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using ExistForAll.SimpleSettings.Core.Reflection;
+using ExistForAll.SimpleSettings.Validations;
 
 namespace ExistForAll.SimpleSettings
 {
@@ -62,6 +63,64 @@ namespace ExistForAll.SimpleSettings
 				var propertyValue = ConvertPropertyValue(settings, tempValue, propertyPlan);
 				propertyPlan.Property.SetValue(instance, propertyValue);
 			}
+
+			// Runs AFTER the property-set loop so cross-property rules see the fully-populated instance.
+			RunValidators(instance, plan);
+		}
+
+		// Zero-allocation short-circuit for validator-free types: a single field read returns before anything is
+		// allocated, keeping the warm populate path byte-identical to the pre-validation build. The error list
+		// is allocated lazily only after a validator actually produces an error.
+		private static void RunValidators(object instance, SettingsPlan plan)
+		{
+			if (!plan.HasValidators)
+				return;
+
+			List<ValidationError>? errors = null;
+
+			if (plan.ObjectValidatorType is not null)
+				errors = InvokeValidator(plan.ObjectValidatorType, instance, errors);
+
+			foreach (var propertyPlan in plan.Properties)
+			{
+				if (propertyPlan.ValidatorType is null)
+					continue;
+
+				var propertyValue = propertyPlan.Property.GetValue(instance);
+				errors = InvokeValidator(propertyPlan.ValidatorType, propertyValue, errors);
+			}
+
+			// The single aggregate-and-throw entry point shared with the DI-resolved runner: the
+			// thrown contract cannot drift between the two paths.
+			if (errors is not null)
+				SettingsValidationException.ThrowIfAny(errors);
+		}
+
+		private static List<ValidationError>? InvokeValidator(Type validatorType, object? target, List<ValidationError>? errors)
+		{
+			ValidationResult result;
+			try
+			{
+				// The validator type comes from a compile-time attribute; instantiate it and dispatch through the
+				// non-generic ISettingsValidator.Validate. ISettingValidation<T>'s default implementation forwards
+				// to the author's generic overload, so no reflection over the Validate methods is needed.
+				var validator = (ISettingsValidator)Activator.CreateInstance(validatorType)!;
+				result = validator.Validate(new ValidationContext(target));
+			}
+			catch (Exception e)
+			{
+				// A validator threw instead of returning a result. Surface value-free: the inner may embed a
+				// secret the validator read, so it is never chained and the value never enters the message. See S1.
+				throw new SettingsValidatorInvocationException(validatorType, e.GetType());
+			}
+
+			foreach (var error in result.Errors)
+			{
+				errors ??= new List<ValidationError>();
+				errors.Add(error);
+			}
+
+			return errors;
 		}
 
 		private SettingsPlan GetOrBuildPlan(Type settings, SettingsOptions options)
@@ -90,7 +149,8 @@ namespace ExistForAll.SimpleSettings
 					propertyPlans[i] = new PropertyPlan(property,
 						key,
 						attribute?.DefaultValue,
-						_typeConverter.CreateConversion(property, attribute, options));
+						_typeConverter.CreateConversion(property, attribute, options),
+						attribute?.ValidatorType);
 				}
 				catch (Exception e)
 				{
@@ -102,7 +162,12 @@ namespace ExistForAll.SimpleSettings
 				}
 			}
 
-			var plan = new SettingsPlan(settings, options, propertyPlans);
+			// Read the object-level validator ([SettingsSection].ValidatorType) once per type at plan build,
+			// mirroring the per-property attribute read above — never on the hot populate path.
+			var objectValidatorType = settings.GetTypeInfo()
+				.GetCustomAttribute<SettingsSectionAttribute>(inherit: true)?.ValidatorType;
+
+			var plan = new SettingsPlan(settings, options, propertyPlans, objectValidatorType);
 
 			// Concurrent builds would produce equivalent plans, so last-writer-wins is harmless. A build that
 			// throws is never cached (we don't reach here), so the next call retries — matching the old

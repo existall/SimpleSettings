@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Text;
+using ExistForAll.SimpleSettings.Validations;
 
 namespace ExistForAll.SimpleSettings
 {
@@ -40,13 +42,35 @@ namespace ExistForAll.SimpleSettings
 				all properties from type [{type.FullName}]";
 
 		public static string PropertyNotAllowNullMessage(string propertyName) =>
-			$@"[{propertyName}] is marked as Null not allowed, yet the value is null. please provide value via binder or attribute";
+			$@"[{propertyName}] is marked as Null not allowed, yet the value is missing (null, empty, or whitespace). please provide value via binder or attribute";
 
 		public static string TypeIsNotInterface(string typeName) =>
 			$@"[{typeName}] is not an interface, SimpleSettings supports only interfaces";
 
         public static string SettingsOptionAttributeTypeMessage(Type type) =>
             $"SimpleSettings support Attribute indication of interfaces, the type provided [{type.FullName}] is not an attribute.";
+
+		// Composed ONLY from author-supplied ValidationError text (SettingsName + ErrorMessage). The inspected
+		// settings values are deliberately never embedded — a validator may run against a secret, and this
+		// message reaches logs via Exception.ToString(). See D-12/S1 and SettingsValidationException.
+		public static string SettingsValidationExceptionMessage(IReadOnlyList<ValidationError> errors)
+		{
+			var builder = new StringBuilder();
+			builder.Append("Settings validation failed with ").Append(errors.Count).Append(" error(s):");
+
+			for (var i = 0; i < errors.Count; i++)
+			{
+				var error = errors[i];
+				builder.Append(Environment.NewLine).Append(" - [").Append(error.SettingsName).Append("] ").Append(error.ErrorMessage);
+			}
+
+			return builder.ToString();
+		}
+
+		// Value-free like the rest of the family: names only the validator and the failure type, never the
+		// settings value the validator inspected (which may be a secret). See S1.
+		public static string SettingsValidatorInvocationExceptionMessage(Type validatorType, Type failureType) =>
+			$"Validator [{validatorType.Name}] threw [{failureType.Name}] while validating. The settings value is omitted to avoid leaking secrets into logs.";
 
     }
 }

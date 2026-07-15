@@ -1,3 +1,4 @@
+using System.Linq;
 using ExistForAll.SimpleSettings.Binder;
 using ExistForAll.SimpleSettings.Binders;
 using Microsoft.Extensions.Configuration;
@@ -78,6 +79,123 @@ namespace ExistForAll.SimpleSettings.UnitTests
 			await Assert.That(settings.Value).IsEqualTo(value);
 		}
 
+		[Test]
+		public async Task Bind_ChildSequence_ToStringArray_BindsEachElementInOrder()
+		{
+			var settings = BindSequence<ISequenceStringSetting>(new Dictionary<string, string?>
+			{
+				["SequenceStringSetting:Values:0"] = "a",
+				["SequenceStringSetting:Values:1"] = "b",
+				["SequenceStringSetting:Values:2"] = "c",
+			});
+
+			await Assert.That(settings.Values.SequenceEqual(new[] { "a", "b", "c" })).IsTrue();
+		}
+
+		[Test]
+		public async Task Bind_ChildSequence_ToIntArray_BindsEachElementInOrder()
+		{
+			var settings = BindSequence<ISequenceIntSetting>(new Dictionary<string, string?>
+			{
+				["SequenceIntSetting:Numbers:0"] = "1",
+				["SequenceIntSetting:Numbers:1"] = "2",
+				["SequenceIntSetting:Numbers:2"] = "3",
+			});
+
+			await Assert.That(settings.Numbers.SequenceEqual(new[] { 1, 2, 3 })).IsTrue();
+		}
+
+		[Test]
+		public async Task Bind_ChildSequence_WithEmptyElements_DropsThemLikeCommaScalar()
+		{
+			// Empty entries are dropped for parity with the comma-scalar RemoveEmptyEntries, so an interspersed
+			// empty element does not crash the int[] bind (review MED-2).
+			var settings = BindSequence<ISequenceIntSetting>(new Dictionary<string, string?>
+			{
+				["SequenceIntSetting:Numbers:0"] = "1",
+				["SequenceIntSetting:Numbers:1"] = "",
+				["SequenceIntSetting:Numbers:2"] = "3",
+			});
+
+			await Assert.That(settings.Numbers.SequenceEqual(new[] { 1, 3 })).IsTrue();
+		}
+
+		[Test]
+		public async Task Bind_ChildSequence_ToStringList_BindsEachElementInOrder()
+		{
+			var settings = BindSequence<ISequenceStringListSetting>(new Dictionary<string, string?>
+			{
+				["SequenceStringListSetting:Items:0"] = "x",
+				["SequenceStringListSetting:Items:1"] = "y",
+			});
+
+			await Assert.That(settings.Items.SequenceEqual(new List<string> { "x", "y" })).IsTrue();
+		}
+
+		[Test]
+		public async Task Bind_ScalarAndChildren_ChildrenWin()
+		{
+			var settings = BindSequence<ISequenceStringSetting>(new Dictionary<string, string?>
+			{
+				["SequenceStringSetting:Values"] = "scalar-should-lose",
+				["SequenceStringSetting:Values:0"] = "a",
+				["SequenceStringSetting:Values:1"] = "b",
+			});
+
+			await Assert.That(settings.Values.SequenceEqual(new[] { "a", "b" })).IsTrue();
+		}
+
+		[Test]
+		public async Task Bind_CommaScalar_NoChildren_StillBinds()
+		{
+			var settings = BindSequence<ISequenceStringSetting>(new Dictionary<string, string?>
+			{
+				["SequenceStringSetting:Values"] = "a,b,c",
+			});
+
+			await Assert.That(settings.Values.SequenceEqual(new[] { "a", "b", "c" })).IsTrue();
+		}
+
+		[Test]
+		public async Task Bind_WhitespaceScalar_ToStringArray_BindsEmpty()
+		{
+			var settings = BindSequence<ISequenceStringSetting>(new Dictionary<string, string?>
+			{
+				["SequenceStringSetting:Values"] = "   ",
+			});
+
+			await Assert.That(settings.Values.Length).IsEqualTo(0);
+		}
+
+		[Test]
+		public async Task Bind_EmptySequence_BindsEmpty()
+		{
+			var settings = BindSequence<ISequenceStringSetting>(new Dictionary<string, string?>());
+
+			await Assert.That(settings.Values.Length).IsEqualTo(0);
+		}
+
+		[Test]
+		public async Task Bind_ChildSequence_WithRootSection_ResolvesUnderPrefix()
+		{
+			var settings = BindSequence<ISequenceStringSetting>(new Dictionary<string, string?>
+			{
+				["MyRoot:SequenceStringSetting:Values:0"] = "a",
+				["MyRoot:SequenceStringSetting:Values:1"] = "b",
+			}, "MyRoot");
+
+			await Assert.That(settings.Values.SequenceEqual(new[] { "a", "b" })).IsTrue();
+		}
+
+		private static T BindSequence<T>(Dictionary<string, string?> data, string? rootSection = null) where T : class
+		{
+			var configuration = new ConfigurationBuilder().AddInMemoryCollection(data).Build();
+
+			return SettingsBuilder
+				.CreateBuilder(x => x.AddSectionBinder(new ConfigurationBinder(configuration, rootSection)))
+				.GetSettings<T>();
+		}
+
 		private IConfiguration GetConfiguration()
 		{
 			return new ConfigurationBuilder()
@@ -96,6 +214,21 @@ namespace ExistForAll.SimpleSettings.UnitTests
 			});
 
 			return sut;
+		}
+
+		public interface ISequenceStringSetting
+		{
+			string[] Values { get; set; }
+		}
+
+		public interface ISequenceIntSetting
+		{
+			int[] Numbers { get; set; }
+		}
+
+		public interface ISequenceStringListSetting
+		{
+			List<string> Items { get; set; }
 		}
 	}
 }

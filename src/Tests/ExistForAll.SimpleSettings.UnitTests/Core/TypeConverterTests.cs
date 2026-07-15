@@ -51,6 +51,54 @@ namespace ExistForAll.SimpleSettings.UnitTests.Core
 			await Assert.That(((int[])result!).SequenceEqual(new[] { -1 })).IsTrue();
 		}
 
+		[Test]
+		public async Task Convert_NullForArrayProperty_ReturnsEmptyArray()
+		{
+			var conversion = ResolveConversion<IIntArrayProp>(nameof(IIntArrayProp.Values));
+
+			var result = conversion.Convert(null);
+
+			await Assert.That(result is int[]).IsTrue();
+			await Assert.That(((int[])result!).Length).IsEqualTo(0);
+		}
+
+		[Test]
+		public async Task Convert_NullForListProperty_ReturnsEmptyList()
+		{
+			var conversion = ResolveConversion<IIntListProp>(nameof(IIntListProp.Values));
+
+			var result = conversion.Convert(null);
+
+			await Assert.That(result is List<int>).IsTrue();
+			await Assert.That(((List<int>)result!).Count).IsEqualTo(0);
+		}
+
+		[Test]
+		public async Task Convert_NullForEnumerableProperty_ReturnsEmptyArray()
+		{
+			var conversion = ResolveConversion<IIntEnumerableProp>(nameof(IIntEnumerableProp.Values));
+
+			var result = conversion.Convert(null);
+
+			await Assert.That(result is int[]).IsTrue();
+			await Assert.That(((int[])result!).Length).IsEqualTo(0);
+		}
+
+		[Test]
+		public async Task Convert_NullForListProperty_YieldsFreshInstancePerBind()
+		{
+			var conversion = ResolveConversion<IIntListProp>(nameof(IIntListProp.Values));
+
+			var first = (List<int>)conversion.Convert(null)!;
+			var second = (List<int>)conversion.Convert(null)!;
+
+			await Assert.That(ReferenceEquals(first, second)).IsFalse();
+
+			first.Add(99);
+
+			await Assert.That(second.Count).IsEqualTo(0);
+		}
+
 		private static PropertyConversion ResolveConversion<T>(string propertyName)
 		{
 			var options = new SettingsOptions(); // Converters auto-seeded: DateTime,Uri,Array,Enumerable,Enum,Default
@@ -69,6 +117,21 @@ namespace ExistForAll.SimpleSettings.UnitTests.Core
 		public interface IWithConverterOverride
 		{
 			[SettingsProperty(ConverterType = typeof(SentinelConverter))]
+			IEnumerable<int> Values { get; set; }
+		}
+
+		public interface IIntArrayProp
+		{
+			int[] Values { get; set; }
+		}
+
+		public interface IIntListProp
+		{
+			List<int> Values { get; set; }
+		}
+
+		public interface IIntEnumerableProp
+		{
 			IEnumerable<int> Values { get; set; }
 		}
 

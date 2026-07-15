@@ -87,6 +87,59 @@ namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 		}
 
 		[Test]
+		public async Task Convert_DelimitedString_ToIntList_MaterializesList()
+		{
+			var result = Build<IIntList>("IntList", nameof(IIntList.Values), "1,2,3");
+
+			await Assert.That(result.Values is List<int>).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([1, 2, 3])).IsTrue();
+		}
+
+		[Test]
+		public async Task Convert_DelimitedString_ToIntIList_MaterializesList()
+		{
+			var result = Build<IIntIList>("IntIList", nameof(IIntIList.Values), "1,2,3");
+
+			await Assert.That(result.Values is List<int>).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([1, 2, 3])).IsTrue();
+		}
+
+		[Test]
+		public async Task Convert_DelimitedString_ToIntICollection_MaterializesList()
+		{
+			var result = Build<IIntICollection>("IntICollection", nameof(IIntICollection.Values), "4,5,6");
+
+			await Assert.That(result.Values is List<int>).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([4, 5, 6])).IsTrue();
+		}
+
+		[Test]
+		public async Task Convert_DelimitedString_ToIntReadOnlyList_MaterializesList()
+		{
+			var result = Build<IIntReadOnlyList>("IntReadOnlyList", nameof(IIntReadOnlyList.Values), "7,8,9");
+
+			await Assert.That(result.Values is List<int>).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([7, 8, 9])).IsTrue();
+		}
+
+		[Test]
+		public async Task Convert_DelimitedString_ToIntReadOnlyCollection_MaterializesList()
+		{
+			var result = Build<IIntReadOnlyCollection>("IntReadOnlyCollection", nameof(IIntReadOnlyCollection.Values), "10,20,30");
+
+			await Assert.That(result.Values is List<int>).IsTrue();
+			await Assert.That(result.Values.SequenceEqual([10, 20, 30])).IsTrue();
+		}
+
+		[Test]
+		public async Task Convert_DelimitedString_ToDayOfWeekList_ParsesEachElement()
+		{
+			var result = Build<IDayOfWeekList>("DayOfWeekList", nameof(IDayOfWeekList.Values), "Monday,Friday");
+
+			await Assert.That(result.Values.SequenceEqual(new[] { DayOfWeek.Monday, DayOfWeek.Friday })).IsTrue();
+		}
+
+		[Test]
 		public async Task Convert_DelimitedString_ToEnumArray_ParsesEachElement()
 		{
 			var result = Build<IDayOfWeekArray>("DayOfWeekArray", nameof(IDayOfWeekArray.Values), "Monday,Friday");
@@ -175,6 +228,36 @@ namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 		public interface IUriArray
 		{
 			Uri[] Values { get; set; }
+		}
+
+		public interface IIntList
+		{
+			List<int> Values { get; set; }
+		}
+
+		public interface IIntIList
+		{
+			IList<int> Values { get; set; }
+		}
+
+		public interface IIntICollection
+		{
+			ICollection<int> Values { get; set; }
+		}
+
+		public interface IIntReadOnlyList
+		{
+			IReadOnlyList<int> Values { get; set; }
+		}
+
+		public interface IIntReadOnlyCollection
+		{
+			IReadOnlyCollection<int> Values { get; set; }
+		}
+
+		public interface IDayOfWeekList
+		{
+			List<DayOfWeek> Values { get; set; }
 		}
 	}
 }
