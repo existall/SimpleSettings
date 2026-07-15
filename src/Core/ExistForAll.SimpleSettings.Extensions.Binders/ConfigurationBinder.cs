@@ -64,7 +64,7 @@ namespace ExistForAll.SimpleSettings.Binders
 			{
 				var childValue = child.Value;
 				if (!string.IsNullOrEmpty(childValue))
-					(values ??= new List<string>()).Add(childValue);
+					(values ??= []).Add(childValue);
 			}
 
 			if (values is null)
