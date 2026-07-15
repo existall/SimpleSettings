@@ -28,11 +28,12 @@ namespace ExistForAll.SimpleSettings.Conversion
 
 		public object? Convert(object? value)
 		{
+			// AllowEmpty=false (VAL-02/D-13) rejects null AND null-or-whitespace strings, value-free (D-14).
+			if (_throwOnNull && (value == null || (value is string s && string.IsNullOrWhiteSpace(s))))
+				throw new SettingsPropertyNullException(_propertyName);
+
 			if (value == null)
 			{
-				if (_throwOnNull)
-					throw new SettingsPropertyNullException(_propertyName);
-
 				// A list null-result is a factory so each bind gets a fresh mutable List<T> (review B-3);
 				// arrays / IEnumerable / value-type defaults stay on the shared cached instance.
 				if (_nullResult is Func<object> listFactory)
