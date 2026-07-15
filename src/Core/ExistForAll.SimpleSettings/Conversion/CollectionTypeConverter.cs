@@ -22,7 +22,7 @@ namespace ExistForAll.SimpleSettings.Conversion
 		// The element type to convert each item to: the array's element type, or the IEnumerable<T> argument.
 		protected abstract Type GetElementType(Type settingsType);
 
-		public object Convert(object value, Type settingsType)
+		public virtual object Convert(object value, Type settingsType)
 		{
 			var elementType = GetElementType(settingsType);
 			var source = AsArray(value);

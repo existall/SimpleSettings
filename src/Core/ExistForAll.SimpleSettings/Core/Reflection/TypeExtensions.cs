@@ -24,5 +24,27 @@ namespace ExistForAll.SimpleSettings.Core.Reflection
 
 			return info.IsGenericType && info.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 		}
+
+		// Disjoint from IsEnumerable/IsArray: matches only the List<T> family the ListTypeConverter claims.
+		public static bool IsListLike(this Type type)
+		{
+			var info = type.GetTypeInfo();
+
+			if (!info.IsGenericType)
+				return false;
+
+			var definition = info.GetGenericTypeDefinition();
+
+			return definition == typeof(List<>)
+				|| definition == typeof(IList<>)
+				|| definition == typeof(ICollection<>)
+				|| definition == typeof(IReadOnlyList<>)
+				|| definition == typeof(IReadOnlyCollection<>);
+		}
+
+		public static bool IsCollectionShape(this Type type)
+		{
+			return type.IsArray || type.IsEnumerable() || type.IsListLike();
+		}
 	}
 }
