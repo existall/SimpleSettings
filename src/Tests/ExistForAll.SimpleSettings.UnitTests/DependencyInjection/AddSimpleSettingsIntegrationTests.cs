@@ -90,6 +90,48 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 			await Assert.That(() => services.AddSimpleSettings(null!)).Throws<ArgumentNullException>();
 		}
 
+		[Test]
+		public async Task AddSimpleSettings_RegistersSettingsCollection_ServingTheContainerInstance()
+		{
+			var services = new ServiceCollection();
+			services.AddSimpleSettings(o => o.AddAssemblies([typeof(IDiExampleSettings).Assembly]));
+
+			var provider = services.BuildServiceProvider();
+			var collection = provider.GetRequiredService<ISettingsCollection>();
+
+			// The collection serves the same startup-built instance the container resolves for the interface.
+			await Assert.That(ReferenceEquals(collection.GetSettings<IDiExampleSettings>(),
+				provider.GetRequiredService<IDiExampleSettings>())).IsTrue();
+		}
+
+		[Test]
+		public async Task AddSimpleSettings_OutOverload_SurfacesBoundCollection_AndPreservesChain()
+		{
+			var collection = new InMemoryCollection();
+			collection.Add(Section, nameof(IDiExampleSettings.Name), "out-value");
+
+			var services = new ServiceCollection();
+			var returned = services.AddSimpleSettings(out var settings, o =>
+			{
+				o.AddAssemblies([typeof(IDiExampleSettings).Assembly]);
+				o.AddSectionBinder(new InMemoryBinder(collection));
+			});
+
+			await Assert.That(ReferenceEquals(returned, services)).IsTrue();
+			await Assert.That(settings.GetSettings<IDiExampleSettings>().Name).IsEqualTo("out-value");
+		}
+
+		[Test]
+		public async Task AddSimpleSettings_OutOverload_SurfacesSameInstanceAsResolvedSingleton()
+		{
+			var services = new ServiceCollection();
+			services.AddSimpleSettings(out var settings, o => o.AddAssemblies([typeof(IDiExampleSettings).Assembly]));
+
+			var provider = services.BuildServiceProvider();
+
+			await Assert.That(ReferenceEquals(settings, provider.GetRequiredService<ISettingsCollection>())).IsTrue();
+		}
+
 		public interface IDiExampleSettings
 		{
 			string Name { get; set; }
