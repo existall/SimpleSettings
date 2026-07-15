@@ -3,7 +3,7 @@ namespace ExistForAll.SimpleSettings.Validations
     public class ValidationContext<T> : ValidationContext
     {
         public ValidationContext(T settings)
-            : base(settings!)
+            : base(settings)
         {
             Settings = settings;
         }

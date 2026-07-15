@@ -23,9 +23,25 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 		}
 
 		[Test]
-		public async Task PropertyValidator_RunsAgainstThatPropertyValue()
+		public async Task PropertyValidator_WhenValueInvalid_Throws()
 		{
-			await Assert.That(() => Build<IPropertyValidated>()).Throws<SettingsValidationException>();
+			// Bind an explicitly invalid value (-5) so the failure is distinct from the unbound default (0) —
+			// this proves the validator observed the BOUND value, not just the default.
+			var collection = new InMemoryCollection();
+			collection.Add("PropertyValidated", nameof(IPropertyValidated.Port), "-5");
+
+			await Assert.That(() => Build<IPropertyValidated>(collection)).Throws<SettingsValidationException>();
+		}
+
+		[Test]
+		public async Task PropertyValidator_WhenValueValid_DoesNotThrow()
+		{
+			var collection = new InMemoryCollection();
+			collection.Add("PropertyValidated", nameof(IPropertyValidated.Port), "8080");
+
+			var result = Build<IPropertyValidated>(collection);
+
+			await Assert.That(result.Port).IsEqualTo(8080);
 		}
 
 		[Test]
@@ -35,6 +51,22 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 				.Throws<SettingsValidationException>();
 
 			await Assert.That(exception!.Errors.Count).IsEqualTo(2);
+		}
+
+		[Test]
+		public async Task ObjectAndPropertyValidators_BothFail_AggregateWithObjectErrorFirst()
+		{
+			// A type carrying BOTH an object-level and a property-level validator, each failing, aggregates
+			// into ONE exception; the object error is accumulated before the property error (runs object-first).
+			var collection = new InMemoryCollection();
+			collection.Add("BothValidated", nameof(IBothValidated.Port), "-1");
+
+			var exception = await Assert.That(() => Build<IBothValidated>(collection))
+				.Throws<SettingsValidationException>();
+
+			await Assert.That(exception!.Errors.Count).IsEqualTo(2);
+			await Assert.That(exception.Errors[0].SettingsName).IsEqualTo("Object");
+			await Assert.That(exception.Errors[1].SettingsName).IsEqualTo("Port");
 		}
 
 		[Test]
@@ -72,6 +104,21 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 			var text = exception!.ToString();
 			await Assert.That(text.Contains("ApiKey failed policy")).IsTrue();
 			await Assert.That(text.Contains(Sentinel)).IsFalse();
+		}
+
+		[Test]
+		public async Task ThrowingValidator_IsWrappedValueFree_NotLeaked()
+		{
+			// A validator that throws (rather than returning a result) with the secret in its message must be
+			// surfaced value-free: the invocation is wrapped in SettingsValidatorInvocationException, whose
+			// ToString() carries no bound value and does not chain the leaking inner.
+			var collection = new InMemoryCollection();
+			collection.Add("Throwing", nameof(IThrowing.ApiKey), Sentinel);
+
+			var exception = await Assert.That(() => Build<IThrowing>(collection))
+				.Throws<SettingsValidatorInvocationException>();
+
+			await Assert.That(exception!.ToString().Contains(Sentinel)).IsFalse();
 		}
 
 		[Test]
@@ -117,6 +164,13 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 			string Name { get; set; }
 		}
 
+		[SettingsValidator(typeof(BothObjectValidator))]
+		public interface IBothValidated
+		{
+			[SettingsProperty(ValidatorType = typeof(PositivePortValidator))]
+			int Port { get; set; }
+		}
+
 		[SettingsValidator(typeof(CrossPropertyValidator))]
 		public interface ICrossProperty
 		{
@@ -130,6 +184,12 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 			string ApiKey { get; set; }
 		}
 
+		[SettingsValidator(typeof(ThrowingValidator))]
+		public interface IThrowing
+		{
+			string ApiKey { get; set; }
+		}
+
 		public interface INoValidators
 		{
 			string Name { get; set; }
@@ -137,9 +197,6 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 		private class FailingObjectValidator : ISettingValidation<IObjectValidated>
 		{
-			public ValidationResult Validate(ValidationContext context)
-				=> Validate((ValidationContext<IObjectValidated>)context);
-
 			public ValidationResult Validate(ValidationContext<IObjectValidated> context)
 			{
 				var result = new ValidationResult();
@@ -150,17 +207,11 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 		private class PassingObjectValidator : ISettingValidation<IObjectValid>
 		{
-			public ValidationResult Validate(ValidationContext context)
-				=> Validate((ValidationContext<IObjectValid>)context);
-
 			public ValidationResult Validate(ValidationContext<IObjectValid> context) => new();
 		}
 
 		private class PositivePortValidator : ISettingValidation<int>
 		{
-			public ValidationResult Validate(ValidationContext context)
-				=> Validate((ValidationContext<int>)context);
-
 			public ValidationResult Validate(ValidationContext<int> context)
 			{
 				var result = new ValidationResult();
@@ -172,9 +223,6 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 		private class TwoErrorValidator : ISettingValidation<ITwoErrors>
 		{
-			public ValidationResult Validate(ValidationContext context)
-				=> Validate((ValidationContext<ITwoErrors>)context);
-
 			public ValidationResult Validate(ValidationContext<ITwoErrors> context)
 			{
 				var result = new ValidationResult();
@@ -184,11 +232,18 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 			}
 		}
 
+		private class BothObjectValidator : ISettingValidation<IBothValidated>
+		{
+			public ValidationResult Validate(ValidationContext<IBothValidated> context)
+			{
+				var result = new ValidationResult();
+				result.AddError(new ValidationError("Object", "object-level failure"));
+				return result;
+			}
+		}
+
 		private class CrossPropertyValidator : ISettingValidation<ICrossProperty>
 		{
-			public ValidationResult Validate(ValidationContext context)
-				=> Validate((ValidationContext<ICrossProperty>)context);
-
 			public ValidationResult Validate(ValidationContext<ICrossProperty> context)
 			{
 				var result = new ValidationResult();
@@ -201,15 +256,18 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 
 		private class RedactionValidator : ISettingValidation<IRedaction>
 		{
-			public ValidationResult Validate(ValidationContext context)
-				=> Validate((ValidationContext<IRedaction>)context);
-
 			public ValidationResult Validate(ValidationContext<IRedaction> context)
 			{
 				var result = new ValidationResult();
 				result.AddError(new ValidationError("ApiKey", "ApiKey failed policy"));
 				return result;
 			}
+		}
+
+		private class ThrowingValidator : ISettingValidation<IThrowing>
+		{
+			public ValidationResult Validate(ValidationContext<IThrowing> context)
+				=> throw new InvalidOperationException($"boom with {context.Settings!.ApiKey}");
 		}
 	}
 }

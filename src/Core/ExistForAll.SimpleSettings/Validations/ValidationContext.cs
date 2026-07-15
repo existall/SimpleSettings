@@ -2,7 +2,7 @@ namespace ExistForAll.SimpleSettings.Validations
 {
     public class ValidationContext
     {
-        public ValidationContext(object settings)
+        public ValidationContext(object? settings)
         {
             Settings = settings;
         }

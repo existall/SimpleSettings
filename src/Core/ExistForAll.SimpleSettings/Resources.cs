@@ -42,7 +42,7 @@ namespace ExistForAll.SimpleSettings
 				all properties from type [{type.FullName}]";
 
 		public static string PropertyNotAllowNullMessage(string propertyName) =>
-			$@"[{propertyName}] is marked as Null not allowed, yet the value is null. please provide value via binder or attribute";
+			$@"[{propertyName}] is marked as Null not allowed, yet the value is missing (null, empty, or whitespace). please provide value via binder or attribute";
 
 		public static string TypeIsNotInterface(string typeName) =>
 			$@"[{typeName}] is not an interface, SimpleSettings supports only interfaces";
@@ -66,6 +66,11 @@ namespace ExistForAll.SimpleSettings
 
 			return builder.ToString();
 		}
+
+		// Value-free like the rest of the family: names only the validator and the failure type, never the
+		// settings value the validator inspected (which may be a secret). See S1.
+		public static string SettingsValidatorInvocationExceptionMessage(Type validatorType, Type failureType) =>
+			$"Validator [{validatorType.Name}] threw [{failureType.Name}] while validating. The settings value is omitted to avoid leaking secrets into logs.";
 
     }
 }

@@ -64,13 +64,13 @@ namespace ExistForAll.SimpleSettings
 				propertyPlan.Property.SetValue(instance, propertyValue);
 			}
 
-			// Runs AFTER the property-set loop so cross-property rules see the fully-populated instance (D-09).
+			// Runs AFTER the property-set loop so cross-property rules see the fully-populated instance.
 			RunValidators(instance, plan);
 		}
 
-		// Zero-allocation short-circuit for validator-free types (review B-2): a single field read returns
-		// before anything is allocated, keeping the warm populate path byte-identical to the pre-validation
-		// build. The error list is allocated lazily only after a validator actually produces an error.
+		// Zero-allocation short-circuit for validator-free types: a single field read returns before anything is
+		// allocated, keeping the warm populate path byte-identical to the pre-validation build. The error list
+		// is allocated lazily only after a validator actually produces an error.
 		private static void RunValidators(object instance, SettingsPlan plan)
 		{
 			if (!plan.HasValidators)
@@ -90,7 +90,7 @@ namespace ExistForAll.SimpleSettings
 				errors = InvokeValidator(propertyPlan.ValidatorType, propertyValue, errors);
 			}
 
-			// The single aggregate-and-throw entry point shared with Plan 04's DI runner (review S-3): the
+			// The single aggregate-and-throw entry point shared with the DI-resolved runner: the
 			// thrown contract cannot drift between the two paths.
 			if (errors is not null)
 				SettingsValidationException.ThrowIfAny(errors);
@@ -98,18 +98,21 @@ namespace ExistForAll.SimpleSettings
 
 		private static List<ValidationError>? InvokeValidator(Type validatorType, object? target, List<ValidationError>? errors)
 		{
-			var validator = Activator.CreateInstance(validatorType)!;
-
-			var closedContextType = ResolveContextType(validatorType);
-
-			var context = Activator.CreateInstance(closedContextType, target)!;
-
-			// ISettingValidation<T> : ISettingsValidator declares TWO Validate overloads, so the parameterless
-			// GetMethod("Validate") throws AmbiguousMatchException — select the overload by its parameter type
-			// explicitly (review S-2).
-			var validateMethod = validatorType.GetMethod(nameof(ISettingsValidator.Validate), new[] { closedContextType })!;
-
-			var result = (ValidationResult)validateMethod.Invoke(validator, new[] { context })!;
+			ValidationResult result;
+			try
+			{
+				// The validator type comes from a compile-time attribute; instantiate it and dispatch through the
+				// non-generic ISettingsValidator.Validate. ISettingValidation<T>'s default implementation forwards
+				// to the author's generic overload, so no reflection over the Validate methods is needed.
+				var validator = (ISettingsValidator)Activator.CreateInstance(validatorType)!;
+				result = validator.Validate(new ValidationContext(target));
+			}
+			catch (Exception e)
+			{
+				// A validator threw instead of returning a result. Surface value-free: the inner may embed a
+				// secret the validator read, so it is never chained and the value never enters the message. See S1.
+				throw new SettingsValidatorInvocationException(validatorType, e.GetType());
+			}
 
 			foreach (var error in result.Errors)
 			{
@@ -118,21 +121,6 @@ namespace ExistForAll.SimpleSettings
 			}
 
 			return errors;
-		}
-
-		private static Type ResolveContextType(Type validatorType)
-		{
-			foreach (var contract in validatorType.GetInterfaces())
-			{
-				var info = contract.GetTypeInfo();
-				if (info.IsGenericType && info.GetGenericTypeDefinition() == typeof(ISettingValidation<>))
-				{
-					var validatedType = info.GetGenericArguments()[0];
-					return typeof(ValidationContext<>).MakeGenericType(validatedType);
-				}
-			}
-
-			return typeof(ValidationContext);
 		}
 
 		private SettingsPlan GetOrBuildPlan(Type settings, SettingsOptions options)
