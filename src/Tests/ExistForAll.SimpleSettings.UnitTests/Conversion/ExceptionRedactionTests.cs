@@ -1,5 +1,7 @@
 using ExistForAll.SimpleSettings.Binder;
+using ExistForAll.SimpleSettings.Binders;
 using ExistForAll.SimpleSettings.Conversion;
+using Microsoft.Extensions.Configuration;
 
 namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 {
@@ -54,6 +56,58 @@ namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 			await AssertRedacted(ex, nameof(ILeakyConverterSetting.Value), nameof(String));
 		}
 
+		[Test]
+		public async Task Convert_SecretInSequenceElement_DoesNotLeakValue()
+		{
+			// D-06/S1 on the ConfigurationBinder GetChildren() sequence path: an int[] element that fails to
+			// convert is wrapped value-free — the secret in a LATER element never reaches the ToString() chain.
+			var ex = CaptureSequenceConversionFailure<IIntArraySetting>(nameof(IIntArraySetting.Values), "1", Secret);
+			await AssertRedacted(ex, nameof(IIntArraySetting.Values), nameof(Int32));
+		}
+
+		[Test]
+		public async Task Convert_SecretInFirstSequenceElement_DoesNotLeakValue()
+		{
+			// S-6: element position must not matter — the throw site is the shared per-element convert, so a
+			// secret in the FIRST element is redacted identically.
+			var ex = CaptureSequenceConversionFailure<IIntArraySetting>(nameof(IIntArraySetting.Values), Secret, "2");
+			await AssertRedacted(ex, nameof(IIntArraySetting.Values), nameof(Int32));
+		}
+
+		[Test]
+		public async Task Convert_SecretInListSequenceElement_DoesNotLeakValue()
+		{
+			// S-6: the List<T> converter wraps into a List<T> only AFTER the element-convert throw site, so the
+			// redaction contract holds identically for the List shape as for the array shape.
+			var ex = CaptureSequenceConversionFailure<IIntListSetting>(nameof(IIntListSetting.Values), "1", Secret);
+			await AssertRedacted(ex, nameof(IIntListSetting.Values), "List");
+		}
+
+		private static SettingsPropertyValueException CaptureSequenceConversionFailure<T>(string key, params string[] elements)
+			where T : class
+		{
+			var data = new Dictionary<string, string?>();
+			var section = SectionOf<T>();
+			for (var i = 0; i < elements.Length; i++)
+			{
+				data[$"{section}:{key}:{i}"] = elements[i];
+			}
+
+			var configuration = new ConfigurationBuilder().AddInMemoryCollection(data).Build();
+			var builder = SettingsBuilder.CreateBuilder(x => x.AddSectionBinder(new ConfigurationBinder(configuration)));
+
+			try
+			{
+				builder.GetSettings<T>();
+			}
+			catch (SettingsPropertyValueException e)
+			{
+				return e;
+			}
+
+			throw new Exception($"Expected a SettingsPropertyValueException for [{typeof(T).Name}], but none was thrown.");
+		}
+
 		private static SettingsPropertyValueException CaptureConversionFailure<T>(string key, string value)
 			where T : class
 		{
@@ -102,6 +156,16 @@ namespace ExistForAll.SimpleSettings.UnitTests.Conversion
 		public interface IUriSetting
 		{
 			Uri Endpoint { get; set; }
+		}
+
+		public interface IIntArraySetting
+		{
+			int[] Values { get; set; }
+		}
+
+		public interface IIntListSetting
+		{
+			List<int> Values { get; set; }
 		}
 
 		public interface ILeakyConverterSetting
