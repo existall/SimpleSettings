@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784049803270,
+  "lastUpdate": 1784139218852,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -871,6 +871,80 @@ window.BENCHMARK_DATA = {
           {
             "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
             "value": 17572816,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "52a2c6f06901384fdd35fe8e9882bdde19337bc9",
+          "message": "Phase 4 (Waves 1–2): collection binding + validation engine (#33)\n\n* test(04-01): add failing tests for List<T>-family conversion\n\n- Add fixture interfaces for List/IList/ICollection/IReadOnlyList/IReadOnlyCollection<int>\n- Assert each materializes a List<int> from a delimited scalar\n- Add per-element DayOfWeek list test (element converter chain)\n\n* feat(04-01): add List<T>-family converter with disjoint shape predicates\n\n- Add IsListLike/IsCollectionShape predicates disjoint from IsEnumerable/IsArray\n- Add ListTypeConverter subclassing CollectionTypeConverter; materialize via cached per-element factory delegate (no warm-path reflection, S-4/A1)\n- Promote CollectionTypeConverter.Convert to virtual\n- Register ListTypeConverter after EnumerableTypeConverter, before EnumTypeConverter (disjoint, order preserved)\n\n* test(04-01): add failing tests for empty-not-null collection defaults\n\n- Unbound int[] -> empty int[], unbound List<int> -> empty List<int>\n- Regression: unbound IEnumerable<int> -> empty int[]\n- B-3: two null-binds of List<int> return reference-distinct, mutation-isolated instances\n\n* feat(04-01): empty-not-null default for every collection shape\n\n- CreateNullResult branches IsArray -> IsEnumerable -> IsListLike -> value-type/null\n- Array/IEnumerable keep the shared cached empty array\n- List family binds a fresh empty List<T> per bind via a baked factory delegate (B-3), reusing the existing _nullResult slot so PropertyPlan[] layout is unchanged\n- PropertyConversion.Convert invokes the factory when _nullResult is Func<object>\n\n* test(04-02): add failing child-sequence bind tests for ConfigurationBinder\n\n- child-section sequence binds string[]/int[]/List<string> elements\n- children win over coexisting scalar\n- comma-scalar regression guard (prod override)\n- whitespace scalar and empty sequence bind empty (no [\" \"] token)\n- RootSection prefix honored on the sequence path\n\n* feat(04-02): bind collections from IConfiguration child-section sequences\n\n- grant InternalsVisibleTo to the Binders assembly so ConfigurationBinder\n  reuses Core's internal IsCollectionShape predicate (single source of truth)\n- add GetChildren() branch: indexed sub-sections materialize a right-sized\n  string[] via a manual two-pass walk (no LINQ on the bind path)\n- children win over a coexisting scalar; empty sequence falls through\n- whitespace/empty scalar on a collection target skips SetNewValue so COLL-02's\n  empty-not-null default applies (avoids the [\" \"] token pitfall)\n- element chain and RootSection prefix inherited unchanged\n\n* test(04-02): D-06 secret redaction on the child-sequence bind path\n\n- Convert_SecretInSequenceElement_DoesNotLeakValue: int[] secret in a later\n  element is absent from the whole SettingsPropertyValueException.ToString()\n- first-element case (S-6): element position must not matter\n- List<int> case (S-6): redaction holds across the array and list converter shapes\n- drives the new ConfigurationBinder GetChildren() sequence path, not the scalar\n  InMemoryBinder path\n\n* feat(04-03): sync validation contracts, context ctors, validator attribute, aggregate exception\n\n- ISettingsValidator/ISettingValidation<T>.Validate return ValidationResult (drop Task<>) (D-07)\n- ValidationContext(object)/ValidationContext<T>(T) constructors carry the settings instance (D-08)\n- SettingsValidatorAttribute (AttributeTargets.Interface, Type ValidatorType) (D-11)\n- SettingsValidationException : SimpleSettingsException + static ThrowIfAny shared aggregate-and-throw (D-10/S-3)\n- Resources.SettingsValidationExceptionMessage composed only from author ValidationError text (D-12)\n\n* test(04-03): add failing tests for core-path settings validation\n\n- object-level [SettingsValidator] and property-level [SettingsProperty(ValidatorType)] invocation\n- multi-error aggregation into one SettingsValidationException\n- cross-property rule observing the fully-populated instance\n- D-12 value-free exception message\n- B-2 validator-free short-circuit fast path\n\n* feat(04-03): run declared validators in the core populate path\n\n- thread object-level [SettingsValidator] and property-level [SettingsProperty(ValidatorType)] into the cached plan at build (D-11)\n- SettingsPlan.HasValidators computed once at build; post-populate hook short-circuits before any allocation, error list allocated lazily (review B-2)\n- validators run after the property-set loop so cross-property rules see the full instance (D-09)\n- reflective dispatch selects the Validate overload via GetMethod(name, new[]{closedContextType}) + MakeGenericType context, avoiding AmbiguousMatchException (review S-2)\n- aggregate-and-throw routed through shared SettingsValidationException.ThrowIfAny (review S-3/D-10)\n\n* test(04-05): add failing AllowEmpty=false empty/whitespace rejection tests\n\n- AllowEmpty=false rejects \"\" and whitespace via SettingsPropertyNullException (value-free)\n- AllowEmpty=true still binds \"\" and whitespace as-is\n\n* feat(04-05): reject empty/whitespace strings for AllowEmpty=false (VAL-02)\n\n- Convert now throws value-free SettingsPropertyNullException for null or null-or-whitespace strings when AllowEmpty=false\n- AllowEmpty=true falls through to normal conversion (empty/whitespace bound as-is)\n- 04-01 list null-result factory dispatch preserved\n\n* fix(04-02): single-pass child-sequence bind — reload-safe, drops empty elements\n\n- Enumerate the live config view once (a second GetChildren() pass could race a\n  reload and overrun the count-sized array or inject null holes) — review MED-1.\n- Drop empty entries for parity with the comma-scalar split (RemoveEmptyEntries),\n  so [\"1\",\"\",\"3\"] no longer diverges from \"1,,3\" and crashes int[]/List<int> — review MED-2.\n- PR #33 review comment 1.\n\n* refactor(04-05): check value==null once in PropertyConversion.Convert\n\n- Consolidate the two null branches into one block (throw if required, else the\n  null-result/factory), keeping the whitespace-string reject and the AllowEmpty=true\n  fall-through intact. PR #33 review comment 2.\n\n* refactor(04-03): dispatch validators via ISettingValidation<T> DIM bridge; guard invocation value-free\n\n- ISettingValidation<T> default-implements the base Validate, forwarding to the generic overload, so\n  ValuesPopulator dispatches through a plain ISettingsValidator cast — no MakeGenericType/GetMethod/Invoke\n  reflection and no AmbiguousMatchException workaround (PR #33 comment 4).\n- Wrap validator invocation: a validator that throws is surfaced as the value-free\n  SettingsValidatorInvocationException (never chains the inner, which may hold a secret) — review MED-3.\n- ValidationContext ctor accepts object? (drops the !); fixtures implement only the generic Validate; add\n  property-validator positive/discriminating, object+property aggregation, and throwing-validator coverage.\n\n* test(04-02): lock child-sequence element order + cover empty-element drop\n\n- Assert order-sensitive SequenceEqual on indexed-sequence cases (IsEquivalentTo was order-insensitive\n  and would not catch an order regression) — review test-gap T1.\n- Add an interspersed-empty-element case proving parity with the comma-scalar — review MED-2.\n\n* chore(04): strip internal review-ID tokens from code comments\n\n* refactor(04): fold object validator onto [SettingsSection].ValidatorType (PR #33 comment #3)\n\nReuse the existing section attribute for the object-level validator instead of a separate\nSettingsValidatorAttribute (now deleted; it was unreleased, so not a breaking change).\nValuesPopulator reads the validator Type from SettingsSectionAttribute.ValidatorType; the\ndispatch and value-free exception wrapping are unchanged.\n\nBecause [SettingsSection] is the scan-discovery marker, the deliberately-failing validation\nfixtures would now be eagerly built by the whole-assembly ScanAssemblies tests. Making them\ninternal is not viable: the Reflection.Emit proxy generator emits into a random-GUID dynamic\nassembly that cannot implement an internal interface (verified: TypeLoadException). So the\nfixtures move to a new, never-scanned ExistForAll.SimpleSettings.UnitTests.Fixtures library,\nreferenced by UnitTests but never passed to ScanAssemblies.\n\nAdds a regression test that the merged validator also runs under the assembly-scan path.\nFull suite 143/143 on net10; build clean on net8 + net10.",
+          "timestamp": "2026-07-15T21:11:16+03:00",
+          "tree_id": "b77a79e6d778d95177f57c2e14a9abd33a9e7456",
+          "url": "https://github.com/existall/SimpleSettings/commit/52a2c6f06901384fdd35fe8e9882bdde19337bc9"
+        },
+        "date": 1784139218390,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17909680,
             "unit": "bytes"
           }
         ]
