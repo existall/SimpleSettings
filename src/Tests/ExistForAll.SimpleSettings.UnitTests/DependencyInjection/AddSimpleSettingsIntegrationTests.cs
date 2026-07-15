@@ -168,32 +168,41 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 		[Test]
 		public async Task AddSimpleSettings_DoesNotRunDiValidators_UntilValidateIsCalled()
 		{
+			var counter = new InvocationCounter();
 			var services = new ServiceCollection();
 			services.AddSimpleSettings(o => o.AddAssemblies([typeof(IDiValidatedSettings).Assembly]));
-			services.AddSingleton<ValidatorDependency>();
-			services.AddSingleton<ISettingValidation<IDiValidatedSettings>, FailingDiValidator>();
+			services.AddSingleton(counter);
+			services.AddSingleton<ISettingValidation<IDiValidatedSettings>, CountingDiValidator>();
 
-			// AddSimpleSettings and BuildServiceProvider must complete without running the DI validator.
 			var provider = services.BuildServiceProvider();
 
-			await Assert.That(() => provider.ValidateSimpleSettings()).Throws<SettingsValidationException>();
+			// AddSimpleSettings and BuildServiceProvider must complete without running the DI validator.
+			await Assert.That(counter.Count).IsEqualTo(0);
+
+			provider.ValidateSimpleSettings();
+
+			// The explicit call runs it exactly once.
+			await Assert.That(counter.Count).IsEqualTo(1);
 		}
 
 		[Test]
 		public async Task ValidateSimpleSettings_ResolvesValidatorFromFreshScope_ForScopedDependencies()
 		{
+			var counter = new InvocationCounter();
 			var services = new ServiceCollection();
 			services.AddSimpleSettings(o => o.AddAssemblies([typeof(IScopedValidatedSettings).Assembly]));
+			services.AddSingleton(counter);
 			services.AddScoped<ScopedDependency>();
 			services.AddScoped<ISettingValidation<IScopedValidatedSettings>, ScopedDependentValidator>();
 
-			// Under scope validation, resolving the scoped validator from the root provider would throw; the
-			// runner resolves it from a fresh scope, so this succeeds.
+			// Resolving the scoped validator from the root provider would throw under scope validation; the runner
+			// resolves it from a fresh scope, so this succeeds and the scoped validator actually runs.
 			var provider = services.BuildServiceProvider(validateScopes: true);
 
 			var result = provider.ValidateSimpleSettings();
 
 			await Assert.That(ReferenceEquals(result, provider)).IsTrue();
+			await Assert.That(counter.Count).IsEqualTo(1);
 		}
 
 		[Test]
@@ -213,11 +222,32 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 
 			var provider = services.BuildServiceProvider();
 
+			// Guard against a vacuous pass: the secret must actually be bound onto the instance the validator reads.
+			await Assert.That(provider.GetRequiredService<IDiSecretSettings>().ApiKey).IsEqualTo(secret);
+
 			// A throwing validator surfaces value-free: the invocation exception carries only type names.
 			var exception = await Assert.That(() => provider.ValidateSimpleSettings())
 				.Throws<SettingsValidatorInvocationException>();
 
 			await Assert.That(exception!.ToString().Contains(secret)).IsFalse();
+		}
+
+		[Test]
+		public async Task ValidateSimpleSettings_WithNoDiValidators_IsNoOp_AndReturnsProvider()
+		{
+			var services = new ServiceCollection();
+			services.AddSimpleSettings(o => o.AddAssemblies([typeof(IDiExampleSettings).Assembly]));
+			var provider = services.BuildServiceProvider();
+
+			await Assert.That(ReferenceEquals(provider.ValidateSimpleSettings(), provider)).IsTrue();
+		}
+
+		[Test]
+		public async Task ValidateSimpleSettings_WithoutAddSimpleSettings_Throws()
+		{
+			var provider = new ServiceCollection().BuildServiceProvider();
+
+			await Assert.That(() => provider.ValidateSimpleSettings()).Throws<InvalidOperationException>();
 		}
 
 		public interface IDiExampleSettings
@@ -248,6 +278,11 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 		{
 		}
 
+		public sealed class InvocationCounter
+		{
+			public int Count { get; set; }
+		}
+
 		public sealed class FailingDiValidator : ISettingValidation<IDiValidatedSettings>
 		{
 			public FailingDiValidator(ValidatorDependency dependency)
@@ -267,13 +302,30 @@ namespace ExistForAll.SimpleSettings.UnitTests.DependencyInjection
 			public ValidationResult Validate(ValidationContext<IDiValidatedSettings> context) => new();
 		}
 
+		public sealed class CountingDiValidator : ISettingValidation<IDiValidatedSettings>
+		{
+			private readonly InvocationCounter _counter;
+
+			public CountingDiValidator(InvocationCounter counter) => _counter = counter;
+
+			public ValidationResult Validate(ValidationContext<IDiValidatedSettings> context)
+			{
+				_counter.Count++;
+				return new();
+			}
+		}
+
 		public sealed class ScopedDependentValidator : ISettingValidation<IScopedValidatedSettings>
 		{
-			public ScopedDependentValidator(ScopedDependency dependency)
-			{
-			}
+			private readonly InvocationCounter _counter;
 
-			public ValidationResult Validate(ValidationContext<IScopedValidatedSettings> context) => new();
+			public ScopedDependentValidator(ScopedDependency dependency, InvocationCounter counter) => _counter = counter;
+
+			public ValidationResult Validate(ValidationContext<IScopedValidatedSettings> context)
+			{
+				_counter.Count++;
+				return new();
+			}
 		}
 
 		public sealed class ThrowingDiValidator : ISettingValidation<IDiSecretSettings>

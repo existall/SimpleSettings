@@ -21,7 +21,11 @@ namespace ExistForAll.SimpleSettings.Extensions.GenericHost
         {
             if (provider == null) throw new ArgumentNullException(nameof(provider));
 
-            provider.GetRequiredService<ISettingsValidationRunner>().Validate();
+            var runner = provider.GetService<ISettingsValidationRunner>()
+                ?? throw new InvalidOperationException(
+                    "ValidateSimpleSettings requires AddSimpleSettings to have been called during service registration.");
+
+            runner.Validate();
             return provider;
         }
     }
