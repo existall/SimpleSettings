@@ -50,6 +50,7 @@ namespace ExistForAll.SimpleSettings.Extensions.GenericHost
 
             services.AddSingleton<ISettingsCollection>(settingsCollection);
             services.AddSingleton<ISettingsProvider>(new SettingsProvider(settingsCollection, settingsBuilder));
+            services.AddSingleton<ISettingsValidationRunner, SettingsValidationRunner>();
 
             return settingsCollection;
         }
