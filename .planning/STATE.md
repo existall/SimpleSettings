@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 04
 current_phase_name: collection-validation-binding
 status: executing
-stopped_at: Completed 04-05-PLAN.md (VAL-02) — Phase 4 all 5 plans done
-last_updated: "2026-07-15T13:58:04.988Z"
+stopped_at: Completed 04-04-PLAN.md (VAL-01 DI path + API-02, Wave 3) — all 5 Phase 4 plans landed; phase verify + secure + mark-complete pending
+last_updated: "2026-07-15T18:00:00.000Z"
 last_activity: 2026-07-15
-last_activity_desc: Phase 04 execution started
+last_activity_desc: Phase 04 Plan 04 (Wave 3) executed + reviewed
 progress:
   total_phases: 6
   completed_phases: 2
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
   percent: 33
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 
 ## Current Position
 
-Phase: 04 (collection-validation-binding) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
-Last activity: 2026-07-15 — Phase 04 execution started
+Phase: 04 (collection-validation-binding) — EXECUTING (all 5 plans landed; verify + secure + mark-complete pending)
+Plan: 5 of 5 — complete
+Status: Wave 3 (04-04) executed + reviewed; ready for phase verify
+Last activity: 2026-07-15 — Phase 04 Plan 04 (Wave 3) executed + reviewed
 
 Progress: [███░░░░░░░] 33%
 
@@ -64,6 +64,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 04 P02 | 12min | 2 tasks | 4 files |
 | Phase 04 P03 | 5min | 2 tasks | 10 files |
 | Phase 04 P05 | 3min | 1 tasks | 2 files |
+| Phase 04 P04 | ~35min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,7 @@ Recent decisions affecting current work:
 - [Phase ?]: HasValidators short-circuit on the cached plan gates the validation hook before any allocation (protects the B-2 benchmark allocation gate)
 - [Phase 04]: 04-05 VAL-02: reuse value-free SettingsPropertyNullException for empty/whitespace rejection — already excluded from the ValuesPopulator:122 redaction filter, so no filter change
 - [Phase 04]: 04-05 VAL-02: reject guard placed ahead of 04-01's Func<object> list null-result factory dispatch and gated on _throwOnNull; accept path and factory dispatch untouched
+- [Phase 04]: 04-04 VAL-01 DI path + API-02: ISettingsCollection exposed via a DI singleton + an AddSimpleSettings(out ISettingsCollection, Action?) overload; deferred opt-in IServiceProvider.ValidateSimpleSettings() runs DI-registered ISettingValidation<T> from a fresh scope (IServiceScopeFactory), dispatches via the DIM bridge (no reflection), and throws the same value-free SettingsValidationException as the core path via the shared ThrowIfAny. Runner is internal; DI path is additive (reads no attribute).
 
 ### Pending Todos
 
