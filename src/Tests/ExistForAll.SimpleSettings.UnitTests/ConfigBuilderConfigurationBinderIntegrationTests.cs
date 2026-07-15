@@ -1,3 +1,4 @@
+using System.Linq;
 using ExistForAll.SimpleSettings.Binder;
 using ExistForAll.SimpleSettings.Binders;
 using Microsoft.Extensions.Configuration;
@@ -79,7 +80,7 @@ namespace ExistForAll.SimpleSettings.UnitTests
 		}
 
 		[Test]
-		public async Task Bind_ChildSequence_ToStringArray_BindsEachElement()
+		public async Task Bind_ChildSequence_ToStringArray_BindsEachElementInOrder()
 		{
 			var settings = BindSequence<ISequenceStringSetting>(new Dictionary<string, string?>
 			{
@@ -88,11 +89,11 @@ namespace ExistForAll.SimpleSettings.UnitTests
 				["SequenceStringSetting:Values:2"] = "c",
 			});
 
-			await Assert.That(settings.Values).IsEquivalentTo(new[] { "a", "b", "c" });
+			await Assert.That(settings.Values.SequenceEqual(new[] { "a", "b", "c" })).IsTrue();
 		}
 
 		[Test]
-		public async Task Bind_ChildSequence_ToIntArray_BindsEachElement()
+		public async Task Bind_ChildSequence_ToIntArray_BindsEachElementInOrder()
 		{
 			var settings = BindSequence<ISequenceIntSetting>(new Dictionary<string, string?>
 			{
@@ -101,11 +102,26 @@ namespace ExistForAll.SimpleSettings.UnitTests
 				["SequenceIntSetting:Numbers:2"] = "3",
 			});
 
-			await Assert.That(settings.Numbers).IsEquivalentTo(new[] { 1, 2, 3 });
+			await Assert.That(settings.Numbers.SequenceEqual(new[] { 1, 2, 3 })).IsTrue();
 		}
 
 		[Test]
-		public async Task Bind_ChildSequence_ToStringList_BindsEachElement()
+		public async Task Bind_ChildSequence_WithEmptyElements_DropsThemLikeCommaScalar()
+		{
+			// Empty entries are dropped for parity with the comma-scalar RemoveEmptyEntries, so an interspersed
+			// empty element does not crash the int[] bind (review MED-2).
+			var settings = BindSequence<ISequenceIntSetting>(new Dictionary<string, string?>
+			{
+				["SequenceIntSetting:Numbers:0"] = "1",
+				["SequenceIntSetting:Numbers:1"] = "",
+				["SequenceIntSetting:Numbers:2"] = "3",
+			});
+
+			await Assert.That(settings.Numbers.SequenceEqual(new[] { 1, 3 })).IsTrue();
+		}
+
+		[Test]
+		public async Task Bind_ChildSequence_ToStringList_BindsEachElementInOrder()
 		{
 			var settings = BindSequence<ISequenceStringListSetting>(new Dictionary<string, string?>
 			{
@@ -113,7 +129,7 @@ namespace ExistForAll.SimpleSettings.UnitTests
 				["SequenceStringListSetting:Items:1"] = "y",
 			});
 
-			await Assert.That(settings.Items).IsEquivalentTo(new List<string> { "x", "y" });
+			await Assert.That(settings.Items.SequenceEqual(new List<string> { "x", "y" })).IsTrue();
 		}
 
 		[Test]
@@ -126,7 +142,7 @@ namespace ExistForAll.SimpleSettings.UnitTests
 				["SequenceStringSetting:Values:1"] = "b",
 			});
 
-			await Assert.That(settings.Values).IsEquivalentTo(new[] { "a", "b" });
+			await Assert.That(settings.Values.SequenceEqual(new[] { "a", "b" })).IsTrue();
 		}
 
 		[Test]
@@ -137,7 +153,7 @@ namespace ExistForAll.SimpleSettings.UnitTests
 				["SequenceStringSetting:Values"] = "a,b,c",
 			});
 
-			await Assert.That(settings.Values).IsEquivalentTo(new[] { "a", "b", "c" });
+			await Assert.That(settings.Values.SequenceEqual(new[] { "a", "b", "c" })).IsTrue();
 		}
 
 		[Test]
@@ -168,7 +184,7 @@ namespace ExistForAll.SimpleSettings.UnitTests
 				["MyRoot:SequenceStringSetting:Values:1"] = "b",
 			}, "MyRoot");
 
-			await Assert.That(settings.Values).IsEquivalentTo(new[] { "a", "b" });
+			await Assert.That(settings.Values.SequenceEqual(new[] { "a", "b" })).IsTrue();
 		}
 
 		private static T BindSequence<T>(Dictionary<string, string?> data, string? rootSection = null) where T : class
