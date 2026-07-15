@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v2.0.0
 milestone_name: milestone
-current_phase: 4
-current_phase_name: AOT/Trim Honesty & Documentation
-status: verifying
-stopped_at: Phase 3 context gathered
-last_updated: "2026-07-14T13:07:28.003Z"
-last_activity: 2026-07-14
-last_activity_desc: Phase 03 complete, transitioned to Phase 4
+current_phase: 04
+current_phase_name: collection-validation-binding
+status: executing
+stopped_at: Completed 04-05-PLAN.md (VAL-02) — Phase 4 all 5 plans done
+last_updated: "2026-07-15T13:58:04.988Z"
+last_activity: 2026-07-15
+last_activity_desc: Phase 04 execution started
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 2
-  total_plans: 4
-  completed_plans: 4
-  percent: 40
+  total_plans: 9
+  completed_plans: 8
+  percent: 33
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Correctness of binding — config → strongly-typed settings maps accurately across every supported shape (sections, arrays/enumerables, defaults, nullable, custom converters).
-**Current focus:** Phase 03 — public-surface-packaging-binder-cleanup
+**Current focus:** Phase 04 — collection-validation-binding
 
 ## Current Position
 
-Phase: 4 — AOT/Trim Honesty & Documentation
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-07-14 — Phase 03 complete, transitioned to Phase 4
+Phase: 04 (collection-validation-binding) — EXECUTING
+Plan: 5 of 5
+Status: Ready to execute
+Last activity: 2026-07-15 — Phase 04 execution started
 
-Progress: [████░░░░░░] 40%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -60,6 +60,10 @@ Progress: [████░░░░░░] 40%
 | Phase 02 P02 | 3min | 1 tasks | 1 files |
 | Phase 03 P01 | 3min | 3 tasks | 4 files |
 | Phase 03 P02 | 4min | 2 tasks | 4 files |
+| Phase 04 P01 | 6min | 2 tasks | 8 files |
+| Phase 04 P02 | 12min | 2 tasks | 4 files |
+| Phase 04 P03 | 5min | 2 tasks | 10 files |
+| Phase 04 P05 | 3min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -78,6 +82,13 @@ Recent decisions affecting current work:
 - [Phase 02]: TUnit invocation uses --treenode-filter (Microsoft.Testing.Platform); legacy --filter returns zero tests / exit 5.
 - [Phase 02]: TEST-03 (Plan 02) scalar Uri/DateTime conversion locked via ScalarConversionTests (Uri->new Uri, DateTime->ParseExact yyyy-MM-dd, one format-mismatch negative asserting exception type only); no array-of-* or redaction duplication. Phase 2 success criterion #5 scalar coverage met on net10 (net8 via CI).
 - [Phase 03]: SRC-02 (Plan 02): CLI binder lookahead + split-by-entry-point exe skip. SkipFirstArgument default false (AddArguments binds arg[0]); AddCommandLine sources GetCommandLineArgs() and sets SkipFirstArgument=true internally. Prefixed next-token = new key (diverges from Microsoft). Empty-safe zero-alloc prefix detection; CLI-path secret redaction (S1) held via store-only BindPropertySettings + regression test.
+- [Phase ?]: [Phase 04]: COLL-01/COLL-02 (Plan 01): ListTypeConverter handles the List<T> family (List/IList/ICollection/IReadOnlyList/IReadOnlyCollection<T>) via a cached per-element Func<Array,object> factory — no MakeGenericType/Activator on the warm path (S-4/A1). IsListLike is a NEW disjoint predicate (IsEnumerable unchanged, Pitfall 1); IsCollectionShape is the shared shape check COLL-03 reuses.
+- [Phase ?]: [Phase 04]: COLL-02 (Plan 01): unbound array/List/IEnumerable bind an empty collection not null; the List null-result is fresh-per-bind (baked Func<object> factory in the existing _nullResult slot, so PropertyPlan[] layout is unchanged) while arrays/IEnumerable keep the shared cached empty array (review B-3).
+- [Phase ?]: 04-02: ConfigurationBinder binds collections from child-section sequences (children win, comma-scalar preserved, whitespace/empty -> empty); Binders reuses Core internal IsCollectionShape via InternalsVisibleTo
+- [Phase ?]: VAL-01 core path: object + property validators run post-populate, aggregated via shared SettingsValidationException.ThrowIfAny (reused by Plan 04 DI path)
+- [Phase ?]: HasValidators short-circuit on the cached plan gates the validation hook before any allocation (protects the B-2 benchmark allocation gate)
+- [Phase 04]: 04-05 VAL-02: reuse value-free SettingsPropertyNullException for empty/whitespace rejection — already excluded from the ValuesPopulator:122 redaction filter, so no filter change
+- [Phase 04]: 04-05 VAL-02: reject guard placed ahead of 04-01's Func<object> list null-result factory dispatch and gated on _throwOnNull; accept path and factory dispatch untouched
 
 ### Pending Todos
 
@@ -87,18 +98,22 @@ None yet.
 
 - None blocking. (T7/ENG-01 `SettingsClassGenerator` concurrency race **closed** — shipped pre-GSD via #29: double-checked locking, warm path lock-free, same/distinct-interface `Barrier` stress tests.)
 
+### Roadmap Evolution
+
+- Phase 4 inserted: Phase 4 Collection & Validation Binding formalized (COLL-02/COLL-03/VAL-01/VAL-02/API-02); AOT/Docs renumbered to Phase 5, beta to Phase 6
+
 ## Deferred Items
 
 Items acknowledged and carried forward:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Held feature | VAL-01 Validations API (D1) | Held (owner-driven) | 2026-07-13 |
+| Held feature | VAL-01 Validations API (D1) | Promoted → Phase 4 (2026-07-14) | 2026-07-13 |
 | Held feature | EQ-01 EqualityCompererCreator (D2) | Held | 2026-07-13 |
 | Perf | PERF-03 compiled setter (P3b) | Deferred (profile-gated) | 2026-07-13 |
 
 ## Session Continuity
 
-Last session: 2026-07-14T12:55:01.741Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-public-surface-packaging-binder-cleanup/03-CONTEXT.md
+Last session: 2026-07-15T13:58:04.982Z
+Stopped at: Completed 04-05-PLAN.md (VAL-02) — Phase 4 all 5 plans done
+Resume file: None

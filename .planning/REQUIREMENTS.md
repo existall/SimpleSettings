@@ -57,6 +57,14 @@ Remaining open work (from `FIX-PLAN.md`), batched toward the first `v2.0.0-beta`
 - [x] **PKG-02**: Float `Microsoft.Extensions.*` floor per-TFM (`8.0.x` for net8) or justify the pin (A4)
 - [x] **SRC-02**: Command-line binder parses quoted values with spaces correctly and skips `arg[0]` (A6)
 
+### Collection & Validation Binding
+
+- [x] **COLL-02**: Unset `T[]`/`List<T>` bind an empty collection, never `null` (only `IEnumerable<T>` does today); fix in `TypeConverter.ConvertValue` null branch (client pre-beta #1)
+- [x] **COLL-03**: Bind collections from YAML/child-section sequences via `GetChildren()` in `ConfigurationBinder.BindPropertySettings`; comma-scalar MUST still bind (prod `MultiHost__CommonHosts`); children win over scalar; empty/whitespace/empty-sequence → empty (never `[""]`); each element flows the inner converter chain; re-verify S1/SEC-01 redaction (client pre-beta #2)
+- [x] **VAL-01**: Wire `ISettingValidation<T>` + `SettingsPropertyAttribute.ValidatorType` into the populate path so a settings object validates itself incl. cross-property rules (promoted from Held D1; reconcile with the `validate-settings` branch) (client pre-beta #3)
+- [x] **VAL-02**: `[SettingsProperty(AllowEmpty=false)]` rejects `""`/whitespace/unsubstituted `${ENV:-}` at bind, not just `null`; `TypeConverter.ValidateNullAcceptance` (naturally rides on VAL-01) (client pre-beta)
+- [ ] **API-02**: `AddSimpleSettings(...)` exposes the `ISettingsCollection` (return value or resolvable service — shape TBD in planning) (client pre-beta #4)
+
 ### AOT/Trim & Documentation
 
 - [ ] **AOT-01**: Annotate reflection entry points (`[RequiresDynamicCode]`/`[RequiresUnreferencedCode]`) and/or document the AOT/trim limitation before stable (A1)
@@ -72,7 +80,6 @@ Deferred / held. Tracked but not in the current roadmap.
 
 ### Held (do NOT delete)
 
-- **VAL-01**: Wire the `Validations/*` API + `SettingsPropertyAttribute.ValidatorType` into the populate path (reconcile with the `validate-settings` branch) — D1, HELD
 - **EQ-01**: Delete or fix+wire `EqualityCompererCreator` (has a latent invalid-IL bug) for value-equality on generated types — D2, HELD
 
 ### Deferred
@@ -104,18 +111,23 @@ Deferred / held. Tracked but not in the current roadmap.
 | PKG-01 | Phase 3 | Complete |
 | PKG-02 | Phase 3 | Complete |
 | SRC-02 | Phase 3 | Complete |
-| AOT-01 | Phase 4 | Pending |
-| DOC-01 | Phase 4 | Pending |
-| REL-01 | Phase 5 | Pending |
+| COLL-02 | Phase 4 | Complete |
+| COLL-03 | Phase 4 | Complete |
+| VAL-01 | Phase 4 | Complete |
+| VAL-02 | Phase 4 | Complete |
+| API-02 | Phase 4 | Pending |
+| AOT-01 | Phase 5 | Pending |
+| DOC-01 | Phase 5 | Pending |
+| REL-01 | Phase 6 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 15 total
-- Mapped to phases: 15
+- v1 requirements: 20 total (added Phase 4 engine reqs COLL-02/COLL-03/VAL-02/API-02 + promoted VAL-01 from Held)
+- Mapped to phases: 20
 - Unmapped: 0 ✓
-- Complete: 4 (Phase 1 SEC-01/SEC-02/EXC-01 #27/#28 + ENG-01/T7 #29); Pending: 11
+- Complete: 12 (Phase 1 SEC-01/SEC-02/EXC-01 #27/#28; Phase 2 COLL-01/TEST-01/TEST-02/TEST-03 + ENG-01/T7 #29; Phase 3 API-01/PKG-01/PKG-02/SRC-02 #31); Pending: 8 (Phase 4 COLL-02/COLL-03/VAL-01/VAL-02/API-02; Phase 5 AOT-01/DOC-01; Phase 6 REL-01)
 - Validated (shipped, no phase): 13
 
 ---
 *Requirements defined: 2026-07-13*
-*Last updated: 2026-07-14 — ENG-01/T7 marked complete (#29). GSD is now the source of truth; FIX-PLAN.md frozen as a historical reference. Reconciled from session handoff + git.*
+*Last updated: 2026-07-14 — Phase 4 "Collection & Validation Binding" formalized (COLL-02/COLL-03/VAL-02/API-02 added; VAL-01 promoted from Held D1); AOT/Docs → Phase 5, beta → Phase 6. ENG-01/T7 complete (#29). GSD is the source of truth; FIX-PLAN.md frozen as historical reference.*
