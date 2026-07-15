@@ -14,6 +14,7 @@
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="Tests/ExistForAll.SimpleSettings.UnitTests/ExistForAll.SimpleSettings.UnitTests.csproj" />
+    <Project Path="Tests/ExistForAll.SimpleSettings.UnitTests.Fixtures/ExistForAll.SimpleSettings.UnitTests.Fixtures.csproj" />
   </Folder>
   <Folder Name="/Performance/">
     <Project Path="performance/ExistForAll.SimpleSettings.Benchmark/ExistForAll.SimpleSettings.Benchmark.csproj" />

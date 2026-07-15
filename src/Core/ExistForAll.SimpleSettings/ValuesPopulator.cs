@@ -162,10 +162,10 @@ namespace ExistForAll.SimpleSettings
 				}
 			}
 
-			// Read the object-level [SettingsValidator] once per type at plan build, mirroring the per-property
-			// attribute read above — never on the hot populate path.
+			// Read the object-level validator ([SettingsSection].ValidatorType) once per type at plan build,
+			// mirroring the per-property attribute read above — never on the hot populate path.
 			var objectValidatorType = settings.GetTypeInfo()
-				.GetCustomAttribute<SettingsValidatorAttribute>(inherit: true)?.ValidatorType;
+				.GetCustomAttribute<SettingsSectionAttribute>(inherit: true)?.ValidatorType;
 
 			var plan = new SettingsPlan(settings, options, propertyPlans, objectValidatorType);
 

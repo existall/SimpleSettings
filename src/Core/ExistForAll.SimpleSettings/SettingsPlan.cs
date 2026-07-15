@@ -40,8 +40,8 @@ namespace ExistForAll.SimpleSettings
 
 		public PropertyPlan[] Properties { get; }
 
-		// The [SettingsValidator] object-level validator declared on the settings interface, resolved once at
-		// plan build (null when none is declared).
+		// The object-level validator ([SettingsSection].ValidatorType) declared on the settings interface,
+		// resolved once at plan build (null when none is declared).
 		public Type? ObjectValidatorType { get; }
 
 		// Computed once at plan build so the post-populate hook can short-circuit with a single field read

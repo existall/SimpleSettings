@@ -1,11 +1,9 @@
 using ExistForAll.SimpleSettings.Binder;
-using ExistForAll.SimpleSettings.Validations;
+using ExistForAll.SimpleSettings.UnitTests.Fixtures;
 
 namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 {
-	// Fixtures are intentionally NON-settings-indicated (no "Settings" suffix, no [SettingsSection]/
-	// ISettingsSection) and resolved via GetSettings<T>() so a deliberately-failing validator never trips
-	// ScanAssemblies-based tests elsewhere in the suite.
+	// Fixtures live in the never-scanned ExistForAll.SimpleSettings.UnitTests.Fixtures project; resolved via GetSettings<T>().
 	public class SettingsValidationTests
 	{
 		[Test]
@@ -129,6 +127,17 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 			await Assert.That(result).IsNotNull();
 		}
 
+		[Test]
+		public async Task ScanAssemblies_WhenSectionCarriesValidator_RunsItAndSurfacesFailure()
+		{
+			// Guards the scan path for the merged [SettingsSection(ValidatorType=...)]: scanning the Fixtures
+			// assembly (whose discovered sections carry failing validators) must surface a validation failure.
+			var builder = SettingsBuilder.CreateBuilder();
+
+			await Assert.That(() => builder.ScanAssemblies(typeof(IObjectValidated).Assembly))
+				.Throws<SimpleSettingsException>();
+		}
+
 		private const string Sentinel = "SUPER_SECRET_API_KEY_VALUE";
 
 		private static T Build<T>(InMemoryCollection? collection = null) where T : class
@@ -138,136 +147,6 @@ namespace ExistForAll.SimpleSettings.UnitTests.SimpleSettings
 				: SettingsBuilder.CreateBuilder(x => x.AddSectionBinder(new InMemoryBinder(collection)));
 
 			return builder.GetSettings<T>();
-		}
-
-		[SettingsValidator(typeof(FailingObjectValidator))]
-		public interface IObjectValidated
-		{
-			string Name { get; set; }
-		}
-
-		[SettingsValidator(typeof(PassingObjectValidator))]
-		public interface IObjectValid
-		{
-			string Name { get; set; }
-		}
-
-		public interface IPropertyValidated
-		{
-			[SettingsProperty(ValidatorType = typeof(PositivePortValidator))]
-			int Port { get; set; }
-		}
-
-		[SettingsValidator(typeof(TwoErrorValidator))]
-		public interface ITwoErrors
-		{
-			string Name { get; set; }
-		}
-
-		[SettingsValidator(typeof(BothObjectValidator))]
-		public interface IBothValidated
-		{
-			[SettingsProperty(ValidatorType = typeof(PositivePortValidator))]
-			int Port { get; set; }
-		}
-
-		[SettingsValidator(typeof(CrossPropertyValidator))]
-		public interface ICrossProperty
-		{
-			int Min { get; set; }
-			int Max { get; set; }
-		}
-
-		[SettingsValidator(typeof(RedactionValidator))]
-		public interface IRedaction
-		{
-			string ApiKey { get; set; }
-		}
-
-		[SettingsValidator(typeof(ThrowingValidator))]
-		public interface IThrowing
-		{
-			string ApiKey { get; set; }
-		}
-
-		public interface INoValidators
-		{
-			string Name { get; set; }
-		}
-
-		private class FailingObjectValidator : ISettingValidation<IObjectValidated>
-		{
-			public ValidationResult Validate(ValidationContext<IObjectValidated> context)
-			{
-				var result = new ValidationResult();
-				result.AddError(new ValidationError(nameof(IObjectValidated.Name), "name is invalid"));
-				return result;
-			}
-		}
-
-		private class PassingObjectValidator : ISettingValidation<IObjectValid>
-		{
-			public ValidationResult Validate(ValidationContext<IObjectValid> context) => new();
-		}
-
-		private class PositivePortValidator : ISettingValidation<int>
-		{
-			public ValidationResult Validate(ValidationContext<int> context)
-			{
-				var result = new ValidationResult();
-				if (context.Settings <= 0)
-					result.AddError(new ValidationError("Port", "port must be positive"));
-				return result;
-			}
-		}
-
-		private class TwoErrorValidator : ISettingValidation<ITwoErrors>
-		{
-			public ValidationResult Validate(ValidationContext<ITwoErrors> context)
-			{
-				var result = new ValidationResult();
-				result.AddError(new ValidationError("Name", "first failure"));
-				result.AddError(new ValidationError("Name", "second failure"));
-				return result;
-			}
-		}
-
-		private class BothObjectValidator : ISettingValidation<IBothValidated>
-		{
-			public ValidationResult Validate(ValidationContext<IBothValidated> context)
-			{
-				var result = new ValidationResult();
-				result.AddError(new ValidationError("Object", "object-level failure"));
-				return result;
-			}
-		}
-
-		private class CrossPropertyValidator : ISettingValidation<ICrossProperty>
-		{
-			public ValidationResult Validate(ValidationContext<ICrossProperty> context)
-			{
-				var result = new ValidationResult();
-				var settings = context.Settings!;
-				if (settings.Min > settings.Max)
-					result.AddError(new ValidationError("Min", "Min must not exceed Max"));
-				return result;
-			}
-		}
-
-		private class RedactionValidator : ISettingValidation<IRedaction>
-		{
-			public ValidationResult Validate(ValidationContext<IRedaction> context)
-			{
-				var result = new ValidationResult();
-				result.AddError(new ValidationError("ApiKey", "ApiKey failed policy"));
-				return result;
-			}
-		}
-
-		private class ThrowingValidator : ISettingValidation<IThrowing>
-		{
-			public ValidationResult Validate(ValidationContext<IThrowing> context)
-				=> throw new InvalidOperationException($"boom with {context.Settings!.ApiKey}");
 		}
 	}
 }

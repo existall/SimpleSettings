@@ -18,5 +18,6 @@
     <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings.Extensions.Binders\ExistForAll.SimpleSettings.Binders.csproj" />
     <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings\ExistForAll.SimpleSettings.csproj" />
     <ProjectReference Include="..\..\Core\ExistForAll.SimpleSettings.Extensions.GenericHost\ExistForAll.SimpleSettings.Extensions.GenericHost.csproj" />
+    <ProjectReference Include="..\ExistForAll.SimpleSettings.UnitTests.Fixtures\ExistForAll.SimpleSettings.UnitTests.Fixtures.csproj" />
   </ItemGroup>
 </Project>
