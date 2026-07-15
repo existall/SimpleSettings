@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Text;
+using ExistForAll.SimpleSettings.Validations;
 
 namespace ExistForAll.SimpleSettings
 {
@@ -47,6 +49,23 @@ namespace ExistForAll.SimpleSettings
 
         public static string SettingsOptionAttributeTypeMessage(Type type) =>
             $"SimpleSettings support Attribute indication of interfaces, the type provided [{type.FullName}] is not an attribute.";
+
+		// Composed ONLY from author-supplied ValidationError text (SettingsName + ErrorMessage). The inspected
+		// settings values are deliberately never embedded — a validator may run against a secret, and this
+		// message reaches logs via Exception.ToString(). See D-12/S1 and SettingsValidationException.
+		public static string SettingsValidationExceptionMessage(IReadOnlyList<ValidationError> errors)
+		{
+			var builder = new StringBuilder();
+			builder.Append("Settings validation failed with ").Append(errors.Count).Append(" error(s):");
+
+			for (var i = 0; i < errors.Count; i++)
+			{
+				var error = errors[i];
+				builder.Append(Environment.NewLine).Append(" - [").Append(error.SettingsName).Append("] ").Append(error.ErrorMessage);
+			}
+
+			return builder.ToString();
+		}
 
     }
 }
