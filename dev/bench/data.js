@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784140156917,
+  "lastUpdate": 1784463656967,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -969,6 +969,80 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/existall/SimpleSettings/commit/1388c5c03bd2d9d67da90f1a57980a0fd6304f71"
         },
         "date": 1784140156480,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17909680,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0c858faa53420d95da1fe412bd151d54017e7c49",
+          "message": "Phase 4 Wave 3: DI-resolved validator path + ISettingsCollection exposure (VAL-01 DI path, API-02) (#35)\n\n* docs: refresh session handoff (Phase 4 Waves 1-2 + comment #3 merged; Wave 3 next)\n\n* feat: expose ISettingsCollection from AddSimpleSettings (API-02/D-15)\n\nRegister the built ISettingsCollection as a DI singleton and add an\nAddSimpleSettings(out ISettingsCollection, Action?) overload that surfaces\nthe same instance while preserving the IServiceCollection fluent chain.\n\n* feat: DI-resolved settings validator path (VAL-01 DI path)\n\nAdd a deferred, opt-in ISettingsValidationRunner resolved via\nIServiceProvider.ValidateSimpleSettings(). It resolves DI-registered\nISettingValidation<T> from a fresh scope (so scoped-dependency validators\nwork), dispatches through the ISettingsValidator cast (the default-interface\nbridge, no reflection), and aggregates via the shared\nSettingsValidationException.ThrowIfAny so the thrown contract is identical to\nthe core populate path. A throwing validator surfaces value-free as\nSettingsValidatorInvocationException (type-only, no bound value, no inner).\n\n* refactor: address Wave 3 review findings\n\n- ValidateSimpleSettings surfaces a caller-facing error when AddSimpleSettings\n  was not called (internal runner type no longer leaks into the message).\n- Trim runner comments to one line each; drop internal planning-ID reference.\n- Harden tests: deferral test is now an invocation-counter timing probe\n  (0 runs at build, 1 on the explicit call); scope test asserts the scoped\n  validator actually executed; redaction test pins that the secret is bound;\n  add no-op (no DI validators) and misuse coverage.\n\n* docs(planning): Phase 4 Wave 3 (04-04) summary, review, plan patch, state\n\nRecord the VAL-01 DI path + API-02 execution: 04-04-SUMMARY.md, the\ngsd-code-reviewer 04-04-REVIEW.md, STATE.md (all 5 Phase 4 plans landed;\nverify+secure pending), and patch the plan's superseded reflective-dispatch\ntext to the shipped default-interface-bridge dispatch.",
+          "timestamp": "2026-07-19T15:18:44+03:00",
+          "tree_id": "46ae4cd9e1c5952f4eedc59c8e0c96e898a90a94",
+          "url": "https://github.com/existall/SimpleSettings/commit/0c858faa53420d95da1fe412bd151d54017e7c49"
+        },
+        "date": 1784463656711,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
