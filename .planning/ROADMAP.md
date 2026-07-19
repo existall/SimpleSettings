@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status (2026-07-14):** Phases 1–3 complete (Phase 1 #27/#28, Phase 2 #30, Phase 3 #31; ENG-01/T7 #29). `master` @ `7f9e17c`. Active phase is **Phase 4 — Collection & Validation Binding** (new engine phase for the client pre-beta requirements); AOT/Trim & Docs renumbered to Phase 5, first beta to Phase 6.
+**Status (2026-07-19):** Phases 1–4 complete (Phase 1 #27/#28, Phase 2 #30, Phase 3 #31, Phase 4 #33/#34/#35; ENG-01/T7 #29). `master` @ `0c858fa`. Active phase is **Phase 5 — AOT/Trim Honesty & Documentation**; first beta is Phase 6.
 
 The binding engine already ships and works. This milestone is a hardening + pre-stable
 cleanup pass that batches every remaining breaking change and safety fix before cutting the
@@ -25,7 +25,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 - [x] **Phase 1: Exception Safety & Public Hierarchy** — ✓ COMPLETE (S1 #27, C2 #28 merged 2026-07-14) - No secret leaks; one catchable, structured `SimpleSettingsException` base
 - [x] **Phase 2: Binding Correctness & Engine Test Hardening** - Collections/nullable/converters verified; generator race closed by tests *(ENG-01/T7 done #29; COLL-01 + TEST-01/02/03 remain)* (completed 2026-07-14)
 - [x] **Phase 3: Public Surface, Packaging & Binder Cleanup** - Meaningful public surface; per-TFM deps; correct command-line parsing (completed 2026-07-14)
-- [ ] **Phase 4: Collection & Validation Binding** - Empty/sequence collection binding, working settings validation, and DI collection surface (client pre-beta engine requirements)
+- [x] **Phase 4: Collection & Validation Binding** — ✓ COMPLETE (Waves 1–3 merged #33/#34/#35, 2026-07-19) - Empty/sequence collection binding, working settings validation, and DI collection surface (client pre-beta engine requirements)
 - [ ] **Phase 5: AOT/Trim Honesty & Documentation** - Honest AOT/trim signals; canonically-named docs
 - [ ] **Phase 6: First v2.0.0-beta Release** - Batched breaking changes ship as an installable pre-release
 
@@ -92,6 +92,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 **Goal**: Collections bind correctly across empty, comma-scalar, and YAML-sequence shapes; declared settings validation actually runs; and the DI extension exposes the settings collection — the client-requested engine features batched before beta.
 **Depends on**: Phase 3
 **Requirements**: COLL-02, COLL-03, VAL-01, VAL-02, API-02
+**Status**: ✓ COMPLETE — Waves 1–3 merged (#33 Waves 1–2, #34 planning, #35 Wave 3) to `master` @ `0c858fa` on 2026-07-19. All 6 success criteria MET (VERIFICATION.md — 6/6, non-vacuous tests); security gate cleared (SECURITY.md — 15/15 threats closed, D-06 secret-redaction gate signed off); suite 153/153 on net8 + net10.
 **Success Criteria** (what must be TRUE):
 
   1. An unset `T[]` / `List<T>` / `IEnumerable<T>` binds to an empty collection, never `null` (COLL-02).
@@ -101,7 +102,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
   5. `AddSimpleSettings(...)` exposes the `ISettingsCollection` (return value or resolvable service) (API-02).
   6. After COLL-03 edits `ConfigurationBinder.BindPropertySettings`, the S1/SEC-01 secret-redaction invariant is re-verified; suite green on net8 + net10.
 
-**Plans**: 4/5 plans executed
+**Plans**: 5/5 plans complete
 
 **Wave 1**
 
@@ -115,7 +116,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-04-PLAN.md — API-02 ISettingsCollection exposure (DI singleton + out-overload, D-15) + VAL-01 deferred DI-resolved validator runner (D-11/Q3) [Wave 3, depends on 04-03]
+- [x] 04-04-PLAN.md — API-02 ISettingsCollection exposure (DI singleton + out-overload, D-15) + VAL-01 deferred DI-resolved validator runner (D-11/Q3, DIM-bridge dispatch) [Wave 3, depends on 04-03]
 
 ### Phase 5: AOT/Trim Honesty & Documentation
 
@@ -154,6 +155,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Exception Safety & Public Hierarchy | n/a (shipped) | ✓ Complete | 2026-07-14 (#27/#28) |
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
 | 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete    | 2026-07-14 |
-| 4. Collection & Validation Binding | 4/5 | In Progress|  |
+| 4. Collection & Validation Binding | 5/5 | ✓ Complete | 2026-07-19 (#35) |
 | 5. AOT/Trim Honesty & Documentation | 0/TBD | Not started | - |
 | 6. First v2.0.0-beta Release | 0/TBD | Not started | - |
