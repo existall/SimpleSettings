@@ -18,7 +18,15 @@ namespace ExistForAll.SimpleSettings.Extensions.GenericHost
             return services;
         }
 
-        private static void IntegrateSimpleSettings(this IServiceCollection services,
+        public static IServiceCollection AddSimpleSettings(this IServiceCollection services,
+            out ISettingsCollection settings,
+            Action<ISettingsBuilderOptions>? action = null)
+        {
+            settings = IntegrateSimpleSettings(services, action);
+            return services;
+        }
+
+        private static ISettingsCollection IntegrateSimpleSettings(this IServiceCollection services,
             Action<ISettingsBuilderOptions>? action = null)
         {
             SettingsBuilderOptions? options = null;
@@ -40,7 +48,11 @@ namespace ExistForAll.SimpleSettings.Extensions.GenericHost
                 services.AddSingleton(settings.Key, settings.Value);
             }
 
+            services.AddSingleton<ISettingsCollection>(settingsCollection);
             services.AddSingleton<ISettingsProvider>(new SettingsProvider(settingsCollection, settingsBuilder));
+            services.AddSingleton<ISettingsValidationRunner, SettingsValidationRunner>();
+
+            return settingsCollection;
         }
     }
 }
