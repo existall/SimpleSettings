@@ -464,13 +464,13 @@ public class EmailSettingsValidator : ISettingValidation<IEmailSenderSettings>
 
 **Everything else in this research is `[VERIFIED]` against source or `[CITED]` from a Phase 3/4 sign-off — no user confirmation needed for the API facts, the legacy inventory, or the security invariants.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Which docs/ page holds the deep security guidance?**
+1. **Which docs/ page holds the deep security guidance?** — **RESOLVED (05-03):** a dedicated new `docs/Security.md` (cleaner separation + a stable README deep-link target).
    - What we know: D-04 says depth lives in docs/; D-05 says refresh in place. `Extend Simple Config.md` (extension/behavior) or a new dedicated page are both viable.
    - What's unclear: page placement (explicitly Claude's discretion).
    - Recommendation: add a "Security & behavior" section to the renamed extend page, or a short new `docs/Security.md` if it grows; planner picks.
-2. **README logo asset** (see A2).
+2. **README logo asset** (see A2). — **RESOLVED (05-04):** absolute raw URL `https://raw.githubusercontent.com/existall/SimpleSettings/master/icon.png` (nuget.org renders only absolute HTTPS image URLs; `<PackageIcon>` keeps the packed local `icon.png`).
    - Recommendation: default to the packed local `icon.png`; confirm with user if a hosted brand logo is preferred.
 
 ## Environment Availability
