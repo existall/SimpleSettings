@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 05
 current_phase_name: Documentation
 status: executing
-stopped_at: Phase 5 Plan 01 complete — docs/ canonicalized (extension guide renamed, 5 inbound links repointed, SimpleConfig parenthetical purged). Next plan 05-02.
-last_updated: "2026-07-20T09:10:04.850Z"
+stopped_at: Completed 05-02 (package metadata token fix). Next plan 05-03.
+last_updated: "2026-07-20T09:13:52.970Z"
 last_activity: 2026-07-20
-last_activity_desc: Completed 05-01-PLAN.md — docs canonicalization
+last_activity_desc: Completed 05-02 (package metadata token fix)
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 13
-  completed_plans: 10
-  percent: 77
+  completed_plans: 12
+  percent: 92
 ---
 
 # Project State
@@ -29,11 +29,11 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 ## Current Position
 
 Phase: 05 (Documentation) — EXECUTING
-Next: Execute plan 05-02
-Status: Executing Phase 05 — plan 05-01 complete
-Last activity: 2026-07-20 — Completed 05-01 (docs canonicalization)
+Next: Execute plan 05-03
+Status: Executing Phase 05 — plan 05-02 complete
+Last activity: 2026-07-20 — Completed 05-02 (package metadata token fix)
 
-Progress: [████████░░] 77%
+Progress: [█████████░] 92%
 
 ## Performance Metrics
 
@@ -66,6 +66,7 @@ Progress: [████████░░] 77%
 | Phase 04 P05 | 3min | 1 tasks | 2 files |
 | Phase 04 P04 | ~35min | 2 tasks | 5 files |
 | Phase 05 P01 | 5min | 2 tasks | 5 files |
+| Phase 05 P02 | 3min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,7 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-05 VAL-02: reuse value-free SettingsPropertyNullException for empty/whitespace rejection — already excluded from the ValuesPopulator:122 redaction filter, so no filter change
 - [Phase 04]: 04-05 VAL-02: reject guard placed ahead of 04-01's Func<object> list null-result factory dispatch and gated on _throwOnNull; accept path and factory dispatch untouched
 - [Phase 04]: 04-04 VAL-01 DI path + API-02: ISettingsCollection exposed via a DI singleton + an AddSimpleSettings(out ISettingsCollection, Action?) overload; deferred opt-in IServiceProvider.ValidateSimpleSettings() runs DI-registered ISettingValidation<T> from a fresh scope (IServiceScopeFactory), dispatches via the DIM bridge (no reflection), and throws the same value-free SettingsValidationException as the core path via the shared ThrowIfAny. Runner is internal; DI path is additive (reads no attribute).
+- [Phase ?]: 05-02: Replaced legacy SimpleConfig PackageTags token with canonical SimpleSettings; fixed Description typo appliaction->application
 
 ### Pending Todos
 
@@ -119,6 +121,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-07-20T09:09:53.421Z
-Stopped at: Phase 5 planned — 4 plans (2 waves), plan-checker PASSED; ready to execute
-Resume file: .planning/phases/05-documentation/05-CONTEXT.md
+Last session: 2026-07-20T09:13:52.964Z
+Stopped at: Completed 05-02 (package metadata token fix). Next plan 05-03.
+Resume file: None
