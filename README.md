@@ -76,3 +76,20 @@ serviceProvider.ValidateSimpleSettings();
 ```
 
 `ValidateSimpleSettings()` extends `IServiceProvider` and must be called **after** `BuildServiceProvider()`; attribute and `ValidatorType` validators run inline during binding and need no such call. See [Security & Behavior](https://github.com/existall/SimpleSettings/blob/master/docs/Security.md) for the full validation model.
+
+## Security notes
+
+Every exception SimpleSettings throws on a bind or conversion failure is **value-free**: it carries only type and property metadata and never chains an inner exception that saw the bound value, so a secret you bound cannot surface in the error's `ToString()` chain. This is a structural guarantee, not a convention.
+
+There are two carve-outs the guard does **not** reach, and you own them: author-supplied `ValidationError` message text (it is emitted verbatim), and DI-resolved validator **constructors** (they run outside the value-free bind guard). Never echo a bound value into a validation message and never log a secret in a validator constructor. See [Security & Behavior](https://github.com/existall/SimpleSettings/blob/master/docs/Security.md) for the full treatment.
+
+## Breaking changes / migration (v1 -> v2)
+
+The v1 -> v2 release batched four breaking changes:
+
+- **`SettingsHolder` / `ISettingsHolder` are now internal** — use the public `SettingsBuilder` / `ISettingsCollection` / `ISettingsProvider` surface instead.
+- **The `Core.AspNet` package was dropped** — it exposed no public type; remove any reference to it.
+- **The `Microsoft.Extensions.*` dependency floor is now per-TFM** — `8.0.x` on `net8.0`, current on `net10.0`.
+- **A public `abstract SimpleSettingsException` base was introduced** and boundary exceptions were made public and structured; the old bare-`Exception` throw for a non-interface settings type is now `SettingsTypeNotInterfaceException`.
+
+See the full migration guide in [docs/Security.md](https://github.com/existall/SimpleSettings/blob/master/docs/Security.md#migration).
