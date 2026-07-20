@@ -171,5 +171,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
 | 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete    | 2026-07-14 |
 | 4. Collection & Validation Binding | 5/5 | ✓ Complete | 2026-07-19 (#35) |
-| 5. Documentation | 4/4 | Complete   | 2026-07-20 |
+| 5. Documentation | 4/4 | Complete    | 2026-07-20 |
 | 6. First v2.0.0-beta Release | 0/TBD | Not started | - |

@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.0.0
 milestone_name: milestone
-current_phase: 05
-current_phase_name: Documentation
-status: executing
+current_phase: 6
+current_phase_name: First v2.0.0-beta Release
+status: completed
 stopped_at: Completed 05-04. Phase 05 plan set complete.
-last_updated: "2026-07-20T09:27:04.149Z"
+last_updated: "2026-07-20T09:35:05.147Z"
 last_activity: 2026-07-20
-last_activity_desc: Completed 05-04 (README rewrite + phase-final DOC-VERIFICATION gate); Phase 05 plan set complete
+last_activity_desc: Phase 05 complete, transitioned to Phase 6
 progress:
   total_phases: 6
   completed_phases: 4
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 
 ## Current Position
 
-Phase: 05 (Documentation) — plan set COMPLETE (05-01..05-04)
+Phase: 6 — First v2.0.0-beta Release
 Next: Phase 05 verify/ship gate; then Phase 06 beta release
 Status: Phase 05 all four plans complete — README + docs/ + props canonical, packages repack cleanly
-Last activity: 2026-07-20 — Completed 05-04 (README rewrite + phase-final DOC-VERIFICATION gate)
+Last activity: 2026-07-20 — Phase 05 complete, transitioned to Phase 6
 
 Progress: [██████████] 100% (13/13 plans)
 
@@ -39,7 +39,7 @@ Progress: [██████████] 100% (13/13 plans)
 
 **Velocity:**
 
-- Total plans completed: 4
+- Total plans completed: 8
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -49,6 +49,7 @@ Progress: [██████████] 100% (13/13 plans)
 |-------|-------|-------|----------|
 | 02 | 2 | - | - |
 | 03 | 2 | - | - |
+| 05 | 4 | - | - |
 
 **Recent Trend:**
 
