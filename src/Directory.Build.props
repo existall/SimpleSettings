@@ -13,12 +13,12 @@
   <PropertyGroup>
     <Authors>Guy Ludvig</Authors>
     <Company>ExistForAll</Company>
-    <Description>SimpleSettings allow applications to use configurations values from any data store in the type of interfaces, thus decouples the frameworks from your appliaction and allowing application to inject interfaces and nothing else. This framework should be used instead of .Net Core IOptions&lt;T&gt;.</Description>
+    <Description>SimpleSettings allow applications to use configurations values from any data store in the type of interfaces, thus decouples the frameworks from your application and allowing application to inject interfaces and nothing else. This framework should be used instead of .Net Core IOptions&lt;T&gt;.</Description>
     <PackageProjectUrl>https://github.com/existall/SimpleSettings</PackageProjectUrl>
     <RepositoryUrl>https://github.com/existall/SimpleSettings</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>Configuration, Settings, Ioc, DI, ExistForAll, Dependency injection, Options, SimpleConfig</PackageTags>
+    <PackageTags>Configuration, Settings, Ioc, DI, ExistForAll, Dependency injection, Options, SimpleSettings</PackageTags>
     <PackageIcon>icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
