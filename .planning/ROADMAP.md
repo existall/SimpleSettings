@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status (2026-07-19):** Phases 1–4 complete (Phase 1 #27/#28, Phase 2 #30, Phase 3 #31, Phase 4 #33/#34/#35; ENG-01/T7 #29). `master` @ `0c858fa`. Active phase is **Phase 5 — AOT/Trim Honesty & Documentation**; first beta is Phase 6.
+**Status (2026-07-19):** Phases 1–4 complete (Phase 1 #27/#28, Phase 2 #30, Phase 3 #31, Phase 4 #33/#34/#35; ENG-01/T7 #29). `master` @ `0c858fa`. Active phase is **Phase 5 — Documentation** (docs-only; AOT-01 deferred to a future v2.1 milestone); first beta is Phase 6.
 
 The binding engine already ships and works. This milestone is a hardening + pre-stable
 cleanup pass that batches every remaining breaking change and safety fix before cutting the
@@ -11,8 +11,10 @@ consumers one catchable, structured exception base (Phase 1), proves binding cor
 across collection/nullable/converter shapes and closes the generator concurrency race with
 tests (Phase 2), trims and corrects the public surface, packaging, and command-line binder
 (Phase 3), binds collections and settings validation correctly across empty/sequence/validator
-shapes (Phase 4), tells consumers the truth about AOT/trim and refreshes the docs (Phase 5), and
-finally publishes the batched result as the first beta (Phase 6). Everything serves the core
+shapes (Phase 4), refreshes the docs to canonical naming and accurate, current content (Phase 5), and
+finally publishes the batched result as the first beta (Phase 6). AOT/trim honesty (AOT-01) is
+deferred to a future v2.1 milestone — its `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]`
+annotations are additive and non-breaking, so they need not batch pre-beta. Everything serves the core
 value: config → typed settings maps accurately, and never leaks a secret doing it.
 
 ## Phases
@@ -26,7 +28,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 - [x] **Phase 2: Binding Correctness & Engine Test Hardening** - Collections/nullable/converters verified; generator race closed by tests *(ENG-01/T7 done #29; COLL-01 + TEST-01/02/03 remain)* (completed 2026-07-14)
 - [x] **Phase 3: Public Surface, Packaging & Binder Cleanup** - Meaningful public surface; per-TFM deps; correct command-line parsing (completed 2026-07-14)
 - [x] **Phase 4: Collection & Validation Binding** — ✓ COMPLETE (Waves 1–3 merged #33/#34/#35, 2026-07-19) - Empty/sequence collection binding, working settings validation, and DI collection surface (client pre-beta engine requirements)
-- [ ] **Phase 5: AOT/Trim Honesty & Documentation** - Honest AOT/trim signals; canonically-named docs
+- [ ] **Phase 5: Documentation** - Canonically-named, accurate, current docs (README + docs/); AOT-01 deferred to a future v2.1 milestone
 - [ ] **Phase 6: First v2.0.0-beta Release** - Batched breaking changes ship as an installable pre-release
 
 ## Phase Details
@@ -118,16 +120,19 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 
 - [x] 04-04-PLAN.md — API-02 ISettingsCollection exposure (DI singleton + out-overload, D-15) + VAL-01 deferred DI-resolved validator runner (D-11/Q3, DIM-bridge dispatch) [Wave 3, depends on 04-03]
 
-### Phase 5: AOT/Trim Honesty & Documentation
+### Phase 5: Documentation
 
-**Goal**: Consumers get honest signals about AOT/trim support and accurate, canonically-named documentation.
+**Goal**: Consumers get accurate, canonically-named documentation — the consumer-facing README and the docs/ folder tell the truth about the current API and carry the Phase 1–4 security/behavior guidance.
 **Depends on**: Phase 4
-**Requirements**: AOT-01, DOC-01
+**Requirements**: DOC-01
 **Success Criteria** (what must be TRUE):
 
-  1. Public reflection-based entry points carry `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` annotations and/or the AOT/trim limitation is documented before stable.
-  2. Building an AOT/trimmed consumer surfaces a warning (or finds a clearly documented limitation) rather than failing silently.
-  3. README uses the canonical `ExistForAll.SimpleSettings` name and links to current repo/package paths (no legacy `existall`/`SimpleConfig` references).
+  1. README uses the canonical `ExistForAll.SimpleSettings` name and links to current repo/package paths (no legacy `SimpleConfig` repo/product references; repo stays `existall/SimpleSettings`).
+  2. The README code example reflects the real API (`[SettingsSection]` / `[SettingsProperty(DefaultValue=…)]`), not the stale `[DefaultValue]` form, and the install command + logo resolve.
+  3. The mandated Phase 1–4 guidance is documented (secret-redaction; validators must not echo secrets, incl. constructors; opt-in/deferred DI `ValidateSimpleSettings()`; validate⇒discoverable coupling; spaced-secrets bind via `AddCommandLine`; Phase-3 breaking-change list) — concise in README, detailed in docs/.
+  4. The docs/ folder carries no legacy `SimpleConfig` naming or dead `existall/SimpleConfig` links, and package metadata (`<Description>`, repo/package URLs, logo) is canonical.
+
+**Note**: AOT-01 (annotate reflection entry points / document the AOT-trim limitation) was **deferred to a future v2.1 milestone** during Phase-5 discussion (2026-07-19). Rationale: `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` are additive, non-breaking attributes, so they need not batch into the pre-beta window; adding them post-stable is safe. See REQUIREMENTS.md (AOT-01 → Deferred).
 
 **Plans**: TBD
 
@@ -156,5 +161,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
 | 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete    | 2026-07-14 |
 | 4. Collection & Validation Binding | 5/5 | ✓ Complete | 2026-07-19 (#35) |
-| 5. AOT/Trim Honesty & Documentation | 0/TBD | Not started | - |
+| 5. Documentation | 0/TBD | Not started | - |
 | 6. First v2.0.0-beta Release | 0/TBD | Not started | - |
