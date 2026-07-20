@@ -2,7 +2,7 @@
 
 ## Overview
 
-**Status (2026-07-14):** Phases 1–3 complete (Phase 1 #27/#28, Phase 2 #30, Phase 3 #31; ENG-01/T7 #29). `master` @ `7f9e17c`. Active phase is **Phase 4 — Collection & Validation Binding** (new engine phase for the client pre-beta requirements); AOT/Trim & Docs renumbered to Phase 5, first beta to Phase 6.
+**Status (2026-07-19):** Phases 1–4 complete (Phase 1 #27/#28, Phase 2 #30, Phase 3 #31, Phase 4 #33/#34/#35; ENG-01/T7 #29). `master` @ `0c858fa`. Active phase is **Phase 5 — Documentation** (docs-only; AOT-01 deferred to a future v2.1 milestone); first beta is Phase 6.
 
 The binding engine already ships and works. This milestone is a hardening + pre-stable
 cleanup pass that batches every remaining breaking change and safety fix before cutting the
@@ -11,8 +11,10 @@ consumers one catchable, structured exception base (Phase 1), proves binding cor
 across collection/nullable/converter shapes and closes the generator concurrency race with
 tests (Phase 2), trims and corrects the public surface, packaging, and command-line binder
 (Phase 3), binds collections and settings validation correctly across empty/sequence/validator
-shapes (Phase 4), tells consumers the truth about AOT/trim and refreshes the docs (Phase 5), and
-finally publishes the batched result as the first beta (Phase 6). Everything serves the core
+shapes (Phase 4), refreshes the docs to canonical naming and accurate, current content (Phase 5), and
+finally publishes the batched result as the first beta (Phase 6). AOT/trim honesty (AOT-01) is
+deferred to a future v2.1 milestone — its `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]`
+annotations are additive and non-breaking, so they need not batch pre-beta. Everything serves the core
 value: config → typed settings maps accurately, and never leaks a secret doing it.
 
 ## Phases
@@ -25,8 +27,8 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 - [x] **Phase 1: Exception Safety & Public Hierarchy** — ✓ COMPLETE (S1 #27, C2 #28 merged 2026-07-14) - No secret leaks; one catchable, structured `SimpleSettingsException` base
 - [x] **Phase 2: Binding Correctness & Engine Test Hardening** - Collections/nullable/converters verified; generator race closed by tests *(ENG-01/T7 done #29; COLL-01 + TEST-01/02/03 remain)* (completed 2026-07-14)
 - [x] **Phase 3: Public Surface, Packaging & Binder Cleanup** - Meaningful public surface; per-TFM deps; correct command-line parsing (completed 2026-07-14)
-- [ ] **Phase 4: Collection & Validation Binding** - Empty/sequence collection binding, working settings validation, and DI collection surface (client pre-beta engine requirements)
-- [ ] **Phase 5: AOT/Trim Honesty & Documentation** - Honest AOT/trim signals; canonically-named docs
+- [x] **Phase 4: Collection & Validation Binding** — ✓ COMPLETE (Waves 1–3 merged #33/#34/#35, 2026-07-19) - Empty/sequence collection binding, working settings validation, and DI collection surface (client pre-beta engine requirements)
+- [x] **Phase 5: Documentation** - Canonically-named, accurate, current docs (README + docs/); AOT-01 deferred to a future v2.1 milestone (completed 2026-07-20)
 - [ ] **Phase 6: First v2.0.0-beta Release** - Batched breaking changes ship as an installable pre-release
 
 ## Phase Details
@@ -92,6 +94,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 **Goal**: Collections bind correctly across empty, comma-scalar, and YAML-sequence shapes; declared settings validation actually runs; and the DI extension exposes the settings collection — the client-requested engine features batched before beta.
 **Depends on**: Phase 3
 **Requirements**: COLL-02, COLL-03, VAL-01, VAL-02, API-02
+**Status**: ✓ COMPLETE — Waves 1–3 merged (#33 Waves 1–2, #34 planning, #35 Wave 3) to `master` @ `0c858fa` on 2026-07-19. All 6 success criteria MET (VERIFICATION.md — 6/6, non-vacuous tests); security gate cleared (SECURITY.md — 15/15 threats closed, D-06 secret-redaction gate signed off); suite 153/153 on net8 + net10.
 **Success Criteria** (what must be TRUE):
 
   1. An unset `T[]` / `List<T>` / `IEnumerable<T>` binds to an empty collection, never `null` (COLL-02).
@@ -101,7 +104,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
   5. `AddSimpleSettings(...)` exposes the `ISettingsCollection` (return value or resolvable service) (API-02).
   6. After COLL-03 edits `ConfigurationBinder.BindPropertySettings`, the S1/SEC-01 secret-redaction invariant is re-verified; suite green on net8 + net10.
 
-**Plans**: 4/5 plans executed
+**Plans**: 5/5 plans complete
 
 **Wave 1**
 
@@ -115,20 +118,33 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 04-04-PLAN.md — API-02 ISettingsCollection exposure (DI singleton + out-overload, D-15) + VAL-01 deferred DI-resolved validator runner (D-11/Q3) [Wave 3, depends on 04-03]
+- [x] 04-04-PLAN.md — API-02 ISettingsCollection exposure (DI singleton + out-overload, D-15) + VAL-01 deferred DI-resolved validator runner (D-11/Q3, DIM-bridge dispatch) [Wave 3, depends on 04-03]
 
-### Phase 5: AOT/Trim Honesty & Documentation
+### Phase 5: Documentation
 
-**Goal**: Consumers get honest signals about AOT/trim support and accurate, canonically-named documentation.
+**Goal**: Consumers get accurate, canonically-named documentation — the consumer-facing README and the docs/ folder tell the truth about the current API and carry the Phase 1–4 security/behavior guidance.
 **Depends on**: Phase 4
-**Requirements**: AOT-01, DOC-01
+**Requirements**: DOC-01
 **Success Criteria** (what must be TRUE):
 
-  1. Public reflection-based entry points carry `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` annotations and/or the AOT/trim limitation is documented before stable.
-  2. Building an AOT/trimmed consumer surfaces a warning (or finds a clearly documented limitation) rather than failing silently.
-  3. README uses the canonical `ExistForAll.SimpleSettings` name and links to current repo/package paths (no legacy `existall`/`SimpleConfig` references).
+  1. README uses the canonical `ExistForAll.SimpleSettings` name and links to current repo/package paths (no legacy `SimpleConfig` repo/product references; repo stays `existall/SimpleSettings`).
+  2. The README code example reflects the real API (`[SettingsSection]` / `[SettingsProperty(DefaultValue=…)]`), not the stale `[DefaultValue]` form, and the install command + logo resolve.
+  3. The mandated Phase 1–4 guidance is documented (secret-redaction; validators must not echo secrets, incl. constructors; opt-in/deferred DI `ValidateSimpleSettings()`; validate⇒discoverable coupling; spaced-secrets bind via `AddCommandLine`; Phase-3 breaking-change list) — concise in README, detailed in docs/.
+  4. The docs/ folder carries no legacy `SimpleConfig` naming or dead `existall/SimpleConfig` links, and package metadata (`<Description>`, repo/package URLs, logo) is canonical.
 
-**Plans**: TBD
+**Note**: AOT-01 (annotate reflection entry points / document the AOT-trim limitation) was **deferred to a future v2.1 milestone** during Phase-5 discussion (2026-07-19). Rationale: `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` are additive, non-breaking attributes, so they need not batch into the pre-beta window; adding them post-stable is safe. See REQUIREMENTS.md (AOT-01 → Deferred).
+
+**Plans**: 4/4 plans complete
+
+**Wave 1** *(parallel — no file overlap)*
+
+- [x] 05-01-PLAN.md — docs/ canonicalization: rename the extension guide to a canonical filename + repoint its 5 in-docs inbound links; drop the residual legacy parenthetical in getting_started.md (D-05) [Wave 1]
+- [x] 05-02-PLAN.md — package metadata: fix `<Description>` typo + legacy `<PackageTags>` token in src/Directory.Build.props; build sanity (D-06) [Wave 1]
+- [x] 05-03-PLAN.md — new deep-guidance page docs/Security.md: the 6 mandated Phase 1–4 items (secret-redaction + 2 caveats, validator secret-safety incl. constructor, opt-in/deferred `ValidateSimpleSettings()` on `IServiceProvider`, validate⇒discoverable, `AddCommandLine` spaced values, v1→v2 breaking-change list) (D-04 deep) [Wave 1]
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 05-04-PLAN.md — README full rewrite: canonical logo/title, `dotnet add package` ×3, canonical ToC (incl. renamed page + Security), correct `[SettingsProperty(DefaultValue=…)]` quickstart, trimmed positioning, concise Security + migration sections; phase-final 13-gate grep sweep + `dotnet build`/`pack` (D-01/D-02/D-03/D-04) [Wave 2, depends on 05-01/05-02/05-03]
 
 ### Phase 6: First v2.0.0-beta Release
 
@@ -154,6 +170,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Exception Safety & Public Hierarchy | n/a (shipped) | ✓ Complete | 2026-07-14 (#27/#28) |
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
 | 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete    | 2026-07-14 |
-| 4. Collection & Validation Binding | 4/5 | In Progress|  |
-| 5. AOT/Trim Honesty & Documentation | 0/TBD | Not started | - |
+| 4. Collection & Validation Binding | 5/5 | ✓ Complete | 2026-07-19 (#35) |
+| 5. Documentation | 4/4 | Complete    | 2026-07-20 |
 | 6. First v2.0.0-beta Release | 0/TBD | Not started | - |

@@ -1,7 +1,7 @@
 Getting Started
 ===============
 
-SimpleSettings (previously SimpleConfig) uses a `SettingsBuilder` in order to create your settings objects. `SettingsBuilder.ScanAssemblies` returns an `ISettingsCollection` that holds a key value pair of `Type` and the generated implementation of the settings interface. Thus it can be easily registered to any IOC container of your liking.
+SimpleSettings uses a `SettingsBuilder` in order to create your settings objects. `SettingsBuilder.ScanAssemblies` returns an `ISettingsCollection` that holds a key value pair of `Type` and the generated implementation of the settings interface. Thus it can be easily registered to any IOC container of your liking.
 
 ## Installation
 SimpleSettings ships as a set of NuGet packages. The core package is all you need to get started:

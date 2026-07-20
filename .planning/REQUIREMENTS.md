@@ -65,10 +65,11 @@ Remaining open work (from `FIX-PLAN.md`), batched toward the first `v2.0.0-beta`
 - [x] **VAL-02**: `[SettingsProperty(AllowEmpty=false)]` rejects `""`/whitespace/unsubstituted `${ENV:-}` at bind, not just `null`; `TypeConverter.ValidateNullAcceptance` (naturally rides on VAL-01) (client pre-beta)
 - [ ] **API-02**: `AddSimpleSettings(...)` exposes the `ISettingsCollection` (return value or resolvable service — shape TBD in planning) (client pre-beta #4)
 
-### AOT/Trim & Documentation
+### Documentation
 
-- [ ] **AOT-01**: Annotate reflection entry points (`[RequiresDynamicCode]`/`[RequiresUnreferencedCode]`) and/or document the AOT/trim limitation before stable (A1)
-- [ ] **DOC-01**: Refresh README to canonical naming and current repo/package links
+- [x] **DOC-01**: Refresh README + docs/ to canonical `ExistForAll.SimpleSettings` naming and current repo/package links; document the Phase 1–4 security/behavior guidance (secret-redaction; validator secret-safety incl. constructors; opt-in/deferred DI validation; validate⇒discoverable coupling; spaced-secrets binding; Phase-3 breaking-change list)
+
+*(AOT-01 was mapped here but was **deferred to a future v2.1 milestone** on 2026-07-19 — see v2 Requirements → Deferred.)*
 
 ### Release
 
@@ -85,6 +86,7 @@ Deferred / held. Tracked but not in the current roadmap.
 ### Deferred
 
 - **PERF-03**: Tiered/lazy compiled property setter — only if set-*time* shows up in a real profile (P3b); a compiled setter was tried and reverted (regressed cold scan, no warm gain)
+- **AOT-01** (A1): Annotate reflection entry points (`[RequiresDynamicCode]`/`[RequiresUnreferencedCode]`) and/or document the AOT/trim limitation — **DEFERRED to a future v2.1 milestone** (2026-07-19, Phase-5 discussion). The annotations are additive/non-breaking, so they need not batch pre-beta; adding them post-stable is safe. Reflection entry points: `SettingsBuilder.CreateBuilder`/`.ScanAssemblies`/`.GetSettings`, `AddSimpleSettings(...)` (all funnel into `Reflection.Emit` with `RunAndCollect`).
 
 ## Out of Scope
 
@@ -115,19 +117,20 @@ Deferred / held. Tracked but not in the current roadmap.
 | COLL-03 | Phase 4 | Complete |
 | VAL-01 | Phase 4 | Complete |
 | VAL-02 | Phase 4 | Complete |
-| API-02 | Phase 4 | Pending |
-| AOT-01 | Phase 5 | Pending |
-| DOC-01 | Phase 5 | Pending |
+| API-02 | Phase 4 | ✓ Complete (#35) |
+| AOT-01 | v2.1 (deferred) | Deferred |
+| DOC-01 | Phase 5 | Complete |
 | REL-01 | Phase 6 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 20 total (added Phase 4 engine reqs COLL-02/COLL-03/VAL-02/API-02 + promoted VAL-01 from Held)
-- Mapped to phases: 20
+- v1 in-milestone requirements: 19 (was 20; **AOT-01 deferred to v2.1** on 2026-07-19)
+- Mapped to phases: 19
 - Unmapped: 0 ✓
-- Complete: 12 (Phase 1 SEC-01/SEC-02/EXC-01 #27/#28; Phase 2 COLL-01/TEST-01/TEST-02/TEST-03 + ENG-01/T7 #29; Phase 3 API-01/PKG-01/PKG-02/SRC-02 #31); Pending: 8 (Phase 4 COLL-02/COLL-03/VAL-01/VAL-02/API-02; Phase 5 AOT-01/DOC-01; Phase 6 REL-01)
+- Complete: 17 (Phase 1 SEC-01/SEC-02/EXC-01 #27/#28; Phase 2 COLL-01/TEST-01/TEST-02/TEST-03 + ENG-01/T7 #29; Phase 3 API-01/PKG-01/PKG-02/SRC-02 #31; Phase 4 COLL-02/COLL-03/VAL-01/VAL-02/API-02 #33/#34/#35); Pending: 2 (Phase 5 DOC-01; Phase 6 REL-01)
 - Validated (shipped, no phase): 13
 
 ---
 *Requirements defined: 2026-07-13*
-*Last updated: 2026-07-14 — Phase 4 "Collection & Validation Binding" formalized (COLL-02/COLL-03/VAL-02/API-02 added; VAL-01 promoted from Held D1); AOT/Docs → Phase 5, beta → Phase 6. ENG-01/T7 complete (#29). GSD is the source of truth; FIX-PLAN.md frozen as historical reference.*
+*Last updated: 2026-07-19 — Phase 5 scoped to Documentation (DOC-01) only; **AOT-01 deferred to a future v2.1 milestone** (additive/non-breaking annotations need not batch pre-beta). Phase 4 marked complete in traceability (COLL-02/COLL-03/VAL-01/VAL-02/API-02, #33/#34/#35).*
+*Prior: 2026-07-14 — Phase 4 "Collection & Validation Binding" formalized (COLL-02/COLL-03/VAL-02/API-02 added; VAL-01 promoted from Held D1); AOT/Docs → Phase 5, beta → Phase 6. ENG-01/T7 complete (#29). GSD is the source of truth; FIX-PLAN.md frozen as historical reference.*

@@ -2,19 +2,19 @@
 gsd_state_version: 1.0
 milestone: v2.0.0
 milestone_name: milestone
-current_phase: 04
-current_phase_name: collection-validation-binding
-status: executing
-stopped_at: Completed 04-04-PLAN.md (VAL-01 DI path + API-02, Wave 3) — all 5 Phase 4 plans landed; phase verify + secure + mark-complete pending
-last_updated: "2026-07-15T18:00:00.000Z"
-last_activity: 2026-07-15
-last_activity_desc: Phase 04 Plan 04 (Wave 3) executed + reviewed
+current_phase: 6
+current_phase_name: First v2.0.0-beta Release
+status: completed
+stopped_at: Completed 05-04. Phase 05 plan set complete.
+last_updated: "2026-07-20T09:35:05.147Z"
+last_activity: 2026-07-20
+last_activity_desc: Phase 05 complete, transitioned to Phase 6
 progress:
   total_phases: 6
-  completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
-  percent: 33
+  completed_phases: 4
+  total_plans: 13
+  completed_plans: 13
+  percent: 67
 ---
 
 # Project State
@@ -24,22 +24,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Correctness of binding — config → strongly-typed settings maps accurately across every supported shape (sections, arrays/enumerables, defaults, nullable, custom converters).
-**Current focus:** Phase 04 — collection-validation-binding
+**Current focus:** Phase 05 — Documentation
 
 ## Current Position
 
-Phase: 04 (collection-validation-binding) — EXECUTING (all 5 plans landed; verify + secure + mark-complete pending)
-Plan: 5 of 5 — complete
-Status: Wave 3 (04-04) executed + reviewed; ready for phase verify
-Last activity: 2026-07-15 — Phase 04 Plan 04 (Wave 3) executed + reviewed
+Phase: 6 — First v2.0.0-beta Release
+Next: Phase 05 verify/ship gate; then Phase 06 beta release
+Status: Phase 05 all four plans complete — README + docs/ + props canonical, packages repack cleanly
+Last activity: 2026-07-20 — Phase 05 complete, transitioned to Phase 6
 
-Progress: [███░░░░░░░] 33%
+Progress: [██████████] 100% (13/13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4
+- Total plans completed: 8
 - Average duration: —
 - Total execution time: 0 hours
 
@@ -49,6 +49,7 @@ Progress: [███░░░░░░░] 33%
 |-------|-------|-------|----------|
 | 02 | 2 | - | - |
 | 03 | 2 | - | - |
+| 05 | 4 | - | - |
 
 **Recent Trend:**
 
@@ -65,6 +66,10 @@ Progress: [███░░░░░░░] 33%
 | Phase 04 P03 | 5min | 2 tasks | 10 files |
 | Phase 04 P05 | 3min | 1 tasks | 2 files |
 | Phase 04 P04 | ~35min | 2 tasks | 5 files |
+| Phase 05 P01 | 5min | 2 tasks | 5 files |
+| Phase 05 P02 | 3min | 1 tasks | 1 files |
+| Phase 05 P03 | 4min | 2 tasks | 1 files |
+| Phase 05 P04 | 2min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -91,6 +96,9 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-05 VAL-02: reuse value-free SettingsPropertyNullException for empty/whitespace rejection — already excluded from the ValuesPopulator:122 redaction filter, so no filter change
 - [Phase 04]: 04-05 VAL-02: reject guard placed ahead of 04-01's Func<object> list null-result factory dispatch and gated on _throwOnNull; accept path and factory dispatch untouched
 - [Phase 04]: 04-04 VAL-01 DI path + API-02: ISettingsCollection exposed via a DI singleton + an AddSimpleSettings(out ISettingsCollection, Action?) overload; deferred opt-in IServiceProvider.ValidateSimpleSettings() runs DI-registered ISettingValidation<T> from a fresh scope (IServiceScopeFactory), dispatches via the DIM bridge (no reflection), and throws the same value-free SettingsValidationException as the core path via the shared ThrowIfAny. Runner is internal; DI path is additive (reads no attribute).
+- [Phase ?]: 05-02: Replaced legacy SimpleConfig PackageTags token with canonical SimpleSettings; fixed Description typo appliaction->application
+- [Phase ?]: 05-03: Placed deep Phase 1-4 security/behavior guidance in a dedicated new docs/Security.md (stable README deep-link target); stated the redaction invariant with both carve-outs without over-claiming
+- [Phase ?]: 05-04: README rewritten against source-verified API (canonical logo, dotnet-add x3, correct [SettingsProperty(DefaultValue)] quickstart); concise Security notes + v1->v2 migration deep-link docs/Security.md; 13 DOC-VERIFICATION gates + dotnet build/pack green
 
 ### Pending Todos
 
@@ -103,6 +111,7 @@ None yet.
 ### Roadmap Evolution
 
 - Phase 4 inserted: Phase 4 Collection & Validation Binding formalized (COLL-02/COLL-03/VAL-01/VAL-02/API-02); AOT/Docs renumbered to Phase 5, beta to Phase 6
+- Phase 5 rescoped (2026-07-19): "AOT/Trim Honesty & Documentation" → "Documentation" (DOC-01 only); AOT-01 deferred to a future v2.1 milestone — additive/non-breaking annotations need not batch pre-beta
 
 ## Deferred Items
 
@@ -113,9 +122,10 @@ Items acknowledged and carried forward:
 | Held feature | VAL-01 Validations API (D1) | Promoted → Phase 4 (2026-07-14) | 2026-07-13 |
 | Held feature | EQ-01 EqualityCompererCreator (D2) | Held | 2026-07-13 |
 | Perf | PERF-03 compiled setter (P3b) | Deferred (profile-gated) | 2026-07-13 |
+| AOT/Trim | AOT-01 annotations/docs (A1) | Deferred → v2.1 milestone | 2026-07-19 |
 
 ## Session Continuity
 
-Last session: 2026-07-15T13:58:04.982Z
-Stopped at: Completed 04-05-PLAN.md (VAL-02) — Phase 4 all 5 plans done
+Last session: 2026-07-20T09:26:57.599Z
+Stopped at: Completed 05-04. Phase 05 plan set complete.
 Resume file: None
