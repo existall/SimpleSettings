@@ -28,7 +28,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 - [x] **Phase 2: Binding Correctness & Engine Test Hardening** - Collections/nullable/converters verified; generator race closed by tests *(ENG-01/T7 done #29; COLL-01 + TEST-01/02/03 remain)* (completed 2026-07-14)
 - [x] **Phase 3: Public Surface, Packaging & Binder Cleanup** - Meaningful public surface; per-TFM deps; correct command-line parsing (completed 2026-07-14)
 - [x] **Phase 4: Collection & Validation Binding** — ✓ COMPLETE (Waves 1–3 merged #33/#34/#35, 2026-07-19) - Empty/sequence collection binding, working settings validation, and DI collection surface (client pre-beta engine requirements)
-- [ ] **Phase 5: Documentation** - Canonically-named, accurate, current docs (README + docs/); AOT-01 deferred to a future v2.1 milestone
+- [x] **Phase 5: Documentation** - Canonically-named, accurate, current docs (README + docs/); AOT-01 deferred to a future v2.1 milestone (completed 2026-07-20)
 - [ ] **Phase 6: First v2.0.0-beta Release** - Batched breaking changes ship as an installable pre-release
 
 ## Phase Details
@@ -134,7 +134,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 
 **Note**: AOT-01 (annotate reflection entry points / document the AOT-trim limitation) was **deferred to a future v2.1 milestone** during Phase-5 discussion (2026-07-19). Rationale: `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` are additive, non-breaking attributes, so they need not batch into the pre-beta window; adding them post-stable is safe. See REQUIREMENTS.md (AOT-01 → Deferred).
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 **Wave 1** *(parallel — no file overlap)*
 
@@ -144,7 +144,7 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 05-04-PLAN.md — README full rewrite: canonical logo/title, `dotnet add package` ×3, canonical ToC (incl. renamed page + Security), correct `[SettingsProperty(DefaultValue=…)]` quickstart, trimmed positioning, concise Security + migration sections; phase-final 13-gate grep sweep + `dotnet build`/`pack` (D-01/D-02/D-03/D-04) [Wave 2, depends on 05-01/05-02/05-03]
+- [x] 05-04-PLAN.md — README full rewrite: canonical logo/title, `dotnet add package` ×3, canonical ToC (incl. renamed page + Security), correct `[SettingsProperty(DefaultValue=…)]` quickstart, trimmed positioning, concise Security + migration sections; phase-final 13-gate grep sweep + `dotnet build`/`pack` (D-01/D-02/D-03/D-04) [Wave 2, depends on 05-01/05-02/05-03]
 
 ### Phase 6: First v2.0.0-beta Release
 
@@ -171,5 +171,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
 | 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete    | 2026-07-14 |
 | 4. Collection & Validation Binding | 5/5 | ✓ Complete | 2026-07-19 (#35) |
-| 5. Documentation | 3/4 | In Progress|  |
+| 5. Documentation | 4/4 | Complete   | 2026-07-20 |
 | 6. First v2.0.0-beta Release | 0/TBD | Not started | - |

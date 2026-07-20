@@ -5,16 +5,16 @@ milestone_name: milestone
 current_phase: 05
 current_phase_name: Documentation
 status: executing
-stopped_at: Completed 05-03. Next plan 05-04.
-last_updated: "2026-07-20T09:19:22.565Z"
+stopped_at: Completed 05-04. Phase 05 plan set complete.
+last_updated: "2026-07-20T09:27:04.149Z"
 last_activity: 2026-07-20
-last_activity_desc: Completed 05-03 (docs/Security.md security & behavior + migration page)
+last_activity_desc: Completed 05-04 (README rewrite + phase-final DOC-VERIFICATION gate); Phase 05 plan set complete
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 13
-  completed_plans: 12
-  percent: 92
+  completed_plans: 13
+  percent: 67
 ---
 
 # Project State
@@ -28,12 +28,12 @@ See: .planning/PROJECT.md (updated 2026-07-13)
 
 ## Current Position
 
-Phase: 05 (Documentation) — EXECUTING
-Next: Execute plan 05-04
-Status: Executing Phase 05 — plan 05-03 complete
-Last activity: 2026-07-20 — Completed 05-03 (docs/Security.md security & behavior + migration page)
+Phase: 05 (Documentation) — plan set COMPLETE (05-01..05-04)
+Next: Phase 05 verify/ship gate; then Phase 06 beta release
+Status: Phase 05 all four plans complete — README + docs/ + props canonical, packages repack cleanly
+Last activity: 2026-07-20 — Completed 05-04 (README rewrite + phase-final DOC-VERIFICATION gate)
 
-Progress: [█████████░] 92%
+Progress: [██████████] 100% (13/13 plans)
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [█████████░] 92%
 | Phase 05 P01 | 5min | 2 tasks | 5 files |
 | Phase 05 P02 | 3min | 1 tasks | 1 files |
 | Phase 05 P03 | 4min | 2 tasks | 1 files |
+| Phase 05 P04 | 2min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,7 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-04 VAL-01 DI path + API-02: ISettingsCollection exposed via a DI singleton + an AddSimpleSettings(out ISettingsCollection, Action?) overload; deferred opt-in IServiceProvider.ValidateSimpleSettings() runs DI-registered ISettingValidation<T> from a fresh scope (IServiceScopeFactory), dispatches via the DIM bridge (no reflection), and throws the same value-free SettingsValidationException as the core path via the shared ThrowIfAny. Runner is internal; DI path is additive (reads no attribute).
 - [Phase ?]: 05-02: Replaced legacy SimpleConfig PackageTags token with canonical SimpleSettings; fixed Description typo appliaction->application
 - [Phase ?]: 05-03: Placed deep Phase 1-4 security/behavior guidance in a dedicated new docs/Security.md (stable README deep-link target); stated the redaction invariant with both carve-outs without over-claiming
+- [Phase ?]: 05-04: README rewritten against source-verified API (canonical logo, dotnet-add x3, correct [SettingsProperty(DefaultValue)] quickstart); concise Security notes + v1->v2 migration deep-link docs/Security.md; 13 DOC-VERIFICATION gates + dotnet build/pack green
 
 ### Pending Todos
 
@@ -123,6 +125,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-07-20T09:19:09.588Z
-Stopped at: Completed 05-03. Next plan 05-04.
+Last session: 2026-07-20T09:26:57.599Z
+Stopped at: Completed 05-04. Phase 05 plan set complete.
 Resume file: None
