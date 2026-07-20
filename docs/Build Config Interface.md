@@ -36,7 +36,7 @@ public interface ISomeInterface
 ````
 
 3. Interface name Suffix.
-By default SimpleSettings scans for interfaces with a name ending with `Settings` and adds it to the collection. ( The suffix option can be changed using `SettingsOptions`, to know more look at the [Extend section](https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md) )
+By default SimpleSettings scans for interfaces with a name ending with `Settings` and adds it to the collection. ( The suffix option can be changed using `SettingsOptions`, to know more look at the [Extend section](https://github.com/existall/SimpleSettings/blob/master/docs/Extending%20SimpleSettings.md) )
 
 ````C#
 public interface ISomeInterfaceSettings

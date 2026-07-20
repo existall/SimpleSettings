@@ -35,7 +35,7 @@ public class MySectionBinder : ISectionBinder
 
 ### Section
 The section name the context provides is the name of the interface with some manipulation, for example the interface `ISomeInterface` will be provided by the context as `SomeInterface`. SimpleSettings removes the leading `I`.
-#### this is configurable via `SettingsOptions` (or per interface with `[SettingsSection("name")]`) and can be viewed on the [Extend section](https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md)
+#### this is configurable via `SettingsOptions` (or per interface with `[SettingsSection("name")]`) and can be viewed on the [Extend section](https://github.com/existall/SimpleSettings/blob/master/docs/Extending%20SimpleSettings.md)
 
 ### Key
 The Key name the context provides is the property name as is, for example the interface `ISomeInterface.SomeProperty` will be provided as `SomeProperty`. You can override it per property with `[SettingsProperty(Name = "...")]`.
@@ -57,4 +57,4 @@ var settings = SettingsBuilder
     .GetSettings<ISomeInterface>();
 ````
 
-In the next page we will learn how to [Extend](https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md) SimpleSettings and future features.
+In the next page we will learn how to [Extend](https://github.com/existall/SimpleSettings/blob/master/docs/Extending%20SimpleSettings.md) SimpleSettings and future features.

@@ -13,7 +13,7 @@ SimpleSettings scans only the public (exported) interfaces in the assemblies you
 
 ## Options
 
-To configure SimpleSettings, use the `CreateBuilder` overload that gives you a builder factory. The factory exposes `SetupOptions` along with a set of `Set*` helpers that mutate `SettingsOptions`. To better understand the options see the [Extend](https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md) section.
+To configure SimpleSettings, use the `CreateBuilder` overload that gives you a builder factory. The factory exposes `SetupOptions` along with a set of `Set*` helpers that mutate `SettingsOptions`. To better understand the options see the [Extend](https://github.com/existall/SimpleSettings/blob/master/docs/Extending%20SimpleSettings.md) section.
 
 ````C#
 var settingsCollection = SettingsBuilder
@@ -42,6 +42,6 @@ SimpleSettings provides several binders out of the box. `InMemoryCollection` liv
 
 For more information about the Binders see the [Build a SectionBinder](https://github.com/existall/SimpleSettings/blob/master/docs/Build%20a%20SectionBinder.md) page.
 
-To create new Binders see the [Extend section](https://github.com/existall/SimpleSettings/blob/master/docs/Extend%20Simple%20Config.md).
+To create new Binders see the [Extend section](https://github.com/existall/SimpleSettings/blob/master/docs/Extending%20SimpleSettings.md).
 
 To continue on to Settings Interfaces click [here](https://github.com/existall/SimpleSettings/blob/master/docs/Build%20Config%20Interface.md).
