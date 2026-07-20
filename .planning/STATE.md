@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0.0
 milestone_name: milestone
 current_phase: 05
-current_phase_name: aot-trim-docs
+current_phase_name: documentation
 status: ready
-stopped_at: Phase 4 COMPLETE — Waves 1–3 merged (#33/#34/#35 @ 0c858fa); verify 6/6 + security gate 15/15 (D-06 signed off). Phase 5 (AOT-01/DOC-01) not started.
+stopped_at: Phase 5 context gathered — scoped to Documentation (DOC-01); AOT-01 deferred to a future v2.1 milestone. Ready to plan.
 last_updated: "2026-07-19T12:00:00.000Z"
 last_activity: 2026-07-19
-last_activity_desc: Phase 04 closeout — verify + security gate passed; phase marked complete
+last_activity_desc: Phase 05 context gathered (Documentation / DOC-01); AOT-01 deferred to v2.1
 progress:
   total_phases: 6
   completed_phases: 3
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Correctness of binding — config → strongly-typed settings maps accurately across every supported shape (sections, arrays/enumerables, defaults, nullable, custom converters).
-**Current focus:** Phase 05 — AOT/Trim Honesty & Documentation (not started); Phase 04 complete
+**Current focus:** Phase 05 — Documentation (DOC-01) — context gathered, ready to plan; Phase 04 complete
 
 ## Current Position
 
-Phase: 04 (collection-validation-binding) — ✓ COMPLETE (Waves 1–3 merged #33/#34/#35; verify 6/6, security 15/15, D-06 signed off)
-Next: Phase 05 (AOT/Trim Honesty & Documentation) — not started
-Status: Phase 4 closed; ready to plan Phase 5
-Last activity: 2026-07-19 — Phase 04 closeout (verify + secure) passed; phase marked complete
+Phase: 05 (documentation) — context gathered; ready to plan (DOC-01 only; AOT-01 deferred to v2.1)
+Next: /gsd-plan-phase 5
+Status: 05-CONTEXT.md written; ROADMAP + REQUIREMENTS updated (Phase 5 → Documentation, AOT-01 → v2.1)
+Last activity: 2026-07-19 — Phase 05 context gathered
 
 Progress: [█████░░░░░] 50%
 
@@ -103,6 +103,7 @@ None yet.
 ### Roadmap Evolution
 
 - Phase 4 inserted: Phase 4 Collection & Validation Binding formalized (COLL-02/COLL-03/VAL-01/VAL-02/API-02); AOT/Docs renumbered to Phase 5, beta to Phase 6
+- Phase 5 rescoped (2026-07-19): "AOT/Trim Honesty & Documentation" → "Documentation" (DOC-01 only); AOT-01 deferred to a future v2.1 milestone — additive/non-breaking annotations need not batch pre-beta
 
 ## Deferred Items
 
@@ -113,9 +114,10 @@ Items acknowledged and carried forward:
 | Held feature | VAL-01 Validations API (D1) | Promoted → Phase 4 (2026-07-14) | 2026-07-13 |
 | Held feature | EQ-01 EqualityCompererCreator (D2) | Held | 2026-07-13 |
 | Perf | PERF-03 compiled setter (P3b) | Deferred (profile-gated) | 2026-07-13 |
+| AOT/Trim | AOT-01 annotations/docs (A1) | Deferred → v2.1 milestone | 2026-07-19 |
 
 ## Session Continuity
 
-Last session: 2026-07-15T13:58:04.982Z
-Stopped at: Completed 04-05-PLAN.md (VAL-02) — Phase 4 all 5 plans done
-Resume file: None
+Last session: 2026-07-19
+Stopped at: Phase 5 context gathered — Documentation (DOC-01); AOT-01 deferred to v2.1
+Resume file: .planning/phases/05-documentation/05-CONTEXT.md
