@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1784463656967,
+  "lastUpdate": 1784541058596,
   "repoUrl": "https://github.com/existall/SimpleSettings",
   "entries": {
     "Allocations (bytes/op)": [
@@ -1043,6 +1043,80 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/existall/SimpleSettings/commit/0c858faa53420d95da1fe412bd151d54017e7c49"
         },
         "date": 1784463656711,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindNoRoot",
+            "value": 40,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConfigBinderBenchmark.BindWithRoot",
+            "value": 56,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ConvertArrayBenchmark.ConvertArray",
+            "value": 688,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnumerateBenchmark.Enumerate",
+            "value": 88,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.EnvBinderBenchmark.BindFastPath",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.GenerateTypeBenchmark.GenerateWarm",
+            "value": 0,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 1)",
+            "value": 144,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 10)",
+            "value": 1376,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.PlanPopulateBenchmark.Populate(PropertyCount: 50)",
+            "value": 6816,
+            "unit": "bytes"
+          },
+          {
+            "name": "ExistForAll.SimpleSettings.Benchmark.ScanBenchmark.ColdScan",
+            "value": 17909680,
+            "unit": "bytes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "guy.lud@gmail.com",
+            "name": "GuyL",
+            "username": "guy-lud"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4a8f82ed67b403ceb15b7c125dfafbc007d67287",
+          "message": "Phase 5: Documentation (DOC-01) + Phase 4 closeout (#36)\n\n* docs(planning): Phase 4 closeout — verify + security gate + mark complete\n\n- VERIFICATION.md: 6/6 ROADMAP success criteria MET (non-vacuous tests, net8+net10 153/153).\n- SECURITY.md: 15/15 threats closed, 0 open; D-06 secret-redaction gate signed off; T-04-VAL DI path holds by construction in merged code.\n- ROADMAP.md + STATE.md: Phase 4 marked complete; advance to Phase 5 (AOT-01/DOC-01).\n\n* docs: refresh session handoff (Phase 4 complete + closeout held; Phase 5 next)\n\n* docs(05): defer AOT-01 to v2.1, scope phase 5 to Documentation (DOC-01)\n\n* docs(05): capture phase context\n\n* docs(state): record phase 5 context session (Documentation; AOT-01 deferred to v2.1)\n\n* docs(05): research phase documentation domain\n\n* docs(phase-5): add validation strategy\n\n* docs(05): create phase plan (4 plans — docs canonicalization, metadata, deep security page, README rewrite)\n\n* docs(05): harden build/pack verify gates (pipefail) + mark research open-questions resolved\n\n* docs(05): record planning completion in state\n\n* docs(05-01): rename extension guide to canonical filename\n\n- git mv \"Extend Simple Config.md\" -> \"Extending SimpleSettings.md\" (history preserved)\n- establishes canonical link target for inbound repoints and README\n\n* docs(05-01): repoint inbound links + drop residual legacy parenthetical\n\n- repoint 5 in-docs links to Extending%20SimpleSettings.md (2x SectionBinder, 2x building_the_collection, 1x Build Config Interface)\n- remove \"(previously SimpleConfig)\" parenthetical in getting_started.md\n- docs/ now free of legacy product name and dead legacy-repo links\n\n* docs(05-01): complete docs-canonicalization plan\n\n* fix(05-02): correct Description typo and legacy PackageTags token\n\n- Fix 'appliaction' -> 'application' in packaged <Description>\n- Replace legacy 'SimpleConfig' PackageTags token with 'SimpleSettings'\n\n* docs(05-02): complete package-metadata token fix plan\n\n* docs(05-03): author Security & Behavior guarantees page\n\n- Document secret-redaction value-free invariant with both carve-outs (author ValidationError text + DI validator constructors)\n- Add secret-safe validator example (echoes no bound value)\n- Document opt-in/deferred ValidateSimpleSettings() on IServiceProvider after BuildServiceProvider()\n- State validate => discoverable coupling via [SettingsSection(ValidatorType)]\n- Document AddCommandLine spaced-value binding with prefix-lookahead caveat\n\n* docs(05-03): append v1 -> v2 migration section\n\n- List four Phase-3 breaking changes: SettingsHolder internal (API-01), Core.AspNet dropped (PKG-01), per-TFM Microsoft.Extensions floor (PKG-02), public SimpleSettingsException base (EXC-01)\n- Name versions, not the legacy product token\n\n* docs(05-03): complete Security & Behavior guidance plan\n\n* docs(05-04): rewrite README structure — canonical logo, dotnet-add install, ToC, quickstart, DI\n\n- Replace broken existall/Shepherd logo with canonical absolute raw icon URL\n- Drop legacy product tag from title; three dotnet add package install lines\n- Repoint all ToC entries to existall/SimpleSettings docs + add Security & Behavior entry\n- Replace stale [DefaultValue] example with verified [SettingsProperty(DefaultValue = ...)] quickstart\n- Trim IOptions polemic to a tight blurb; add feature overview + DI snippet with ValidateSimpleSettings\n\n* docs(05-04): add concise Security notes + v1->v2 migration sections\n\n- Security notes: state the value-free exception invariant with both carve-outs (author ValidationError text + DI validator constructors); link to docs/Security.md\n- Breaking changes / migration: list API-01/PKG-01/PKG-02/EXC-01 by concept; deep-link docs/Security.md#migration\n- Phase-final gate: 13 DOC-VERIFICATION grep gates + dotnet build/pack -c Release from src/ all green\n\n* docs(05-04): complete README rewrite plan (phase-final gate green)\n\n* docs(phase-05): complete phase execution\n\n* docs: refresh session handoff (Phase 5 complete; PR + Phase 6 next)",
+          "timestamp": "2026-07-20T12:48:37+03:00",
+          "tree_id": "44743e44b025b15d118beeda51cb35e3a9b39919",
+          "url": "https://github.com/existall/SimpleSettings/commit/4a8f82ed67b403ceb15b7c125dfafbc007d67287"
+        },
+        "date": 1784541057888,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
