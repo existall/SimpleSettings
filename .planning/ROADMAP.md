@@ -134,13 +134,13 @@ value: config → typed settings maps accurately, and never leaks a secret doing
 
 **Note**: AOT-01 (annotate reflection entry points / document the AOT-trim limitation) was **deferred to a future v2.1 milestone** during Phase-5 discussion (2026-07-19). Rationale: `[RequiresDynamicCode]`/`[RequiresUnreferencedCode]` are additive, non-breaking attributes, so they need not batch into the pre-beta window; adding them post-stable is safe. See REQUIREMENTS.md (AOT-01 → Deferred).
 
-**Plans**: 2/4 plans executed
+**Plans**: 3/4 plans executed
 
 **Wave 1** *(parallel — no file overlap)*
 
 - [x] 05-01-PLAN.md — docs/ canonicalization: rename the extension guide to a canonical filename + repoint its 5 in-docs inbound links; drop the residual legacy parenthetical in getting_started.md (D-05) [Wave 1]
 - [x] 05-02-PLAN.md — package metadata: fix `<Description>` typo + legacy `<PackageTags>` token in src/Directory.Build.props; build sanity (D-06) [Wave 1]
-- [ ] 05-03-PLAN.md — new deep-guidance page docs/Security.md: the 6 mandated Phase 1–4 items (secret-redaction + 2 caveats, validator secret-safety incl. constructor, opt-in/deferred `ValidateSimpleSettings()` on `IServiceProvider`, validate⇒discoverable, `AddCommandLine` spaced values, v1→v2 breaking-change list) (D-04 deep) [Wave 1]
+- [x] 05-03-PLAN.md — new deep-guidance page docs/Security.md: the 6 mandated Phase 1–4 items (secret-redaction + 2 caveats, validator secret-safety incl. constructor, opt-in/deferred `ValidateSimpleSettings()` on `IServiceProvider`, validate⇒discoverable, `AddCommandLine` spaced values, v1→v2 breaking-change list) (D-04 deep) [Wave 1]
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -171,5 +171,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Binding Correctness & Engine Test Hardening | 2/2 | Complete    | 2026-07-14 |
 | 3. Public Surface, Packaging & Binder Cleanup | 2/2 | Complete    | 2026-07-14 |
 | 4. Collection & Validation Binding | 5/5 | ✓ Complete | 2026-07-19 (#35) |
-| 5. Documentation | 2/4 | In Progress|  |
+| 5. Documentation | 3/4 | In Progress|  |
 | 6. First v2.0.0-beta Release | 0/TBD | Not started | - |
