@@ -5,10 +5,10 @@ milestone_name: milestone
 current_phase: 05
 current_phase_name: documentation
 status: ready
-stopped_at: Phase 5 context gathered — scoped to Documentation (DOC-01); AOT-01 deferred to a future v2.1 milestone. Ready to plan.
+stopped_at: Phase 5 planned — 4 plans (2 waves); plan-checker PASSED (2 warnings fixed). Ready to execute. DOC-01 only; AOT-01 → v2.1.
 last_updated: "2026-07-19T12:00:00.000Z"
 last_activity: 2026-07-19
-last_activity_desc: Phase 05 context gathered (Documentation / DOC-01); AOT-01 deferred to v2.1
+last_activity_desc: Phase 05 planned — 4 plans, plan-checker PASSED (Documentation / DOC-01)
 progress:
   total_phases: 6
   completed_phases: 3
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Correctness of binding — config → strongly-typed settings maps accurately across every supported shape (sections, arrays/enumerables, defaults, nullable, custom converters).
-**Current focus:** Phase 05 — Documentation (DOC-01) — context gathered, ready to plan; Phase 04 complete
+**Current focus:** Phase 05 — Documentation (DOC-01) — planned (4 plans, 2 waves), ready to execute; Phase 04 complete
 
 ## Current Position
 
-Phase: 05 (documentation) — context gathered; ready to plan (DOC-01 only; AOT-01 deferred to v2.1)
-Next: /gsd-plan-phase 5
-Status: 05-CONTEXT.md written; ROADMAP + REQUIREMENTS updated (Phase 5 → Documentation, AOT-01 → v2.1)
-Last activity: 2026-07-19 — Phase 05 context gathered
+Phase: 05 (documentation) — planned: 4 plans across 2 waves; ready to execute (DOC-01 only; AOT-01 deferred to v2.1)
+Next: /gsd-execute-phase 5
+Status: 4 plans created; RESEARCH + VALIDATION (13 DOC-VERIFICATION gates) written; plan-checker PASSED (2 verify-gate warnings fixed)
+Last activity: 2026-07-19 — Phase 05 planned (plan-checker passed)
 
 Progress: [█████░░░░░] 50%
 
@@ -119,5 +119,5 @@ Items acknowledged and carried forward:
 ## Session Continuity
 
 Last session: 2026-07-19
-Stopped at: Phase 5 context gathered — Documentation (DOC-01); AOT-01 deferred to v2.1
+Stopped at: Phase 5 planned — 4 plans (2 waves), plan-checker PASSED; ready to execute
 Resume file: .planning/phases/05-documentation/05-CONTEXT.md
