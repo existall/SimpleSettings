@@ -3,18 +3,18 @@ gsd_state_version: 1.0
 milestone: v2.0.0
 milestone_name: milestone
 current_phase: 05
-current_phase_name: documentation
-status: ready
-stopped_at: Phase 5 planned — 4 plans (2 waves); plan-checker PASSED (2 warnings fixed). Ready to execute. DOC-01 only; AOT-01 → v2.1.
-last_updated: "2026-07-19T12:00:00.000Z"
-last_activity: 2026-07-19
-last_activity_desc: Phase 05 planned — 4 plans, plan-checker PASSED (Documentation / DOC-01)
+current_phase_name: Documentation
+status: executing
+stopped_at: Phase 5 Plan 01 complete — docs/ canonicalized (extension guide renamed, 5 inbound links repointed, SimpleConfig parenthetical purged). Next plan 05-02.
+last_updated: "2026-07-20T09:10:04.850Z"
+last_activity: 2026-07-20
+last_activity_desc: Completed 05-01-PLAN.md — docs canonicalization
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 9
-  completed_plans: 9
-  percent: 50
+  total_plans: 13
+  completed_plans: 10
+  percent: 77
 ---
 
 # Project State
@@ -24,16 +24,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-13)
 
 **Core value:** Correctness of binding — config → strongly-typed settings maps accurately across every supported shape (sections, arrays/enumerables, defaults, nullable, custom converters).
-**Current focus:** Phase 05 — Documentation (DOC-01) — planned (4 plans, 2 waves), ready to execute; Phase 04 complete
+**Current focus:** Phase 05 — Documentation
 
 ## Current Position
 
-Phase: 05 (documentation) — planned: 4 plans across 2 waves; ready to execute (DOC-01 only; AOT-01 deferred to v2.1)
-Next: /gsd-execute-phase 5
-Status: 4 plans created; RESEARCH + VALIDATION (13 DOC-VERIFICATION gates) written; plan-checker PASSED (2 verify-gate warnings fixed)
-Last activity: 2026-07-19 — Phase 05 planned (plan-checker passed)
+Phase: 05 (Documentation) — EXECUTING
+Next: Execute plan 05-02
+Status: Executing Phase 05 — plan 05-01 complete
+Last activity: 2026-07-20 — Completed 05-01 (docs canonicalization)
 
-Progress: [█████░░░░░] 50%
+Progress: [████████░░] 77%
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Progress: [█████░░░░░] 50%
 | Phase 04 P03 | 5min | 2 tasks | 10 files |
 | Phase 04 P05 | 3min | 1 tasks | 2 files |
 | Phase 04 P04 | ~35min | 2 tasks | 5 files |
+| Phase 05 P01 | 5min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-07-19
+Last session: 2026-07-20T09:09:53.421Z
 Stopped at: Phase 5 planned — 4 plans (2 waves), plan-checker PASSED; ready to execute
 Resume file: .planning/phases/05-documentation/05-CONTEXT.md

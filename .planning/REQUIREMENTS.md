@@ -67,7 +67,7 @@ Remaining open work (from `FIX-PLAN.md`), batched toward the first `v2.0.0-beta`
 
 ### Documentation
 
-- [ ] **DOC-01**: Refresh README + docs/ to canonical `ExistForAll.SimpleSettings` naming and current repo/package links; document the Phase 1–4 security/behavior guidance (secret-redaction; validator secret-safety incl. constructors; opt-in/deferred DI validation; validate⇒discoverable coupling; spaced-secrets binding; Phase-3 breaking-change list)
+- [x] **DOC-01**: Refresh README + docs/ to canonical `ExistForAll.SimpleSettings` naming and current repo/package links; document the Phase 1–4 security/behavior guidance (secret-redaction; validator secret-safety incl. constructors; opt-in/deferred DI validation; validate⇒discoverable coupling; spaced-secrets binding; Phase-3 breaking-change list)
 
 *(AOT-01 was mapped here but was **deferred to a future v2.1 milestone** on 2026-07-19 — see v2 Requirements → Deferred.)*
 
@@ -119,7 +119,7 @@ Deferred / held. Tracked but not in the current roadmap.
 | VAL-02 | Phase 4 | Complete |
 | API-02 | Phase 4 | ✓ Complete (#35) |
 | AOT-01 | v2.1 (deferred) | Deferred |
-| DOC-01 | Phase 5 | Pending |
+| DOC-01 | Phase 5 | Complete |
 | REL-01 | Phase 6 | Pending |
 
 **Coverage:**
