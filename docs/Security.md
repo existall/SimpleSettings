@@ -86,3 +86,12 @@ builder.AddCommandLine();
 ````
 
 Prefer the inline `--Key=value` form whenever a value could begin with `-` or `/`.
+
+## Migration (v1 -> v2)
+
+The v1 -> v2 release batched four breaking changes. Each is listed with what changed and what to do:
+
+- **`SettingsHolder` / `ISettingsHolder` are now internal.** These types are no longer part of the public surface — remove any consumer reference to them; use the public `SettingsBuilder` / `ISettingsCollection` / `ISettingsProvider` surface instead.
+- **The `Core.AspNet` package was dropped.** It exposed no public type. Remove any package reference to it; nothing you depended on lived there.
+- **The `Microsoft.Extensions.*` dependency floor is now per-TFM.** SimpleSettings floors to `8.0.x` on `net8.0` and to the current release on `net10.0`, so it no longer forces a single shared floor across target frameworks.
+- **A public `abstract SimpleSettingsException` base was introduced and boundary exceptions were made public and structured.** Catch `SimpleSettingsException` to handle every library error as one category. The old bare-`Exception` throw for a non-interface settings type is replaced by the public, structured `SettingsTypeNotInterfaceException`.
